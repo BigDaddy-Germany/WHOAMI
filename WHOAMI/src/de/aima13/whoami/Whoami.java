@@ -5,6 +5,6 @@ package de.aima13.whoami;
  */
 public class Whoami {
     public static void main(String[] args) {
-        
+
     }
 }

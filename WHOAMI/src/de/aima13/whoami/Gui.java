@@ -11,24 +11,4 @@ public class Gui extends Application {
     public void start(Stage stage) throws Exception {
 
     }
-
-    public void startGui() {
-
-    }
-
-    public void confirmAgb() {
-
-    }
-
-    public void showProgress() {
-
-    }
-
-    public void updateProgess() {
-
-    }
-
-    public void showReport() {
-
-    }
 }
