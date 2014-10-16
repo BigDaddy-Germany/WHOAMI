@@ -1,4 +1,3 @@
-*.class
+out/*
 .idea/workspace.xml
 .idea/tasks.xml
-.idea/ant.xml
