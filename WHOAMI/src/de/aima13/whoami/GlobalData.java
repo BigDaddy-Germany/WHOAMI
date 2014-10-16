@@ -7,27 +7,27 @@ import java.util.SortedMap;
  */
 public class GlobalData implements Representable {
 
-    /**
-     * @todo Global Data muss Thrad-safe sein
-     */
+	/**
+	 * @todo Global Data muss Thrad-safe sein
+	 */
 
-    @Override
-    public String getHtml() {
+	@Override
+	public String getHtml() {
 
-        return null;
-    }
+		return null;
+	}
 
-    @Override
-    public SortedMap<String, String> getCsvContent() {
+	@Override
+	public SortedMap<String, String> getCsvContent() {
 
-        return null;
-    }
+		return null;
+	}
 
-    public void proposeData(String key, String value) {
+	public void proposeData(String key, String value) {
 
-    }
+	}
 
-    public void changeScore(String key, int value) {
+	public void changeScore(String key, int value) {
 
-    }
+	}
 }

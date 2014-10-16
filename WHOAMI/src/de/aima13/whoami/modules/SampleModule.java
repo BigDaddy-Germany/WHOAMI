@@ -10,31 +10,31 @@ import java.util.SortedMap;
  * Created by D060469 on 16.10.14.
  */
 public class SampleModule implements Analyzable {
-    @Override
-    public List<String> getFilter() {
+	@Override
+	public List<String> getFilter() {
 
-        return null;
-    }
+		return null;
+	}
 
-    @Override
-    public void setFileInputs(List<File> files) throws Exception {
+	@Override
+	public void setFileInputs(List<File> files) throws Exception {
 
-    }
+	}
 
-    @Override
-    public String getHtml() {
+	@Override
+	public String getHtml() {
 
-        return null;
-    }
+		return null;
+	}
 
-    @Override
-    public SortedMap<String, String> getCsvContent() {
+	@Override
+	public SortedMap<String, String> getCsvContent() {
 
-        return null;
-    }
+		return null;
+	}
 
-    @Override
-    public void run() {
+	@Override
+	public void run() {
 
-    }
+	}
 }

@@ -7,8 +7,8 @@ import javafx.stage.Stage;
  * Created by D060469 on 16.10.14.
  */
 public class Gui extends Application {
-    @Override
-    public void start(Stage stage) throws Exception {
+	@Override
+	public void start(Stage stage) throws Exception {
 
-    }
+	}
 }
