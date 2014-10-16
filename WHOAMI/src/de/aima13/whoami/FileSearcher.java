@@ -1,6 +1,5 @@
 package de.aima13.whoami;
 
-import java.nio.file.SimpleFileVisitor;
 import java.util.List;
 
 /**
