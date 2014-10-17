@@ -10,7 +10,7 @@ public class ReportCreator {
 
 	}
 
-	public void savePdf() {
+	public void savePdf() throws Exception {
 
 	}
 

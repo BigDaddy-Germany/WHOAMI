@@ -4,23 +4,24 @@ package de.aima13.whoami;
  * Created by D060469 on 16.10.14.
  */
 public class GuiManager {
-	public void startGui() {
+	public static void startGui() {
 
 	}
 
-	public void confirmAgb() {
+	public static boolean confirmAgb() {
+
+		return true;
+	}
+
+	public static void showProgress() {
 
 	}
 
-	public void showProgress() {
+	public static void updateProgess(String status) {
 
 	}
 
-	public void updateProgess() {
-
-	}
-
-	public void showReport() {
+	public static void showReport(String reportHtml) {
 
 	}
 }
