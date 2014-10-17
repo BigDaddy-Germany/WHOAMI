@@ -17,7 +17,7 @@ public class GuiManager {
 
 	}
 
-	public static void updateProgess(String status) {
+	public static void updateProgress(String status) {
 
 	}
 

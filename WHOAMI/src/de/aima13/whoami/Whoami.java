@@ -23,16 +23,16 @@ public class Whoami {
 		// Fortschrittsanzeige einnblenden und immer wieder updaten
 		guiManager.showProgress();
 
-		guiManager.updateProgess("Lade und initialisiere Module...");
+		guiManager.updateProgress("Lade und initialisiere Module...");
 		moduleList = ModuleManager.getModuleList();
 
-		guiManager.updateProgess("Scanne Dateisystem...");
+		guiManager.updateProgress("Scanne Dateisystem...");
 		FileSearcher.startSearch(moduleList);
 
 		// Start der Sammlung der globalen Daten und Scores
 		globalData = new GlobalData();
 
-		guiManager.updateProgess("Analysiere gefundene Dateien...");
+		guiManager.updateProgress("Analysiere gefundene Dateien...");
 		try {
 			SlaveDriver.startModules(moduleList);
 		} catch (Exception e) {
