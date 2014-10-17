@@ -13,6 +13,10 @@ public class GuiManager {
 		return true;
 	}
 
+	public static void showGoodBye() {
+
+	}
+
 	public static void showProgress() {
 
 	}

@@ -17,6 +17,7 @@ public class Whoami {
 		guiManager.startGui();
 		if (!guiManager.confirmAgb()) {
 			// Beenden des Programms, falls der User die AGB ablehnt
+			GuiManager.showGoodBye();
 			System.exit(0);
 		}
 
