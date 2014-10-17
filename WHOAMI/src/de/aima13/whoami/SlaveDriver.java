@@ -11,10 +11,9 @@ public class SlaveDriver {
 
 	/**
 	 * @param analyzables Liste der zu startenden Module
-	 * @throws InterruptedException Ein oder mehrere Module konnten nicht komplett ausgeführt
 	 * werden
 	 */
-	public static void startModules(List<Analyzable> analyzables) throws InterruptedException {
+	public static void startModules(List<Analyzable> analyzables) {
 		// Liste der erstellten Threads
 		List<Thread> moduleThreads = new ArrayList<>();
 
@@ -27,7 +26,12 @@ public class SlaveDriver {
 
 		// Warten auf alle Module
 		for (Thread moduleThread : moduleThreads) {
-			moduleThread.join();
+			try {
+				moduleThread.join();
+			} catch (InterruptedException e) {
+				// sollte eigentlich nicht passieren, da keine Zeit bei Join angegeben wurde
+				e.printStackTrace();
+			}
 		}
 	}
 }

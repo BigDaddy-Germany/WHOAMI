@@ -1,6 +1,6 @@
 package de.aima13.whoami;
 
-import java.util.SortedMap;
+import java.util.Map;
 
 /**
  * Created by D060469 on 16.10.14.
@@ -16,5 +16,5 @@ public interface Representable {
 	 * Teil der späteren CSV-Datei
 	 * @return Key-Value Paare der Werte für die CSV-Datei
 	 */
-	public SortedMap<String, String> getCsvContent();
+	public Map<String, String> getCsvContent();
 }

@@ -47,14 +47,7 @@ public class Whoami {
 		GlobalData globalData = GlobalData.getInstance();
 
 		guiManager.updateProgress("Analysiere gefundene Dateien...");
-		try {
-			SlaveDriver.startModules(moduleList);
-		} catch (Exception e) {
-			/**
-			 * @todo Errorhandling SlaveDriver
-			 */
-			e.printStackTrace();
-		}
+		SlaveDriver.startModules(moduleList);
 
 		// Stelle persönliche Daten an den Anfang der Liste
 		representableList = new ArrayList<>();
