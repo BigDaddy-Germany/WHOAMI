@@ -1,5 +1,6 @@
 package de.aima13.whoami;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,9 +9,9 @@ import java.util.List;
  */
 public class Whoami {
 	public static void main(String[] args) {
-		GuiManager guiManager = new GuiManager();   // Steuerung der GUI
-		List<Analyzable> moduleList;                // Liste der Module
-		List<Representable> representableList;      // Liste der Representables
+		GuiManager guiManager = new GuiManager();                       // Steuerung der GUI
+		List<Analyzable> moduleList = new ArrayList<>();                // Liste der Module
+		List<Representable> representableList = new ArrayList<>();      // Liste der Representables
 
 		// Gui starten und AGB zur Bestätigung anzeigen
 		guiManager.startGui();
@@ -24,7 +25,20 @@ public class Whoami {
 		guiManager.showProgress();
 
 		guiManager.updateProgress("Lade und initialisiere Module...");
-		moduleList = ModuleManager.getModuleList();
+		/**
+		 * @todo Errorhandling
+		 */
+		try {
+			moduleList = ModuleManager.getModuleList();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		guiManager.updateProgress("Scanne Dateisystem...");
 		FileSearcher.startSearch(moduleList);
