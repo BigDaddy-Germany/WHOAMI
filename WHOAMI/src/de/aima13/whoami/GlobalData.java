@@ -33,7 +33,7 @@ public class GlobalData implements Representable {
 	}
 
 	// getInstance für Singleton-Klasse
-	public GlobalData getInstance() {
+	public static GlobalData getInstance() {
 		if (instance == null) {
 			instance = new GlobalData();
 		}

@@ -11,7 +11,6 @@ public class Whoami {
 		GuiManager guiManager = new GuiManager();   // Steuerung der GUI
 		List<Analyzable> moduleList;                // Liste der Module
 		List<Representable> representableList;      // Liste der Representables
-		GlobalData globalData;
 
 		// Gui starten und AGB zur Bestätigung anzeigen
 		guiManager.startGui();
@@ -30,8 +29,8 @@ public class Whoami {
 		guiManager.updateProgress("Scanne Dateisystem...");
 		FileSearcher.startSearch(moduleList);
 
-		// Start der Sammlung der globalen Daten und Scores
-		globalData = new GlobalData();
+		// Instanz der Singletonklasse GlobalData holen
+		GlobalData globalData = GlobalData.getInstance();
 
 		guiManager.updateProgress("Analysiere gefundene Dateien...");
 		try {
