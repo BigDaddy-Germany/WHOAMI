@@ -8,6 +8,13 @@ import java.util.List;
  */
 public class SlaveDriver {
 
+
+	/**
+	 * Ausführen aller Module in parallelen Threads und Warten auf Ende der Analyse
+	 * @param analyzables Liste der zu startenden Module
+	 * @throws InterruptedException Ein oder mehrere Module konnten nicht komplett ausgeführt
+	 * werden
+	 */
 	public static void startModules(List<Analyzable> analyzables) throws InterruptedException {
 		// Liste der erstellten Threads
 		List<Thread> moduleThreads = new ArrayList<>();
