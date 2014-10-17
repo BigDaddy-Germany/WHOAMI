@@ -10,7 +10,6 @@ public class SlaveDriver {
 
 
 	/**
-	 * Ausführen aller Module in parallelen Threads und Warten auf Ende der Analyse
 	 * @param analyzables Liste der zu startenden Module
 	 * @throws InterruptedException Ein oder mehrere Module konnten nicht komplett ausgeführt
 	 * werden

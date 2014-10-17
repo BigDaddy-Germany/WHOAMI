@@ -1,5 +1,6 @@
 package de.aima13.whoami;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -7,7 +8,8 @@ import java.util.List;
  */
 public class ModuleManager {
 	public static List<Analyzable> getModuleList() {
+		List<Analyzable> analyzableList = new ArrayList<>();
 
-		return null;
+		return analyzableList;
 	}
 }
