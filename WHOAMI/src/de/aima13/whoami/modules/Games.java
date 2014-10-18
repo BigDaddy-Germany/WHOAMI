@@ -12,9 +12,28 @@ import java.util.*;
  */
 public class Games implements Analyzable {
 
+	/**
+	 * Datenstruktur "Spiel"
+	 */
 	private static class GameEntry {
 		public String name;
 		public Date installed;
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public Date getInstalled() {
+			return installed;
+		}
+
+		public void setInstalled(Date installed) {
+			this.installed = installed;
+		}
 	}
 
 	/**
@@ -23,13 +42,27 @@ public class Games implements Analyzable {
 	private class GameList extends ArrayList<GameEntry> {
 		/**
 		 * Spiel nach Duplikatscheck hinzufügen
+		 *
 		 * @param game Neues Spiel
 		 * @return Tatsächlich hinzugefügt?
 		 */
 		public boolean addUnique(GameEntry game) {
 			return this.add(game);
 		}
+
+		/**
+		 * Sortiert Spieleliste nach Installationsdatum
+		 */
+		public void sortByLatestInstall() {
+			Collections.sort(this, new Comparator<GameEntry>() {
+				@Override
+				public int compare(GameEntry o1, GameEntry o2) {
+					return o2.getInstalled().compareTo(o1.getInstalled());
+				}
+			});
+		}
 	}
+
 	private LinkedList<File> exeFiles;
 
 	private String steamNickname = null;
