@@ -3,16 +3,37 @@ package de.aima13.whoami.modules;
 import de.aima13.whoami.Analyzable;
 
 import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.SortedMap;
+import java.util.*;
 
 /**
+ * Spielemodul sucht installierte Spiele, kommentiert diese und liefert Zocker-Score
  *
+ * @author Niko Berkmann
  */
 public class Games implements Analyzable {
-	private List<File> exeFiles;
-	private File steamAppsFolder;
+
+	private static class GameEntry {
+		public String name;
+		public Date installed;
+	}
+
+	/**
+	 * Spieleliste hält einzigartige Einträge von Spielen, ggf. nach Installationszeitpunkt sortiert
+	 */
+	private class GameList extends ArrayList<GameEntry> {
+		/**
+		 * Spiel nach Duplikatscheck hinzufügen
+		 * @param game Neues Spiel
+		 * @return Tatsächlich hinzugefügt?
+		 */
+		public boolean addUnique(GameEntry game) {
+			return this.add(game);
+		}
+	}
+	private LinkedList<File> exeFiles;
+
+	private String steamNickname = null;
+	private File steamAppsFolder = null;
 
 	/**
 	 * Spielemodul fragt nach einer Liste von Executables und benötigt den Pfad eines
