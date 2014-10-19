@@ -15,12 +15,14 @@ import java.util.regex.Matcher;
 public class FileSearcher {
 
 	// Dieser Pfad wird als root dir zum Suchen genutzt, wenn ungleich null
+	/*
 	private static final String[] DEBUG_TEST_DIR = {
-			"C:\\Users\\D060469\\Desktop\\Praxisphase3",
-			"C:\\Users\\D060469\\Desktop\\alzeyer-schulen-design"
+			"C:\\Users\\D060469\\Desktop\\myTestFolder1",
+			"C:\\Users\\D060469\\Desktop\\myTestFolder2"
 	};
+	*/
 
-	// private static final String DEBUG_TEST_DIR = null;
+	private static final String[] DEBUG_TEST_DIR = null;
 
 	/**
 	 * Interne Klasse zum Nutzen des SimpleFileVisitors
