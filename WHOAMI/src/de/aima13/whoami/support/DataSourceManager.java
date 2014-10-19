@@ -35,6 +35,11 @@ public class DataSourceManager {
 		});
 
 	}
+
+	/**
+	 * Zur Abfrage, ob Verbindung noch offen ist bzw von null verschieden.
+	 * @return Boolean, der angibt ob die Verbindung zustande gekommen ist, bzw. noch offen ist.
+	 */
 	public boolean isConnected(){
 		try {
 			return  !dbConnection.isClosed();
