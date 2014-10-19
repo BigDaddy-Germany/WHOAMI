@@ -21,7 +21,7 @@ public class SampleModule2 implements Analyzable {
 		System.out.println("Nun gebe ich meine Filtereinstellungen aus.");
 
 		List<String> filter = new ArrayList<>();
-		filter.add("*.css");
+		filter.add("**.css");
 
 		return filter;
 	}

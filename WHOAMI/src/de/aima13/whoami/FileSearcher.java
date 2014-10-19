@@ -69,12 +69,11 @@ public class FileSearcher {
 		@Override
 		public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 			// Kontrolle, ob Datei gebraucht wird
-			Path name = file.getFileName();
-			if (name != null && file.toFile().isFile()) {
+			if (file != null && file.toFile().isFile()) {
 
 				// Durchsuche alle Module und entscheide, ob Datei gebraucht wird
 				for (Map.Entry<Analyzable, PathMatcher> matcherEntry : this.matcherMap.entrySet()) {
-					if (matcherEntry.getValue().matches(name)) {
+					if (matcherEntry.getValue().matches(file)) {
 
 						// Zuweisung durchführen
 						this.resultMap.get(matcherEntry.getKey()).add(file.toFile());

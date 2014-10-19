@@ -18,8 +18,8 @@ public class SampleModule implements Analyzable {
 		System.out.println("Nun gebe ich meine Filtereinstellungen aus.");
 
 		List<String> filter = new ArrayList<>();
-		filter.add("PF3*");
-		filter.add("*.php");
+		filter.add("**PF3*");
+		filter.add("**.php");
 
 		return filter;
 	}
