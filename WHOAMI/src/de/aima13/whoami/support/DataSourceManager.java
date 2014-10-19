@@ -17,16 +17,11 @@ public class DataSourceManager {
 	 *
 	 * @param sqliteDatabase Dateipfad zur benötigten sqlite Datenbank.
 	 */
-	public DataSourceManager(File sqliteDatabase) {
-		try {
-			Class.forName("org.sqlite.JDBC");
-			dbConnection = DriverManager.getConnection
+	public DataSourceManager(File sqliteDatabase) throws ClassNotFoundException, SQLException {
+		Class.forName("org.sqlite.JDBC");
+		dbConnection = DriverManager.getConnection
 					("jdbc:sqlite:" + sqliteDatabase.getAbsolutePath());
-		} catch (ClassNotFoundException e) {
 
-		} catch (SQLException e) {
-
-		}
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {
 				try {
@@ -39,6 +34,13 @@ public class DataSourceManager {
 			}
 		});
 
+	}
+	public boolean isConnected(){
+		try {
+			return  !dbConnection.isClosed();
+		} catch (SQLException e) {
+			return false;
+		}
 	}
 
 	/**
