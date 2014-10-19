@@ -14,22 +14,21 @@ public class Whoami {
 	public static void main(String[] args) {
 		startTime = System.currentTimeMillis();
 
-		GuiManager guiManager = new GuiManager();                       // Steuerung der GUI
 		List<Analyzable> moduleList = new ArrayList<>();                // Liste der Module
 		List<Representable> representableList = new ArrayList<>();      // Liste der Representables
 
 		// Gui starten und AGB zur Bestätigung anzeigen
-		guiManager.startGui();
-		if (!guiManager.confirmAgb()) {
+		GuiManager.startGui();
+		if (!GuiManager.confirmAgb()) {
 			// Beenden des Programms, falls der User die AGB ablehnt
 			GuiManager.showGoodBye();
 			System.exit(0);
 		}
 
 		// Fortschrittsanzeige einnblenden und immer wieder updaten
-		guiManager.showProgress();
+		GuiManager.showProgress();
 
-		guiManager.updateProgress("Lade und initialisiere Module...");
+		GuiManager.updateProgress("Lade und initialisiere Module...");
 		/**
 		 * @todo Errorhandling
 		 */
@@ -45,13 +44,13 @@ public class Whoami {
 			e.printStackTrace();
 		}
 
-		guiManager.updateProgress("Scanne Dateisystem...");
+		GuiManager.updateProgress("Scanne Dateisystem...");
 		FileSearcher.startSearch(moduleList);
 
 		// Instanz der Singletonklasse GlobalData holen
 		GlobalData globalData = GlobalData.getInstance();
 
-		guiManager.updateProgress("Analysiere gefundene Dateien...");
+		GuiManager.updateProgress("Analysiere gefundene Dateien...");
 		SlaveDriver.startModules(moduleList);
 
 		// Stelle persönliche Daten an den Anfang der Liste
