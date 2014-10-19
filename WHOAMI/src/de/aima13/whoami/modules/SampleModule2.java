@@ -3,13 +3,16 @@ package de.aima13.whoami.modules;
 import de.aima13.whoami.Analyzable;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * Created by D060469 on 16.10.14.
  */
-public class SampleModule implements Analyzable {
-	public SampleModule() {
+public class SampleModule2 implements Analyzable {
+	public SampleModule2() {
 		System.out.println("Ich wurde konstruiert.");
 	}
 
@@ -18,8 +21,7 @@ public class SampleModule implements Analyzable {
 		System.out.println("Nun gebe ich meine Filtereinstellungen aus.");
 
 		List<String> filter = new ArrayList<>();
-		filter.add("PF3*");
-		filter.add("*.php");
+		filter.add("*.css");
 
 		return filter;
 	}
