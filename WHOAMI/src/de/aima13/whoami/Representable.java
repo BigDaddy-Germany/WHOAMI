@@ -1,20 +1,22 @@
 package de.aima13.whoami;
 
-import java.util.Map;
+import java.util.SortedMap;
 
 /**
  * Created by D060469 on 16.10.14.
+ * Alle Klassen, die im Bericht dargestellt werden können, implementieren dieses Interface
  */
 public interface Representable {
+
 	/**
-	 * Teil des Reports in Form eines HTML-Schnipsels
-	 * @return Der HTML Code
+	 * Rückgabe des beigesteuerten Teils des Berichtes
+	 * @return Teil des Berichtes im HTML-Format
 	 */
 	public String getHtml();
 
 	/**
-	 * Teil der späteren CSV-Datei
-	 * @return Key-Value Paare der Werte für die CSV-Datei
+	 * Rückgabe des beigesteuerten Teils der CSV-Datei
+	 * @return Teil der CSV als Key-Value Paare (SortedMap)
 	 */
-	public Map<String, String> getCsvContent();
+	public SortedMap<String, String> getCsvContent();
 }
