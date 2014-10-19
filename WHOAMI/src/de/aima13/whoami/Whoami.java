@@ -8,12 +8,16 @@ public class Whoami {
 	private static long startTime;
 
 	public static void main(String[] args) {
-		startTime = System.nanoTime();
-		
+		startTime = System.currentTimeMillis();
+
 	}
 
+	/**
+	 * Information über die bisherige und restliche Laufzeit des Programms
+	 * @return Ganzzahliger Prozentwert zwischen 0 und 100 (100: Zeit ist um)
+	 */
 	public static int getTimeProgress() {
-		float elapsedTime = (float) ((System.nanoTime() - startTime) / 1000000000);
+		float elapsedTime = (float) ((System.currentTimeMillis() - startTime) / 1000);
 		int timeProgress = (int) (elapsedTime / ANALYZE_TIME * 100);
 
 		if (timeProgress < 100) {
