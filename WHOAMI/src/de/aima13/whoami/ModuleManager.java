@@ -21,12 +21,11 @@ public class ModuleManager {
 	 * Gibt eine Liste der Instanzen aller Module zurück
 	 * @return Die Liste der Module
 	 * @throws ClassNotFoundException
-	 * @throws IllegalAccessException
 	 * @throws InstantiationException
 	 * @throws IOException
 	 */
 	public static List<Analyzable> getModuleList() throws ClassNotFoundException,
-			IllegalAccessException, InstantiationException, IOException {
+			InstantiationException, IOException {
 
 		List<Analyzable> moduleList = new ArrayList<>();
 
@@ -36,8 +35,22 @@ public class ModuleManager {
 		// Liste aller Klassen abfragen und iterieren
 		final Class[] classes = getClasses(MODULE_PACKAGE);
 		for (Class cl : classes) {
-			Analyzable module = (Analyzable) cl.newInstance();
-			moduleList.add(module);
+			Analyzable module = null;
+			try {
+				module = (Analyzable) cl.newInstance();
+				Class[] moduleInterfaces = module.getClass().getInterfaces();
+				for (Class moduleInterface : moduleInterfaces) {
+					if (moduleInterface.equals(Analyzable.class)) {
+						moduleList.add(module);
+						break;
+					}
+				}
+
+			} catch (IllegalAccessException e) {
+				// do nothing.
+			} catch (InstantiationException e) {
+				// do nothing.
+			}
 		}
 
 		return moduleList;

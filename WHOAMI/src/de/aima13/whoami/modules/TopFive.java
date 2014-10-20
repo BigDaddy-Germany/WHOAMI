@@ -131,9 +131,7 @@ public class TopFive implements Analyzable {
 				// kann nicht auf Spalten zugreifen oder Ergebnis leer
 			}
 		}
-		if (!results.isEmpty()) {
-			prepareOutput();
-		}
+		prepareOutput();
 	}
 
 	/**
