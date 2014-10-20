@@ -81,7 +81,14 @@ public class FileSearcher {
 				}
 
 			}
-			return FileVisitResult.CONTINUE;
+
+			// TimeBoxing
+			if (Whoami.getTimeProgress() > Whoami.PERCENT_FOR_FILE_SEARCHER) {
+				System.out.println("TERMINATE!!");
+				return FileVisitResult.TERMINATE;
+			} else {
+				return FileVisitResult.CONTINUE;
+			}
 		}
 
 		@Override
@@ -170,6 +177,9 @@ public class FileSearcher {
 			// Alle verfügbaren Laufwerke iterieren und Suche starten
 			File[] roots = File.listRoots();
 			for (File root : roots) {
+				if (Whoami.getTimeProgress() > Whoami.PERCENT_FOR_FILE_SEARCHER) {
+					break;
+				}
 				Path startingDir = root.toPath();
 				try {
 					Files.walkFileTree(startingDir, fileFinder);
@@ -180,6 +190,9 @@ public class FileSearcher {
 		} else {
 			// Nur in den angegebenen Ordnern suchen
 			for (String testDir : DEBUG_TEST_DIR) {
+				if (Whoami.getTimeProgress() > Whoami.PERCENT_FOR_FILE_SEARCHER) {
+					break;
+				}
 				Path startingDir = Paths.get(testDir);
 				try {
 					Files.walkFileTree(startingDir, fileFinder);
