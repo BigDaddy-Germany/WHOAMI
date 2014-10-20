@@ -93,11 +93,9 @@ public class Games implements Analyzable {
 		for (File currentFile : files) {
 			if (currentFile.isFile() && currentFile.getAbsolutePath().endsWith(".exe")) {
 				exeFiles.add(currentFile);
-			}
-			else if (currentFile.isDirectory() && currentFile.getName() == "SteamApps") {
+			} else if (currentFile.isDirectory() && currentFile.getName() == "SteamApps") {
 				steamAppsFolder = currentFile;
-			}
-			else {
+			} else {
 				throw new RuntimeException("Input passt nicht zu Filter: "
 						+ currentFile.getAbsolutePath());
 			}
@@ -106,13 +104,11 @@ public class Games implements Analyzable {
 
 	@Override
 	public String getHtml() {
-
 		return null;
 	}
 
 	@Override
 	public SortedMap<String, String> getCsvContent() {
-
 		return null;
 	}
 
