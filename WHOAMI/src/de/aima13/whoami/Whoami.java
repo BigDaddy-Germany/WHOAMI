@@ -38,8 +38,6 @@ public class Whoami {
 			moduleList = ModuleManager.getModuleList();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
 		} catch (InstantiationException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
