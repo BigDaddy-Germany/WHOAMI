@@ -38,10 +38,19 @@ public class ModuleManager {
 			Analyzable module = null;
 			try {
 				module = (Analyzable) cl.newInstance();
+				Class[] moduleInterfaces = module.getClass().getInterfaces();
+				for (Class moduleInterface : moduleInterfaces) {
+					if (moduleInterface.equals(Analyzable.class)) {
+						moduleList.add(module);
+						break;
+					}
+				}
+
 			} catch (IllegalAccessException e) {
 				// do nothing.
+			} catch (InstantiationException e) {
+				// do nothing.
 			}
-			moduleList.add(module);
 		}
 
 		return moduleList;
