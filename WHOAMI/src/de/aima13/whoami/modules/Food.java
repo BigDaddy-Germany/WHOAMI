@@ -22,12 +22,12 @@ public class Food implements Analyzable {
 	@Override
 	public List<String> getFilter() {
 		List<String> searchList = new ArrayList<String>();
-		searchList.add("Rezepte");
-		searchList.add("Rezept");
-		searchList.add("Rezept");
-		searchList.add("backen");
-		searchList.add("Kuchen");
-		searchList.add("Pizza");
+		searchList.add("**"+File.separator+"Rezepte");
+		searchList.add("**"+File.separator+"Rezept");
+		searchList.add("**"+File.separator+"rezept");
+		searchList.add("**"+File.separator+"backen");
+		searchList.add("**"+File.separator+"Kuchen");
+		searchList.add("**"+File.separator+"Pizza");
 
 		return searchList;
 	}
@@ -73,9 +73,9 @@ public class Food implements Analyzable {
 	public void run() {
 		//*********************debugging for Unix Systems only*******
 
-		File f = new File("/Volumes/internal/debugg/Rezepte/Kuchen.txt");
-		myFoodFiles = new ArrayList<File>();
-		myFoodFiles.add(f);
+		//File f = new File("/Volumes/internal/debugg/Rezepte/Kuchen.txt");
+		//myFoodFiles = new ArrayList<File>();
+		//myFoodFiles.add(f);
 		String x=this.parseChefkochUrl("http://www.chefkoch" +
 				".de/rezepte/1108101216891426/Apfelkuchen-mit-Streuseln-vom-Blech.html");
 
