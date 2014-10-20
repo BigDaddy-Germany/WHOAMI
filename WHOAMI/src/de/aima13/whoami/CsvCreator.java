@@ -82,14 +82,6 @@ public class CsvCreator {
 
 		Writer fileWriter;
 
-		File test = new File(FILE_NAME);
-		FileWriter newWriter;
-		try {
-			newWriter = new FileWriter(test);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
 		switch (csvStatus) {
 			case DOESNT_EXIST:
 				try {
@@ -156,7 +148,11 @@ public class CsvCreator {
 		}
 		writer.writeNext(csvData);
 
-
+		try {
+			writer.close();
+		} catch (IOException e) {
+			return false;
+		}
 
 
 		// wenn wir hier gelandet sind, sollte es geklappt haben.
