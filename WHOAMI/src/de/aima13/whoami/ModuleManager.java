@@ -21,7 +21,6 @@ public class ModuleManager {
 	 * Gibt eine Liste der Instanzen aller Module zurück
 	 * @return Die Liste der Module
 	 * @throws ClassNotFoundException
-	 * @throws IllegalAccessException
 	 * @throws InstantiationException
 	 * @throws IOException
 	 */
