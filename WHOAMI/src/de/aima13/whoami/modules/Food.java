@@ -1,7 +1,6 @@
 package de.aima13.whoami.modules;
 
 import de.aima13.whoami.Analyzable;
-import de.aima13.whoami.GlobalData;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -14,7 +13,7 @@ import java.util.TreeMap;
  */
 public class Food implements Analyzable {
 
-	private List<File> myFiles;
+	private List<File> myFoodFiles;
 	//besonderheiten
 	private String myHtml="<h1>Essen</h1>";
 	private TreeMap<String, String> myCsvData = new TreeMap<String,String>();
@@ -38,7 +37,7 @@ public class Food implements Analyzable {
 		if(files==null){
 			throw new IllegalArgumentException("I need input to do stuff");
 		}else{
-			myFiles=files;
+			myFoodFiles =files;
 		}
 	}
 
@@ -54,29 +53,63 @@ public class Food implements Analyzable {
 		return myCsvData;
 	}
 
+	/**
+	 * Diese Methode versucht anhand der URL herauszufinden um welches Gericht es sich bei einer
+	 * gegeben url von chefkoch.de handelt
+	 * @param url eine URL von Chefkoch
+	 * @return DEr Name des Gerichtes wird zurückgegeben
+	 */
+	private String parseChefkochUrl(String url){
+		String[] urlParts = url.split("/");
+		//immer den letzten PArt nehmen, da der anfangsteil immer varieren kann
+		url=urlParts[urlParts.length-1];
+		//jetzt noch Bindestriche und .html entfernen
+		url=url.replace('-',' ');
+		url=url.substring(0,url.length()-5);
+		return url;
+	}
+
 	@Override
 	public void run() {
-		if(myFiles.size()!=0) {
+		//*********************debugging for Unix Systems only*******
 
-		myHtml+="<p>"+myFiles.size() + " Rezepte wurden auf diesem PC gefunden.";
-		myCsvData.put("Anzahl Rezepte",""+myFiles.size());
+		File f = new File("/Volumes/internal/debugg/Rezepte/Kuchen.txt");
+		myFoodFiles = new ArrayList<File>();
+		myFoodFiles.add(f);
+		String x=this.parseChefkochUrl("http://www.chefkoch" +
+				".de/rezepte/1108101216891426/Apfelkuchen-mit-Streuseln-vom-Blech.html");
+
+		//*************************************************************
+
+
+
+
+		if(myFoodFiles!=null && myFoodFiles.size()!=0  ) {
+
+		myHtml+="<p>"+ myFoodFiles.size() + " Rezepte wurden auf diesem PC gefunden.";
+		myCsvData.put("Anzahl Rezepte",""+ myFoodFiles.size());
 
 		//herausfinden welche Datei zuletzt erzeugt wurde
 
-			File lastCreated = myFiles.get(0);
 
-			for (int i = 1; i < myFiles.size(); i++) {
+			//TODO: Run Methode in sinnvolle Untermethoden aufschlüsseln
+			//TODO: IN FOR EACH SCHLEIFE UMWANDELN DA PERFORMANTER
+			File latestReciept = myFoodFiles.get(0);
+
+			for (int i = 1; i < myFoodFiles.size(); i++) {
 				File curr;
-				curr = myFiles.get(i);
-				if (lastCreated.lastModified() < curr.lastModified()) {
-					lastCreated = curr;
+				curr = myFoodFiles.get(i);
+				if (latestReciept.lastModified() < curr.lastModified()) {
+					latestReciept = curr;
 				}
 			}
-			myHtml += "<p>Zuletzt hast du das Rezept:\"" + lastCreated.getName() + "\" bearbeitet.</p>";
-			myCsvData.put("Zuletzt geändertes Rezept", lastCreated.getName());
+			//Dateiendung wird hier mit ausgegeben
+			myHtml += "<p>Zuletzt hast du das Rezept:\"" + latestReciept.getName()
+					+ "\" bearbeitet.</p>";
+			myCsvData.put("Zuletzt geändertes Rezept", latestReciept.getName());
 		}else{
 			myHtml += "<p>Keine Rezepte gefunden. Mami kocht wohl immer noch am besten, was?</p>";
-			//GlobalData.changeScore("Faulenzerfaktor",5);
+			//GlobalData.getInstance()changeScore("Faulenzerfaktor",5);
 		}
 
 		//ToDo
@@ -86,10 +119,10 @@ public class Food implements Analyzable {
 
 
 		if(pizzaFound){
-			//GlobalData.changeScore("Nerdfaktor",5);
-			//GlobalData.changeScore("Faulenzerfaktor",5);
+			//GlobalData.getInstance().changeScore("Nerdfaktor",5);
+			//GlobalData.getInstance()changeScore("Faulenzerfaktor",5);
 		}
-		//GlobalData.changeScore("Faulenzerfaktor",countDeliveryServices*3);
+		//GlobalData.getInstance()changeScore("Faulenzerfaktor",countDeliveryServices*3);
 
 
 	}
