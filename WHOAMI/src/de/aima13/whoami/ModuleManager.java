@@ -2,6 +2,7 @@ package de.aima13.whoami;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -58,7 +59,11 @@ public class ModuleManager {
 		List<File> dirs = new ArrayList<>();
 		while (resources.hasMoreElements()) {
 			URL resource = resources.nextElement();
-			dirs.add(new File(resource.getFile().replace("%20", " ")));
+			try {
+				dirs.add(new File(resource.toURI()));
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
 		}
 		ArrayList<Class> classes = new ArrayList<>();
 		for (File directory : dirs) {
