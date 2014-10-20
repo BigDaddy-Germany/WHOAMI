@@ -55,12 +55,12 @@ public class ModuleManager {
 		String path = packageName.replace('.', '/');
 		Enumeration<URL> resources = CLASS_LOADER.getResources(path);
 
-		List<File> dirs = new ArrayList<File>();
+		List<File> dirs = new ArrayList<>();
 		while (resources.hasMoreElements()) {
 			URL resource = resources.nextElement();
-			dirs.add(new File(resource.getFile()));
+			dirs.add(new File(resource.getFile().replace("%20", " ")));
 		}
-		ArrayList<Class> classes = new ArrayList<Class>();
+		ArrayList<Class> classes = new ArrayList<>();
 		for (File directory : dirs) {
 			classes.addAll(findClasses(directory, packageName));
 		}
