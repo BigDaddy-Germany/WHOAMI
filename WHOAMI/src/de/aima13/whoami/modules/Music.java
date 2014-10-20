@@ -1,12 +1,11 @@
 package de.aima13.whoami.modules;
 
 import de.aima13.whoami.Analyzable;
-import sun.java2d.cmm.Profile;
 
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import org.apache.tika.exception.TikaException;
@@ -23,31 +22,56 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  */
 public class Music implements Analyzable { //Analysable enthält runnable und representable
+
+
+	List<File> localFiles = new ArrayList<File>();
+	List<File> musicDatabases = new ArrayList<File>();
+	List<File> browserFiles = new ArrayList<File>();
+
 	@Override
 	//Rückgabe einer Liste der vom Modul akzeptierten bzw. geforderten Dateitypen.
 	//mit diesen Dateitypen kann das Modul arbeiten.
 	public List<String> getFilter() {
+		//a) Sammelt bisher nur MP3-Dateien (.FLAC, .RM, .acc, .ogg, .wav?)
+		List<String> filterMusic = new ArrayList<String>();
+		filterMusic.add("*.mp3");
+		filterMusic.add("*.MP3");
 
-		return null;
+		//b) Browser-history
+		filterMusic.add("**Google/Profile/*/history");
+		filterMusic.add("**Firefox**places.sqlite");
+		return filterMusic;
+
+		//c) windows (registry)?: spotify, wimp, naster... (?)
+		//-> Keine Daten oder RegDaten?
+
 	}
+
 
 	@Override
 	//Die Eingabe der für das Modul gefundenen Dateien durch den Scanner erfolgt über diese Methode
 	public void setFileInputs(List<File> files) throws Exception {
-		//files.add(** -> über Ordnergrenzen, * -> ?)
-		//FilenameFilter?
-		//FileNameExtensionFilter(.MP3);
-		//files.add('**.MP3');
-		//files.add('**Google/Profile/*/history');
-		//setFileInputs(files);
 
-		//Suche Dateitypen:
+		//Überprüfe ob überhaupt Daten gefunden wurden
+		if (files != null && !files.isEmpty()) {
+			musicDatabases = files;
+		}
+		else {
+			throw new IllegalArgumentException("Keine Musikspuren gefunden");
+		}
 
-		/*
-		a) lokal: .MP3, .FLAC, .RM, .acc, .ogg, .wav -> ID3 Tag ist doch nur bei MP3 oder?
-		b) browser: youtube.com, spotify.com, myvideo.com...
-		c) windows (registry)?: spotify, wimp, naster... (?)
-		 */
+		//Spalte Dateien in BrowserFiles und lokale Dateien auf
+		for(File element : musicDatabases){
+			if(element.getName().contains(".mp3")){
+				localFiles.add(element);
+			}
+			else {
+				browserFiles.add(element);
+			}
+			}
+		}
+
+
 
 	}
 
@@ -65,11 +89,10 @@ public class Music implements Analyzable { //Analysable enthält runnable und re
 	}
 
 	@Override
-	//Start der eigentlichen Analyse der Musik
+	//Steuerung der Analyse der Musik
 	public void run() {
 
 	}
-
 
 	public void scoreUser(){
 
@@ -78,14 +101,12 @@ public class Music implements Analyzable { //Analysable enthält runnable und re
 	//http://stackoverflow.com/questions/1645803/how-to-read-mp3-file-tags
 	public void readId3Tag() {
 		/**
-		 * @param args
+		 * @param
 		 */
-		public static void main (String[]args){
 			//String fileLocation = "G:/asas/album/song.mp3"
-			foreach(file : files) {
-
+			for(File file : localFiles) {
 				try {
-
+					String fileLocation = file.getCanonicalPath();
 					InputStream input = new FileInputStream(new File(fileLocation));
 					ContentHandler handler = new DefaultHandler();
 					Metadata metadata = new Metadata();
@@ -123,7 +144,6 @@ public class Music implements Analyzable { //Analysable enthält runnable und re
 
 		}
 	}
-
 
 
 	public void checkNativeClients() {
