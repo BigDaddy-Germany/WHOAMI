@@ -1,6 +1,7 @@
 package de.aima13.whoami.modules;
 
 import de.aima13.whoami.Analyzable;
+import de.aima13.whoami.GlobalData;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -15,19 +16,19 @@ public class Food implements Analyzable {
 
 	private List<File> myFoodFiles;
 	//besonderheiten
-	private String myHtml="<h1>Essen</h1>";
+	private String myHtml="<h1>Essen</h1>\n";
 	private TreeMap<String, String> myCsvData = new TreeMap<String,String>();
 
 
 	@Override
 	public List<String> getFilter() {
 		List<String> searchList = new ArrayList<String>();
-		searchList.add("**"+File.separator+"Rezepte");
-		searchList.add("**"+File.separator+"Rezept");
-		searchList.add("**"+File.separator+"rezept");
-		searchList.add("**"+File.separator+"backen");
-		searchList.add("**"+File.separator+"Kuchen");
-		searchList.add("**"+File.separator+"Pizza");
+		searchList.add("**"+File.separator+"Rezepte"+File.separator+"**");
+		searchList.add("**"+File.separator+"Rezept"+File.separator+"**");
+		searchList.add("**"+File.separator+"rezept"+File.separator+"**");
+		searchList.add("**"+File.separator+"backen"+File.separator+"**");
+		searchList.add("**"+File.separator+"Kuchen"+File.separator+"**");
+		searchList.add("**"+File.separator+"Pizza"+File.separator+"**");
 
 		return searchList;
 	}
@@ -86,7 +87,7 @@ public class Food implements Analyzable {
 
 		if(myFoodFiles!=null && myFoodFiles.size()!=0  ) {
 
-		myHtml+="<p>"+ myFoodFiles.size() + " Rezepte wurden auf diesem PC gefunden.";
+		myHtml+="<p>"+ myFoodFiles.size() + " Rezepte wurden auf diesem PC gefunden.\n";
 		myCsvData.put("Anzahl Rezepte",""+ myFoodFiles.size());
 
 		//herausfinden welche Datei zuletzt erzeugt wurde
@@ -105,25 +106,32 @@ public class Food implements Analyzable {
 			}
 			//Dateiendung wird hier mit ausgegeben
 			myHtml += "<p>Zuletzt hast du das Rezept:\"" + latestReciept.getName()
-					+ "\" bearbeitet.</p>";
+					+ "\" bearbeitet.</p>\n";
 			myCsvData.put("Zuletzt geändertes Rezept", latestReciept.getName());
 		}else{
-			myHtml += "<p>Keine Rezepte gefunden. Mami kocht wohl immer noch am besten, was?</p>";
-			//GlobalData.getInstance()changeScore("Faulenzerfaktor",5);
+			myHtml += "<p>Keine Rezepte gefunden. Mami kocht wohl immer noch am besten, was?</p>\n";
+			GlobalData.getInstance().changeScore("Faulenzerfaktor",5);
 		}
+		this.analyzeDelieveryServices();
+		this.analyzeOnlineCookBooks();
 
-		//ToDo
+
+	}
+	private void analyzeDelieveryServices(){
 		boolean pizzaFound =false;
 		int countDeliveryServices=0;
 		//Suche nach Pizzerien/Lieferservicen
 
 
 		if(pizzaFound){
-			//GlobalData.getInstance().changeScore("Nerdfaktor",5);
-			//GlobalData.getInstance()changeScore("Faulenzerfaktor",5);
+			GlobalData.getInstance().changeScore("Nerdfaktor",5);
+			GlobalData.getInstance().changeScore("Faulenzerfaktor", 5);
 		}
-		//GlobalData.getInstance()changeScore("Faulenzerfaktor",countDeliveryServices*3);
+		GlobalData.getInstance().changeScore("Faulenzerfaktor",countDeliveryServices*3);
 
+
+	}
+	private void analyzeOnlineCookBooks(){
 
 	}
 }
