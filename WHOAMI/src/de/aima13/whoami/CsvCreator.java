@@ -23,8 +23,8 @@ public class CsvCreator {
 	private static final File csvFile = new File(FILE_NAME); // File Datei der CSV Datei
 	private static final String PREFIX_SEPERATOR = "_"; // Seperator zw. Modulname und Header
 
-	private static final char CSV_SEPERATOR = ';';
-	private static final char CSV_QUOTECHAR = '"';
+	private static final char CSV_SEPERATOR = ';'; // Separator der CSV Datei
+	private static final char CSV_QUOTECHAR = '"'; // Feldbegrenzer der CSV Datei
 
 	/**
 	 * Starten der Speicherung
@@ -195,8 +195,7 @@ public class CsvCreator {
 	}
 
 	/**
-	 * * Neuen Dateinamen suchen, der noch nicht vergeben ist (Suffix backup)
-	 *
+	 * Neuen Dateinamen suchen, der noch nicht vergeben ist (Suffix backup)
 	 * @return Der neue Dateiname oder im Misserfolg null
 	 */
 	private static String getNewFileName() {
@@ -205,8 +204,7 @@ public class CsvCreator {
 
 
 	/**
-	 * Untersuchen eventuell bereits vorhandener CSV-Dateien
-	 *
+	 * Untersuchen auf eventuell bereits vorhandener CSV-Dateien
 	 * @param moduleHeader String-Array des aktuellen Headers
 	 * @return enum zur Statusunterscheidung
 	 */
