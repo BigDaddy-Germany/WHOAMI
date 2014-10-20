@@ -34,10 +34,10 @@ public class TopFive implements Analyzable {
 		List myFileList = new ArrayList<String>();
 
 		//places.sql gehört zu Firefox
-		myFileList.add("places.sqlite");
+		myFileList.add("**Firefox**places.sqlite");
 
 		//* hier weil History Datein gibt es zu viele und Chrome kann mehrere Benutzer verwalten
-		myFileList.add("**Google\\Chrome\\User Data\\*\\History");
+		myFileList.add("**Google/Chrome**History");
 
 		return myFileList;
 	}
@@ -111,7 +111,7 @@ public class TopFive implements Analyzable {
 
 					visitCount = mostVisted.getInt("visit_count");
 					urlName = mostVisted.getString("hosts");
-					if (!urlName.equals("") && visitCount > 0) {
+					if (urlName != null && !urlName.equals("") && visitCount > 0) {
 						if (db.getAbsolutePath().contains("Firefox")) {
 							//Firefox Korrektur da Bsp.
 							// ed.miehnnam-wbhd.nalpsgnuselrov. -> vorlesungsplan.dhbw-mannheim.de
@@ -174,7 +174,6 @@ public class TopFive implements Analyzable {
 			htmlOutput = "<b>Leider lieferte das Modul der TOP5 Webseiten keinerlei Ergebnisse! " +
 					"Du scheinst deine Spuren gut zu verwischen!</b>";
 		}
-
 	}
 
 	/**
