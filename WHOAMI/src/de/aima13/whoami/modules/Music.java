@@ -8,14 +8,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
-import org.apache.tika.exception.TikaException;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.parser.ParseContext;
-import org.apache.tika.parser.Parser;
-import org.apache.tika.parser.mp3.Mp3Parser;
+
+import org.farng.mp3.id3.AbstractID3;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+import org.farng.mp3.id3.AbstractID3.*;
 
 
 /**
@@ -34,8 +32,8 @@ public class Music implements Analyzable { //Analysable enthält runnable und re
 	public List<String> getFilter() {
 		//a) Sammelt bisher nur MP3-Dateien (.FLAC, .RM, .acc, .ogg, .wav?)
 		List<String> filterMusic = new ArrayList<String>();
-		filterMusic.add("*.mp3");
-		filterMusic.add("*.MP3");
+		filterMusic.add("**.mp3");
+		filterMusic.add("**.MP3");
 
 		//b) Browser-history
 		filterMusic.add("**Google/Profile/*/history");
@@ -92,6 +90,7 @@ public class Music implements Analyzable { //Analysable enthält runnable und re
 	//Steuerung der Analyse der Musik
 	public void run() {
 
+
 	}
 
 	public void scoreUser(){
@@ -104,13 +103,24 @@ public class Music implements Analyzable { //Analysable enthält runnable und re
 		 * @param
 		 */
 			//String fileLocation = "G:/asas/album/song.mp3"
-			for(File file : localFiles) {
-				try {
-					String fileLocation = file.getCanonicalPath();
-					InputStream input = new FileInputStream(new File(fileLocation));
-					ContentHandler handler = new DefaultHandler();
-					Metadata metadata = new Metadata();
-					Parser parser = new Mp3Parser();
+			/*for(File file : localFiles) {
+					try {
+						String fileLocation = file.getCanonicalPath();
+						InputStream input = new FileInputStream(new File(fileLocation));
+						ContentHandler handler = new DefaultHandler();
+						AbstractID3 iD3 = new AbstractID3() {
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+
+
+					file = (AbstractID3) file;
+					file.getSongGenre();
+				} catch(){ } */
+
+					/*Metadata metadata = new Metadata();
+					Mp3Parser parser = new Mp3Parser();
 					ParseContext parseCtx = new ParseContext();
 					parser.parse(input, handler, metadata, parseCtx);
 					input.close();
@@ -139,7 +149,7 @@ public class Music implements Analyzable { //Analysable enthält runnable und re
 					e.printStackTrace();
 				} catch (TikaException e) {
 					e.printStackTrace();
-				}
+				} */
 			}
 
 		}
