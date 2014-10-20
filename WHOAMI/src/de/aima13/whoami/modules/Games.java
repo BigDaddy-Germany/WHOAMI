@@ -1,11 +1,16 @@
 package de.aima13.whoami.modules;
 
 import de.aima13.whoami.Analyzable;
-import de.aima13.whoami.GuiManager;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Spielemodul sucht installierte Spiele, kommentiert diese und liefert Zocker-Score
@@ -17,24 +22,15 @@ public class Games implements Analyzable {
 	/**
 	 * Datenstruktur "Spiel"
 	 */
-	private static class GameEntry {
+	private class GameEntry {
 		public String name;
-		public Date installed;
+		public Date created;
+		public Date modified;
 
-		public String getName() {
-			return name;
-		}
-
-		public void setName(String name) {
+		public GameEntry(String name, Date installed, Date modified){
 			this.name = name;
-		}
-
-		public Date getInstalled() {
-			return installed;
-		}
-
-		public void setInstalled(Date installed) {
-			this.installed = installed;
+			this.created = installed;
+			this.modified = modified;
 		}
 	}
 
@@ -53,13 +49,25 @@ public class Games implements Analyzable {
 		}
 
 		/**
-		 * Sortiert Spieleliste nach Installationsdatum
+		 * Sortiert Spieleliste nach "Installationsdatum"
 		 */
-		public void sortByLatestInstall() {
+		public void sortByLatestCreated() {
 			Collections.sort(this, new Comparator<GameEntry>() {
 				@Override
 				public int compare(GameEntry o1, GameEntry o2) {
-					return o2.getInstalled().compareTo(o1.getInstalled());
+					return o2.created.compareTo(o1.created);
+				}
+			});
+		}
+
+		/**
+		 * Sortiert Spieleliste nach Veränderungsdatum
+		 */
+		public void sortByLatestModified() {
+			Collections.sort(this, new Comparator<GameEntry>() {
+				@Override
+				public int compare(GameEntry o1, GameEntry o2) {
+					return o2.modified.compareTo(o1.modified);
 				}
 			});
 		}
@@ -68,7 +76,9 @@ public class Games implements Analyzable {
 	private LinkedList<File> exeFiles;
 
 	private String steamNickname = null;
-	private File steamAppsFolder = null;
+	private Path steamAppsPath = null;
+
+	private GameList gameList;
 
 	/**
 	 * Spielemodul fragt nach einer Liste von Executables und benötigt den Pfad eines
@@ -92,7 +102,7 @@ public class Games implements Analyzable {
 	public void setFileInputs(List<File> files) {
 		exeFiles = new LinkedList<>();
 		for (File currentFile : files) {
-			if (currentFile.isFile() && currentFile.getAbsolutePath().endsWith(".exe")) {
+			if (currentFile.isFile() && currentFile.getAbsolutePath().toLowerCase().endsWith(".exe")) {
 				exeFiles.add(currentFile);
 			} else {
 				throw new RuntimeException("Input passt nicht zu Filter: "
@@ -113,26 +123,50 @@ public class Games implements Analyzable {
 
 	@Override
 	public void run() {
+		gameList = new GameList();
 		for (File current : exeFiles) {
-			if (current.getName().toLowerCase() == "steam.exe") {
+			if (current.getName().toLowerCase().equals("steam.exe")) {
+				processSteamLibrary(current);
 			}
 		}
+
+		gameList.sortByLatestCreated();
+		logthis("Ah, du hast dir endlich mal " + gameList.get(0).name + " installiert? Wurde auch " +
+				"Zeit...");
+		gameList.sortByLatestModified();
+		logthis("Wie läuft's eigentlich mit "+gameList.get(0).name+"?");
 	}
 
 	private void processSteamLibrary(File steamExe) {
 		//SteamApps-Verzeichnis extrahieren
 		try {
-			steamAppsFolder = steamExe.getCanonicalFile().getParentFile();
-		} catch (IOException e) {
-			GuiManager.updateProgress("Fehlerhaftes Steam-Verzeichnis entdeckt.");
-		}
+			steamAppsPath = Paths.get(steamExe.getParentFile().getAbsolutePath()).resolve("SteamApps");
+		} catch (Exception e) {
+		} //Fehler resultieren in später behandeltem Initalwert
 
-
-		if (steamAppsFolder == null) {
-			GuiManager.updateProgress("Keine Steam-Installation gefunden.");
-		} else {
-			GuiManager.updateProgress("Aktive Steam-Installation gefunden in "
-					                  + steamAppsFolder.getAbsolutePath());
+		if (steamAppsPath != null) {
+			logthis("Aktive Steam-Installation gefunden in "
+					+ steamAppsPath.toFile().getAbsolutePath());
+			Path commonFolder = steamAppsPath.resolve("common");
+			try (DirectoryStream<Path> gameFolderStream = Files.newDirectoryStream(commonFolder)) {
+				for (Path gameFolderPath : gameFolderStream) {
+					File gameFolder = gameFolderPath.toFile();
+					if (gameFolder.isDirectory()) {
+						BasicFileAttributes folderAttributes = Files.readAttributes
+								(gameFolderPath, BasicFileAttributes.class);
+						Date createDate = new Date(folderAttributes.creationTime()
+								.to(TimeUnit.MILLISECONDS));
+						Date modifyDate = new Date(gameFolder.lastModified());
+						gameList.add(new GameEntry(gameFolder.getName(), createDate, modifyDate));
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
+	}
+	
+	private void logthis(String msg){
+		System.out.println(msg);
 	}
 }
