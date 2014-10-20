@@ -1,8 +1,10 @@
 package de.aima13.whoami.modules;
 
 import de.aima13.whoami.Analyzable;
+import de.aima13.whoami.GuiManager;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -77,8 +79,7 @@ public class Games implements Analyzable {
 	@Override
 	public List<String> getFilter() {
 		List<String> filter = new LinkedList<String>();
-		filter.add("*.exe");
-		filter.add("SteamApps");
+		filter.add("**.exe");
 		return filter;
 	}
 
@@ -93,8 +94,6 @@ public class Games implements Analyzable {
 		for (File currentFile : files) {
 			if (currentFile.isFile() && currentFile.getAbsolutePath().endsWith(".exe")) {
 				exeFiles.add(currentFile);
-			} else if (currentFile.isDirectory() && currentFile.getName() == "SteamApps") {
-				steamAppsFolder = currentFile;
 			} else {
 				throw new RuntimeException("Input passt nicht zu Filter: "
 						+ currentFile.getAbsolutePath());
@@ -114,6 +113,26 @@ public class Games implements Analyzable {
 
 	@Override
 	public void run() {
+		for (File current : exeFiles) {
+			if (current.getName().toLowerCase() == "steam.exe") {
+			}
+		}
+	}
 
+	private void processSteamLibrary(File steamExe) {
+		//SteamApps-Verzeichnis extrahieren
+		try {
+			steamAppsFolder = steamExe.getCanonicalFile().getParentFile();
+		} catch (IOException e) {
+			GuiManager.updateProgress("Fehlerhaftes Steam-Verzeichnis entdeckt.");
+		}
+
+
+		if (steamAppsFolder == null) {
+			GuiManager.updateProgress("Keine Steam-Installation gefunden.");
+		} else {
+			GuiManager.updateProgress("Aktive Steam-Installation gefunden in "
+					                  + steamAppsFolder.getAbsolutePath());
+		}
 	}
 }
