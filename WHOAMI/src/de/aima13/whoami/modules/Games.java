@@ -1,6 +1,7 @@
 package de.aima13.whoami.modules;
 
 import de.aima13.whoami.Analyzable;
+import org.apache.commons.lang3.text.WordUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +28,7 @@ public class Games implements Analyzable {
 		public Date created;
 		public Date modified;
 
-		public GameEntry(String name, Date installed, Date modified){
+		public GameEntry(String name, Date installed, Date modified) {
 			this.name = name;
 			this.created = installed;
 			this.modified = modified;
@@ -45,11 +46,15 @@ public class Games implements Analyzable {
 		 * @return Tatsächlich hinzugefügt?
 		 */
 		public boolean addUnique(GameEntry game) {
+			//Falls Spieleordner in Kleinschreibung sind, Wortanfänge groß machen
+			if (game.name.toLowerCase().equals(game.name)) {
+				game.name = WordUtils.capitalize(game.name);
+			}
 			return this.add(game);
 		}
 
 		/**
-		 * Sortiert Spieleliste nach "Installationsdatum"
+		 * Sortiert Spieleliste nach Installationsdatum
 		 */
 		public void sortByLatestCreated() {
 			Collections.sort(this, new Comparator<GameEntry>() {
@@ -100,6 +105,7 @@ public class Games implements Analyzable {
 	 */
 	@Override
 	public void setFileInputs(List<File> files) {
+		//Eingabedateien gleich in eigene Liste kopieren
 		exeFiles = new LinkedList<>();
 		for (File currentFile : files) {
 			if (currentFile.isFile() && currentFile.getAbsolutePath().toLowerCase().endsWith(".exe")) {
@@ -125,6 +131,7 @@ public class Games implements Analyzable {
 	public void run() {
 		gameList = new GameList();
 		for (File current : exeFiles) {
+			//Haben wir die Steam-Executable gefunden?
 			if (current.getName().toLowerCase().equals("steam.exe")) {
 				processSteamLibrary(current);
 			}
@@ -134,7 +141,7 @@ public class Games implements Analyzable {
 		logthis("Ah, du hast dir endlich mal " + gameList.get(0).name + " installiert? Wurde auch " +
 				"Zeit...");
 		gameList.sortByLatestModified();
-		logthis("Wie läuft's eigentlich mit "+gameList.get(0).name+"?");
+		logthis("Wie läuft's eigentlich mit " + gameList.get(0).name + "?");
 	}
 
 	private void processSteamLibrary(File steamExe) {
@@ -150,23 +157,30 @@ public class Games implements Analyzable {
 			Path commonFolder = steamAppsPath.resolve("common");
 			try (DirectoryStream<Path> gameFolderStream = Files.newDirectoryStream(commonFolder)) {
 				for (Path gameFolderPath : gameFolderStream) {
-					File gameFolder = gameFolderPath.toFile();
-					if (gameFolder.isDirectory()) {
-						BasicFileAttributes folderAttributes = Files.readAttributes
-								(gameFolderPath, BasicFileAttributes.class);
-						Date createDate = new Date(folderAttributes.creationTime()
-								.to(TimeUnit.MILLISECONDS));
-						Date modifyDate = new Date(gameFolder.lastModified());
-						gameList.add(new GameEntry(gameFolder.getName(), createDate, modifyDate));
-					}
+					try {
+						File gameFolder = gameFolderPath.toFile();
+						if (gameFolder.isDirectory()) {
+							BasicFileAttributes folderAttributes = Files.readAttributes
+									(gameFolderPath, BasicFileAttributes.class);
+							Date createDate = new Date(folderAttributes.creationTime()
+									.to(TimeUnit.MILLISECONDS));
+							Date modifyDate = new Date(gameFolder.lastModified());
+							gameList.addUnique(new GameEntry(gameFolder.getName(),
+									createDate, modifyDate));
+						}
+					} catch (Exception e) {
+					} //Bei Problemen mit einzelnen Ordnern -> komplett überspringen
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 	}
-	
-	private void logthis(String msg){
+
+	/**
+	 * :TODO: Hilfsmethode, die es im Release auszumustern gilt
+	 */
+	private void logthis(String msg) {
 		System.out.println(msg);
 	}
 }
