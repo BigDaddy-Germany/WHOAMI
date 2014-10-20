@@ -1,11 +1,10 @@
 package de.aima13.whoami;
 
 import au.com.bytecode.opencsv.CSVReader;
+import au.com.bytecode.opencsv.CSVWriter;
+import com.sun.org.apache.bcel.internal.generic.BREAKPOINT;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -19,8 +18,9 @@ public class CsvCreator {
 	private static enum CSV_STATUS {
 		IS_PERFECT, WRONG_FORMAT, DOESNT_EXIST
 	}
+
 	private static final String FILE_NAME = "WHOAMI_Analyze_Results.csv"; // Name der CSV Datei
-	private static final File csvDatei = new File(FILE_NAME); // File Datei der CSV Datei
+	private static final File csvFile = new File(FILE_NAME); // File Datei der CSV Datei
 	private static final String PREFIX_SEPERATOR = "_"; // Seperator zw. Modulname und Header
 
 	private static final char CSV_SEPERATOR = ';';
@@ -28,10 +28,11 @@ public class CsvCreator {
 
 	/**
 	 * Starten der Speicherung
+	 *
 	 * @param representables Liste alle zu präsentierenden CSV Werte
 	 * @throws Exception Ein Fehler ist aufgetreten
 	 */
-	public static void saveCsv(List<Representable> representables) throws Exception {
+	public static boolean saveCsv(List<Representable> representables) {
 		SortedMap<String, String> completeCsvContent = new TreeMap<>();
 
 		System.out.println("\n\nStarting CsvCreator\n----------------\n");
@@ -48,40 +49,184 @@ public class CsvCreator {
 					// Titel mit Prefix versehen und Spalte hinzufügen
 					completeCsvContent.put(prefix + PREFIX_SEPERATOR + moduleCsvCol.getKey(),
 							moduleCsvCol.getValue());
-
-					System.out.println("Found Pair: (" + prefix + PREFIX_SEPERATOR +
-							moduleCsvCol.getKey() + "|" +
-							moduleCsvCol.getValue() + ")");
 				}
 			}
 		}
 
 		System.out.println((new File(".")).getAbsolutePath());
 
-		// Header als String Array exportieren
-		CSV_STATUS csvStatus = getCsvStatus(
-				completeCsvContent
-						.keySet()
-						.toArray(
-								new String[
-										completeCsvContent
-												.keySet()
-												.size()
-										]
-						)
-		);
+		// Header und Values als Stringarray exportieren
+		String[] csvHeader = completeCsvContent
+				.keySet()
+				.toArray(
+						new String[
+								completeCsvContent
+										.keySet()
+										.size()
+								]
+				);
 
-		System.out.println(csvStatus);
+		String[] csvData = completeCsvContent
+				.values()
+				.toArray(
+						new String[
+								completeCsvContent
+										.values()
+										.size()]
+				);
 
+
+
+		// Status der CSV-Datei herausfinden
+		CSV_STATUS csvStatus = getCsvStatus(csvHeader);
+
+		Writer fileWriter;
+
+		File test = new File(FILE_NAME);
+		FileWriter newWriter;
+		try {
+			newWriter = new FileWriter(test);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		switch (csvStatus) {
+			case DOESNT_EXIST:
+				try {
+					// Versuche neue Datei zu erstellen und darauf zu schreiben
+					if (!csvFile.createNewFile()) {
+						return false;
+					}
+					fileWriter = new FileWriter(csvFile);
+				} catch (IOException e) {
+					return false;
+				}
+				break;
+			case WRONG_FORMAT:
+				// Nach neuem, nicht vergebenem Namen suchen
+				String newFileName;
+				if ((newFileName = getNewFileName()) == null) {
+					// Kein neuer nutzbarer Name gefunden
+					return false;
+				}
+
+				// Vorhandene Datei umbenennen
+				if (!csvFile.renameTo(new File(newFileName))) {
+					// Wenn nicht erfolgreich, kann die Datei nicht geschrieben werden
+					return false;
+				}
+
+				try {
+					fileWriter = new FileWriter(new File(FILE_NAME));
+				} catch (IOException e) {
+					return false;
+				}
+				break;
+			case IS_PERFECT:
+				try {
+					if (!csvFile.canWrite() && !csvFile.setWritable(true)) {
+						// Datei kann nicht benutzt werden. Suche nach anderem Namen
+						if ((newFileName = getNewFileName()) == null) {
+							// Kein neuer nutzbarer Name gefunden
+							return false;
+						}
+
+						File newFile = new File(newFileName);
+						fileWriter = new FileWriter((newFile));
+
+					} else {
+						// Datei ist schreibbar
+						fileWriter = new FileWriter(csvFile, true);
+					}
+				} catch (IOException e) {
+					return false;
+				}
+				break;
+
+			default:
+				return false;
+		}
+
+		// Neuen Writer für CSV Datei erstellen (sollte klappen)
+		CSVWriter writer = new CSVWriter(fileWriter, CSV_SEPERATOR, CSV_QUOTECHAR);
+
+		if (csvStatus != CSV_STATUS.IS_PERFECT) {
+			// Header muss neu geschrieben werden
+			writer.writeNext(csvHeader);
+		}
+		writer.writeNext(csvData);
+
+
+
+
+		// wenn wir hier gelandet sind, sollte es geklappt haben.
+		return true;
 	}
 
+
+	/**
+	 * Neuen Dateinamen suchen, der noch nicht vergeben ist
+	 *
+	 * @param backup soll backup als suffix genutzt werden?
+	 * @return Der neue Dateiname oder im Misserfolg null
+	 */
+	private static String getNewFileName(boolean backup) {
+		String currentName;
+		if (backup) {
+			currentName = csvFile.getName() + ".backup";
+		} else {
+			currentName = csvFile.getName();
+		}
+
+		if ((new File(currentName)).exists()) {
+			int i = 1;
+
+			currentName += "." + i;
+			File newFile = new File(currentName);
+			while (newFile.exists() && (newFile.canWrite() || newFile
+					.setWritable(true))) {
+				i++;
+				if (i == 1000) {
+					// Harte Grenze bei 1000
+					return null;
+				}
+				currentName = currentName.substring(0, currentName.length()-String.valueOf(i)
+						.length()) + "." + i;
+				newFile = new File(currentName);
+			}
+		}
+		return currentName;
+	}
+
+	/**
+	 * * Neuen Dateinamen suchen, der noch nicht vergeben ist (Suffix backup)
+	 *
+	 * @return Der neue Dateiname oder im Misserfolg null
+	 */
+	private static String getNewFileName() {
+		return getNewFileName(true);
+	}
+
+
+	/**
+	 * Untersuchen eventuell bereits vorhandener CSV-Dateien
+	 *
+	 * @param moduleHeader String-Array des aktuellen Headers
+	 * @return enum zur Statusunterscheidung
+	 */
 	private static CSV_STATUS getCsvStatus(String[] moduleHeader) {
 		try {
-			CSVReader reader = new CSVReader(new FileReader(csvDatei), CSV_SEPERATOR, CSV_QUOTECHAR);
+			CSVReader reader = new CSVReader(new FileReader(csvFile), CSV_SEPERATOR,
+					CSV_QUOTECHAR);
 
 			// Wir gehen davon aus, dass die erste Zeile der Header ist
 			String[] header = reader.readNext();
 			reader.close();
+
+			if (header == null) {
+				// Leere Datei
+				return CSV_STATUS.WRONG_FORMAT;
+			}
 
 			// zu Anfang gehen wir von einem korrekten Header aus, wenn die header die selbe
 			// Größe haben
