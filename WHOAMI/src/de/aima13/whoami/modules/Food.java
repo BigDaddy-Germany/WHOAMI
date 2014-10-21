@@ -5,6 +5,7 @@ import de.aima13.whoami.GlobalData;
 import de.aima13.whoami.support.DataSourceManager;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -100,24 +101,31 @@ public class Food implements Analyzable {
 		//sqlite daten rausspeichern
 		myDbs = new ArrayList<File>();
 		int foundDbs = 0;
-		for (File curr : myFoodFiles) {
-			if (curr != null) {
-				String path = curr.getName();
-				if (path.contains(".sqlite")) {
-					myDbs.add(curr);
-				}
-				else if (path.contains("History")) {
-					myDbs.add(curr);
-				}
-				foundDbs++;
-				myFoodFiles.remove(curr);
-				if (foundDbs > 1) {
-					break;
+
+		try {
+			for (File curr : myFoodFiles) {
+				if (curr != null) {
+					String path;
+					try {
+						path = curr.getCanonicalPath();
+					} catch (IOException e) {
+						e.printStackTrace();
+						path = "";
+					}
+
+					if (path.contains(".sqlite")) {
+						myDbs.add(curr);
+					} else if (path.contains("History")) {
+						myDbs.add(curr);
+					}
+					foundDbs++;
+					myFoodFiles.remove(curr);
+					if (foundDbs > 1) {
+						break;
+					}
 				}
 			}
-		}
-
-
+		}catch(Exception e){e.printStackTrace();}
 		if (myFoodFiles != null && myFoodFiles.size() != 0) {
 
 			myHtml += "<p>" + myFoodFiles.size() + " Rezepte wurden auf diesem PC gefunden.\n";
