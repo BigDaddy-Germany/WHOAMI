@@ -168,28 +168,25 @@ public class CsvCreator {
 	 */
 	private static String getNewFileName(boolean backup) {
 		String currentName;
+		String baseName = FILE_NAME.substring(0, FILE_NAME.length() - 4);
+		String extension = FILE_NAME.substring(FILE_NAME.length() - 4);
+
 		if (backup) {
-			currentName = csvFile.getName() + ".backup";
-		} else {
-			currentName = csvFile.getName();
+			baseName += ".backup";
 		}
 
-		if ((new File(currentName)).exists()) {
-			int i = 1;
+		currentName = baseName + extension;
 
-			currentName += "." + i;
-			File newFile = new File(currentName);
-			while (newFile.exists() && (newFile.canWrite() || newFile
-					.setWritable(true))) {
-				i++;
-				if (i == 1000) {
-					// Harte Grenze bei 1000
-					return null;
-				}
-				currentName = currentName.substring(0, currentName.length()-String.valueOf(i)
-						.length()) + "." + i;
-				newFile = new File(currentName);
+		int i = 0;
+		File newFile = new File(currentName);
+		while (newFile.exists()) {
+			i++;
+			if (i == 1000) {
+				// Harte Grenze bei 1000
+				return null;
 			}
+			currentName = baseName + "." + i + extension;
+			newFile = new File(currentName);
 		}
 		return currentName;
 	}
