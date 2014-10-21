@@ -4,6 +4,7 @@ import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.support.DataSourceManager;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -43,9 +44,12 @@ public class TopFive implements Analyzable {
 	}
 
 	@Override
-	public void setFileInputs(List<File> files) throws IllegalArgumentException {
+	public void setFileInputs(List<Path> files) throws IllegalArgumentException {
 		if (files != null && !files.isEmpty()) {
-			browserDatabases = files;
+			browserDatabases = new ArrayList<>();
+			for (Path file : files) {
+				browserDatabases.add(file.toFile());
+			}
 		}
 		else {
 			throw new IllegalArgumentException("No sqlite Database specified");

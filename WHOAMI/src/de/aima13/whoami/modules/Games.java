@@ -3,6 +3,7 @@ package de.aima13.whoami.modules;
 import de.aima13.whoami.Analyzable;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -88,9 +89,10 @@ public class Games implements Analyzable {
 	 * @param files Suchergebnisse
 	 */
 	@Override
-	public void setFileInputs(List<File> files) {
+	public void setFileInputs(List<Path> files) {
 		exeFiles = new LinkedList<>();
-		for (File currentFile : files) {
+		for (Path currentFile2 : files) {
+			File currentFile = currentFile2.toFile();
 			if (currentFile.isFile() && currentFile.getAbsolutePath().endsWith(".exe")) {
 				exeFiles.add(currentFile);
 			}
