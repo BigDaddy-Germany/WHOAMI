@@ -4,3 +4,4 @@ out/*
 .idea/copyright/profiles_settings.xml
 .idea/misc.xml
 .idea/ant.xml
+WHOAMI_Analyze_Results*.csv

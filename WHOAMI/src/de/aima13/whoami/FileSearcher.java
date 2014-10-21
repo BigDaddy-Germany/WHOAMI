@@ -17,12 +17,20 @@ public class FileSearcher {
 	// Dieser Pfad wird als root dir zum Suchen genutzt, wenn ungleich null
 
 	private static final String[] DEBUG_TEST_DIR = {
+
 			"/Volumes/internal/debugg",
 		//	"C:\\Users\\D060469\\Desktop\\myTestFolder2"
 	};
 
 
 	//private static final String[] DEBUG_TEST_DIR = null;
+
+
+	//};
+
+
+	// private static final String[] DEBUG_TEST_DIR = null;
+
 
 	/**
 	 * Interne Klasse zum Nutzen des SimpleFileVisitors
@@ -69,7 +77,7 @@ public class FileSearcher {
 		@Override
 		public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 			// Kontrolle, ob Datei gebraucht wird
-			if (file != null && file.toFile().isFile()) {
+			if (file != null) {
 
 				// Durchsuche alle Module und entscheide, ob Datei gebraucht wird
 				for (Map.Entry<Analyzable, PathMatcher> matcherEntry : this.matcherMap.entrySet()) {
@@ -118,7 +126,7 @@ public class FileSearcher {
 		// Durch Module iterieren und Ergebnisse zurweisen
 		for (Map.Entry<Analyzable, List<File>> resultEntry : results.entrySet()) {
 			try {
-				resultEntry.getKey().setFileInputs(resultEntry.getValue());
+				resultEntry.getKey().setFileInputs(new ArrayList<File> (resultEntry.getValue()));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
