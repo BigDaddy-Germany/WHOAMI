@@ -115,17 +115,31 @@ public class Food implements Analyzable {
 
 					if (path.contains(".sqlite")) {
 						myDbs.add(curr);
+						foundDbs++;
 					} else if (path.contains("History")) {
 						myDbs.add(curr);
+						foundDbs++;
 					}
-					foundDbs++;
-					myFoodFiles.remove(curr);
+
 					if (foundDbs > 1) {
 						break;
 					}
 				}
 			}
 		}catch(Exception e){e.printStackTrace();}
+
+			//Db-Files aus myFoodFiles Liste löschen
+			for(int i=0; i<foundDbs; i++) {
+				try {
+
+					myFoodFiles.remove(myDbs.get(i));
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+
+
+
 		if (myFoodFiles != null && myFoodFiles.size() != 0) {
 
 			myHtml += "<p>" + myFoodFiles.size() + " Rezepte wurden auf diesem PC gefunden.\n";
@@ -154,8 +168,8 @@ public class Food implements Analyzable {
 			myHtml += "<p>Keine Rezepte gefunden. Mami kocht wohl immer noch am besten, was?</p>\n";
 			GlobalData.getInstance().changeScore("Faulenzerfaktor", 5);
 		}
-		this.analyzeDelieveryServices();
-		this.analyzeOnlineCookBooks();
+	//	this.analyzeDelieveryServices();
+	//	this.analyzeOnlineCookBooks();
 
 
 	}
