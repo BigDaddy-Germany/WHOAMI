@@ -1,14 +1,32 @@
 package de.aima13.whoami;
 
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+
 /**
- * Created by D060469 on 16.10.14.
+ * @author Marvin Klose
  */
 public class Gui extends Application {
-	@Override
-	public void start(Stage stage) throws Exception {
 
+	@Override
+	public void start(final Stage primaryStage) throws Exception{
+		FXMLLoader loader = new FXMLLoader();
+		Parent root;
+		InputStream is = new FileInputStream("res/start.fxml");
+		root = (Parent) loader.load(is);
+		primaryStage.setTitle("Endnutzervereinbarung");
+		primaryStage.setScene(new Scene(root));
+		primaryStage.show();
+	}
+
+	public static void launchGui(String [] args) {
+		launch(args);
 	}
 }
