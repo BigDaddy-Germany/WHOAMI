@@ -25,6 +25,11 @@ public class Food implements Analyzable {
 	private TreeMap<String, String> myCsvData = new TreeMap<String, String>();
 
 
+	//URLs nach dennen gesucht werden soll
+	private static  final String[] MY_SEARCH_DELIEVERY_URLS={"lieferheld","pizza.de"};
+	private static  final String[] MY_SEARCH_COOKING_URLS={"chefkoch.de","thestonerscookbook.com"};
+
+
 	@Override
 	public List<String> getFilter() {
 		List<String> searchList = new ArrayList<String>();
@@ -40,7 +45,7 @@ public class Food implements Analyzable {
 		searchList.add("**Firefox**places.sqlite");
 
 		//* hier weil History Datein gibt es zu viele und Chrome kann mehrere Benutzer verwalten
-		searchList.add("**Google/Chrome**History");
+		searchList.add("**Google"+File.separator+"Chrome**History");
 
 
 		return searchList;
@@ -87,11 +92,11 @@ public class Food implements Analyzable {
 
 	@Override
 	public void run() {
-		//*********************debugging for Unix Systems only*******
+		//*********************debugging*******
 
-		//File f = new File("/Volumes/internal/debugg/Rezepte/Kuchen.txt");
-		//myFoodFiles = new ArrayList<File>();
-		//myFoodFiles.add(f);
+		File f = new File("/Volumes/internal/debugg/Firefox/witzig/places.sqlite");
+		myFoodFiles = new ArrayList<File>();
+		myFoodFiles.add(f);
 		String x = this.parseChefkochUrl("http://www.chefkoch" +
 				".de/rezepte/1108101216891426/Apfelkuchen-mit-Streuseln-vom-Blech.html");
 
@@ -168,64 +173,71 @@ public class Food implements Analyzable {
 			myHtml += "<p>Keine Rezepte gefunden. Mami kocht wohl immer noch am besten, was?</p>\n";
 			GlobalData.getInstance().changeScore("Faulenzerfaktor", 5);
 		}
-	//	this.analyzeDelieveryServices();
-	//	this.analyzeOnlineCookBooks();
+		this.analyzeDelieveryServices();
+		//this.analyzeOnlineCookBooks();
 
 
 	}
 
+	/**
+	 * Diese Methode liefert einen Beitrag zur Analyse indem sie die Browserverläufe nach
+	 * bestimmten Lieferservice anlaysiert.
+	 * Alle Lieferservices werden nach Anazahl der visits bewertet.
+	 * Es wird nicht ausgewertet was für Gerichte sich der Nutzer angesehen hat.
+	 */
 	private void analyzeDelieveryServices() {
 		boolean pizzaFound = false;
 		int countDeliveryServices = 0;
 
 		if (myDbs.size() > 0) {
-			for (File dbFile : myDbs) {
-				DataSourceManager db = null;
-				try {
-					db = new DataSourceManager(dbFile);
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-				String sqlQuery="";
-				if (dbFile.getAbsolutePath().contains("Firefox")) {
-					sqlQuery = "SELECT url" +
-							"FROM moz_places " +
-							"WHERE url LIKE '%www.pizza.de%' " +
-							"OR url LIKE '%www.lieferheld.de%'" +
-							"LIMIT 5;";
-				}
-				else if (dbFile.getAbsolutePath().contains("Chrome")) {
 
-					sqlQuery = "SELECT url FROM urls " +
-							"WHERE url LIKE '%www.pizza.de%' " +
-							"OR url LIKE '%www.lieferheld.de%'" +
-							"LIMIT 5;";
-				}
-				;
 
-				ResultSet resultSet = null;
+			ResultSet[] dbResult = this.getViewCountAndUrl(MY_SEARCH_DELIEVERY_URLS);
+			for (ResultSet resultSet : dbResult) {
+
 				try {
-					resultSet = db.querySqlStatement(sqlQuery);
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-				try {
-					resultSet.beforeFirst();
-					while (resultSet.next()) {
-						String currUrl = resultSet.getString("url");
-						if (currUrl.contains("pizza")) {
-							pizzaFound = true;
+					if(resultSet!=null) {
+						//resultSet.beforeFirst();
+						while (resultSet.next()) {
+							String currUrl = resultSet.getString("url");
+							if (currUrl.contains("pizza")) {
+								pizzaFound = true;
+							}
+
+							countDeliveryServices += resultSet.getInt("visit_count");
+
 						}
-						else if (currUrl.contains("lieferheld")) {
-							countDeliveryServices++;
-						}
+						resultSet.getStatement().close();
 					}
-				}catch(SQLException e){}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 
 			}
+			myCsvData.put("Webzugriffe auf Lieferservices:",""+countDeliveryServices);
+			myHtml+="<p>Du hast: "+ countDeliveryServices  +" mal auf die Website eines " +
+					"bekannten Lieferservices zugegriffen.";
+
+			if(countDeliveryServices<100){
+				myHtml+=" Das ist aber nicht oft. Biste pleite oder was?";
+			}else{
+				myHtml+="Uhh das ist aber ordentlich, du scheinst aber <b>mächtig Abetitt</b> zu " +
+						"haben.";
+			}
+
+					myHtml+="</p>\n";
+
+			if(pizzaFound){
+				myCsvData.put("Pizzaliebhaber","ja");
+				myHtml+="<p>Du scheinst auch Pizza zu mögen ;)</p>";
+			}else{
+				myCsvData.put("Pizzaliebhaber","nein");
+				myHtml+="<p>Du ist keine Pizza, was ist denn mit dir falsch?</p>";
+			}
+
+
 		}
+
 
 		//Suche nach Pizzerien/Lieferservicen
 
@@ -238,38 +250,103 @@ public class Food implements Analyzable {
 
 	}
 
+	/**
+	 * Diese Methode liefert eienen Beitrag zur Analyze indem sie die gefundenen Browserverläufe
+	 * nach Einträgen gängiger Online -Kochseiten durchsucht und zumindest bei Chefkoch auch
+	 * parst wie
+	 */
 	private void analyzeOnlineCookBooks() {
-		/*
-		if (myDbs.size() > 0) {
-			for (File dbFile : myDbs) {
-				DataSourceManager db = null;
-				try {
-					db = new DataSourceManager(dbFile);
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-				String sqlQuery;
-				if (dbFile.getAbsolutePath().contains("Firefox")) {
-					sqlQuery = "SELECT url" +
-							"FROM moz_places " +
-							"WHERE url LIKE '%www.pizza.de%' " +
-							"OR url LIKE '%www.lieferheld.de%'" +
-							"LIMIT 5;";
-				}
-				else if (dbFile.getAbsolutePath().contains("Chrome")) {
 
-					sqlQuery = "SELECT url FROM urls " +
-							"WHERE url LIKE '%www.pizza.de%' " +
-							"OR url LIKE '%www.lieferheld.de%'" +
-							"LIMIT 5;";
-				}
-				;
+		ResultSet[] dbResults = this.getViewCountAndUrl(MY_SEARCH_COOKING_URLS);
+		TreeMap<Integer,String> chefKochReciepts = new TreeMap<>();
+		int countCookingSiteAccess=0;
+		boolean clientIsStoner=false;
+		for(ResultSet rs:dbResults){
+			try {
+				if(rs!=null) {
+					//resultSet.beforeFirst();
+					while (rs.next()) {
+						String currUrl = rs.getString("url");
+						if (currUrl.contains("chefkoch")) {
+							chefKochReciepts.put(rs.getInt("visit_count"),
+									this.parseChefkochUrl(currUrl));
+						}else if(currUrl.toLowerCase().contains("thestonerscookbook")){
+							clientIsStoner=true;
+						}
 
-				ResultSet resultSet = db.querySqlStatement(sqlQuery);
+						countCookingSiteAccess += rs.getInt("visit_count");
+
+					}
+					rs.getStatement().close();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
-		*/
+		if(clientIsStoner){
+			myHtml+="<p><font color=#00C000>Tja du hast wohl den grünen Gaumen oder " +
+					"bist öfters in den Niederlande.</font></p>";
+			myCsvData.put("Niederländer","ja");
+		}else{
+			myCsvData.put("Niederländer","nein");
+		}
+		 //@Todo hier weitermachen mit der Auswertung
+
 	}
+
+	/**
+	 *Diese Methode durchsucht die gefundenen Browserverläufe nach den mitgegebenen URLs
+	 * @param searchUrl Ein String-Array welches URLs enthält nach dennen gesucht werden soll
+	 * @return ein Array von ResultSets welches die Ergebnisse der SQL-Abfragen enthält(kann auch
+	 * leer sein)
+	 */
+private ResultSet[] getViewCountAndUrl(String[] searchUrl) {
+	ResultSet[] results=new ResultSet[2];
+	String sqlStatement="SELECT url,visit_count ";
+	DataSourceManager dbManager = null;
+	int x=0;
+	for (File db: myDbs){
+
+		if(db!=null){
+			String path="";
+			try {
+				path = db.getCanonicalPath();
+			}catch(IOException e){
+				path="";
+			}
+			path=path.toLowerCase();
+			if(path.contains("firefox")){
+				sqlStatement+="FROM moz_places ";
+			}else if(path.contains("google")){
+				sqlStatement+="FROM urls ";
+			}
+			//Suchbegriffe in Statement einabuen
+			sqlStatement+="WHERE url LIKE '%"+searchUrl[0]+"%' ";
+			for (int i = 1; i <searchUrl.length ; i++) {
+				sqlStatement+= "OR url LIKE '%"+searchUrl[i]+"%' ";
+			}
+			try {
+				dbManager = new DataSourceManager(db);
+			}catch(Exception e){
+				dbManager=null;
+			}
+			if(dbManager!=null){
+				try {
+					results[x] = dbManager.querySqlStatement(sqlStatement);
+					dbManager=null;
+				}catch(Exception e){
+					results[x]=null;
+				}
+
+			}
+			x++;
+		}
+	}
+
+
+	return  results;
+}
+
+
+
 }
