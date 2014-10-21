@@ -117,7 +117,7 @@ public class FileSearcher {
 		// Durch Module iterieren und Ergebnisse zurweisen
 		for (Map.Entry<Analyzable, List<File>> resultEntry : results.entrySet()) {
 			try {
-				resultEntry.getKey().setFileInputs(resultEntry.getValue());
+				resultEntry.getKey().setFileInputs(new ArrayList<File> (resultEntry.getValue()));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
