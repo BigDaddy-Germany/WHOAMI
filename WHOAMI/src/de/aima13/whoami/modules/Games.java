@@ -20,6 +20,7 @@ public class Games implements Analyzable {
 
 	/**
 	 * Datenstruktur "Spiel"
+	 * Quasi ein struct.
 	 */
 	private class GameEntry {
 		public String name;
@@ -41,14 +42,13 @@ public class Games implements Analyzable {
 		 * Spiel nach Duplikatscheck hinzufügen
 		 *
 		 * @param game Neues Spiel
-		 * @return Tatsächlich hinzugefügt?
 		 */
-		public boolean addUnique(GameEntry game) {
+		public void addUnique(GameEntry game) {
 			//Falls Spieleordner in Kleinschreibung sind, Wortanfänge groß machen
 			if (game.name.toLowerCase().equals(game.name)) {
 				game.name = WordUtils.capitalize(game.name);
 			}
-			return this.add(game);
+			gameList.add(game);
 		}
 
 		/**
@@ -76,7 +76,7 @@ public class Games implements Analyzable {
 		}
 	}
 
-	private LinkedList<Path> exePaths;
+	private List<Path> exePaths;
 
 	private String steamNickname = null;
 	private Path steamAppsPath = null;
@@ -97,18 +97,16 @@ public class Games implements Analyzable {
 	}
 
 	/**
-	 * Nimmt Suchergebnisse entgegen und legt Executables und SteamApps-Ordner gleich getrennt ab
+	 * Nimmt Suchergebnisse entgegen und legt Executables getrennt ab
 	 *
 	 * @param paths Suchergebnisse
 	 */
 	@Override
 	public void setFileInputs(List<Path> paths) {
 		//Eingabedateien gleich in eigene Liste kopieren
-		exePaths = new LinkedList<>();
-		for (Path currentPath : paths) {
-			if (currentPath.toAbsolutePath().toString().toLowerCase().endsWith(".exe")) {
-				exePaths.add(currentPath);
-			} else {
+		exePaths = paths; //:TODO: Bestätigung holen, dass das MEINE LISTE GANZ ALLEIN ist
+		for (Path currentPath : exePaths) {
+			if (!currentPath.toAbsolutePath().toString().toLowerCase().endsWith(".exe")) {
 				throw new RuntimeException("Input passt nicht zu Filter: "
 						+ currentPath.toAbsolutePath().toString());
 			}
@@ -144,6 +142,11 @@ public class Games implements Analyzable {
 		}
 	}
 
+	/**
+	 * Verarbeitet gefundene Steam-Bibliothek und veranlasst deren Scan
+	 *
+	 * @param steamExe Pfad zur Steam-Programmdatei
+	 */
 	private void processSteamLibrary(Path steamExe) {
 		//SteamApps-Verzeichnis extrahieren
 		try {
@@ -166,6 +169,11 @@ public class Games implements Analyzable {
 		}
 	}
 
+	/**
+	 * Interpretiert alle Ordner als Spieleverzeichnis und fügt sie zur Liste hinzu
+	 *
+	 * @param gameFolderStream Stream des Verzeichnis Steam/SteamApps/common
+	 */
 	private void addSteamGames(DirectoryStream<Path> gameFolderStream) {
 		String gameName;
 		BasicFileAttributes attributes;
