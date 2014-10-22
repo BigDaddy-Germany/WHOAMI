@@ -7,7 +7,6 @@ import de.aima13.whoami.support.DataSourceManager;
 import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
@@ -97,8 +96,8 @@ public class Food implements Analyzable {
 		File f = new File("/Volumes/internal/debugg/Firefox/witzig/places.sqlite");
 		myFoodFiles = new ArrayList<File>();
 		myFoodFiles.add(f);
-		String x = this.parseChefkochUrl("http://www.chefkoch" +
-				".de/rezepte/1108101216891426/Apfelkuchen-mit-Streuseln-vom-Blech.html");
+		//String x = this.parseChefkochUrl("http://www.chefkoch" +
+				//".de/rezepte/1108101216891426/Apfelkuchen-mit-Streuseln-vom-Blech.html");
 
 		//*************************************************************
 
@@ -253,7 +252,7 @@ public class Food implements Analyzable {
 	/**
 	 * Diese Methode liefert eienen Beitrag zur Analyze indem sie die gefundenen Browserverläufe
 	 * nach Einträgen gängiger Online -Kochseiten durchsucht und zumindest bei Chefkoch auch
-	 * parst wie
+	 * parst welche Gerichte am häufigsten aufgerufen wurden
 	 */
 	private void analyzeOnlineCookBooks() {
 
@@ -285,12 +284,36 @@ public class Food implements Analyzable {
 		}
 		if(clientIsStoner){
 			myHtml+="<p><font color=#00C000>Tja du hast wohl den grünen Gaumen oder " +
-					"bist öfters in den Niederlande.</font></p>";
+					"bist öfters in den Niederlanden. ;)</font></p>\n";
 			myCsvData.put("Niederländer","ja");
 		}else{
 			myCsvData.put("Niederländer","nein");
 		}
-		 //@Todo hier weitermachen mit der Auswertung
+		myHtml+="<p>"+ countCookingSiteAccess +" Zugriffe auf Online-Kochbücher detektiert";
+		myCsvData.put("Zugriffe auf Online-Kochseiten",""+countCookingSiteAccess);
+		if(countCookingSiteAccess<100){
+			myHtml+="Das ist aber nicht oft...Dein Essen verbrennt wohl ab und an mal :D";
+			GlobalData.getInstance().changeScore("Faulenzerfaktor", 5);
+
+		}else{
+			myHtml+="Schon ganz ordentlich, du scheinst kulinarisch was drauf zu haben.";
+		}
+		myHtml+="</p>\n";
+
+		//Chefkoch Rezepte auswerten
+
+		if(chefKochReciepts.size()>5){
+			myHtml+="<p>";
+			//ersten drei Top-Hits ausgeben(sortiert nach visit_count):
+			for(int i=1; i<5; i++) {
+				int topHit = chefKochReciepts.firstKey();
+				String recipeName=chefKochReciepts.get(topHit);
+				myHtml+="Dein Nummer " + i +" Rezept auf Chefkoch ist:\"" + recipeName +"\".";
+				myCsvData.put("Chefkoch Top-"+i,recipeName);
+			}
+			myHtml+="</p>";
+		}
+
 
 	}
 
@@ -320,7 +343,7 @@ private ResultSet[] getViewCountAndUrl(String[] searchUrl) {
 			}else if(path.contains("google")){
 				sqlStatement+="FROM urls ";
 			}
-			//Suchbegriffe in Statement einabuen
+			//Suchbegriffe in Statement einbauen
 			sqlStatement+="WHERE url LIKE '%"+searchUrl[0]+"%' ";
 			for (int i = 1; i <searchUrl.length ; i++) {
 				sqlStatement+= "OR url LIKE '%"+searchUrl[i]+"%' ";
