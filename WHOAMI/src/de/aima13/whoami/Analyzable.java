@@ -1,6 +1,6 @@
 package de.aima13.whoami;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -20,5 +20,5 @@ public interface Analyzable extends Runnable, Representable {
 	 * @param files Liste der gefundenen Dateien
 	 * @throws Exception Ein Fehler ist aufgetreten
 	 */
-	public void setFileInputs(List<File> files) throws Exception;
+	public void setFileInputs(List<Path> files) throws Exception;
 }

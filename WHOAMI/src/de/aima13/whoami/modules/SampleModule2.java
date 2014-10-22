@@ -3,6 +3,7 @@ package de.aima13.whoami.modules;
 import de.aima13.whoami.Analyzable;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
@@ -27,10 +28,10 @@ public class SampleModule2 implements Analyzable {
 	}
 
 	@Override
-	public void setFileInputs(List<File> files) throws Exception {
+	public void setFileInputs(List<Path> files) throws Exception {
 		System.out.println("Setze Dateien im Testmodul. Folgende Dateien gesetzt:");
-		for (File file : files) {
-			System.out.println(" - " + file.getName());
+		for (Path file : files) {
+			System.out.println(" - " + file.getFileName());
 		}
 	}
 
