@@ -173,7 +173,7 @@ public class Food implements Analyzable {
 			GlobalData.getInstance().changeScore("Faulenzerfaktor", 5);
 		}
 		this.analyzeDelieveryServices();
-		//this.analyzeOnlineCookBooks();
+		this.analyzeOnlineCookBooks();
 
 
 	}
@@ -227,25 +227,18 @@ public class Food implements Analyzable {
 					myHtml+="</p>\n";
 
 			if(pizzaFound){
+				GlobalData.getInstance().changeScore("Nerdfaktor", 5);
+				GlobalData.getInstance().changeScore("Faulenzerfaktor", 5);
 				myCsvData.put("Pizzaliebhaber","ja");
-				myHtml+="<p>Du scheinst auch Pizza zu mögen ;)</p>";
+				myHtml+="<p>Du scheinst auch Pizza zu mögen ;)</p>\n";
 			}else{
 				myCsvData.put("Pizzaliebhaber","nein");
-				myHtml+="<p>Du ist keine Pizza, was ist denn mit dir falsch?</p>";
+				myHtml+="<p>Du ist keine Pizza, was ist denn mit dir falsch?</p>\n";
 			}
 
-
+			GlobalData.getInstance().changeScore("Faulenzerfaktor", countDeliveryServices * 3);
 		}
 
-
-		//Suche nach Pizzerien/Lieferservicen
-
-
-		if (pizzaFound) {
-			GlobalData.getInstance().changeScore("Nerdfaktor", 5);
-			GlobalData.getInstance().changeScore("Faulenzerfaktor", 5);
-		}
-		GlobalData.getInstance().changeScore("Faulenzerfaktor", countDeliveryServices * 3);
 
 	}
 
@@ -266,7 +259,8 @@ public class Food implements Analyzable {
 					//resultSet.beforeFirst();
 					while (rs.next()) {
 						String currUrl = rs.getString("url");
-						if (currUrl.contains("chefkoch")) {
+						if (currUrl.contains("chefkoch")&& currUrl.length()>23 && !currUrl
+								.contains("suche")) {
 							chefKochReciepts.put(rs.getInt("visit_count"),
 									this.parseChefkochUrl(currUrl));
 						}else if(currUrl.toLowerCase().contains("thestonerscookbook")){
@@ -311,7 +305,7 @@ public class Food implements Analyzable {
 				myHtml+="Dein Nummer " + i +" Rezept auf Chefkoch ist:\"" + recipeName +"\".";
 				myCsvData.put("Chefkoch Top-"+i,recipeName);
 			}
-			myHtml+="</p>";
+			myHtml+="</p>\n";
 		}
 
 
@@ -356,7 +350,6 @@ private ResultSet[] getViewCountAndUrl(String[] searchUrl) {
 			if(dbManager!=null){
 				try {
 					results[x] = dbManager.querySqlStatement(sqlStatement);
-					dbManager=null;
 				}catch(Exception e){
 					results[x]=null;
 				}
