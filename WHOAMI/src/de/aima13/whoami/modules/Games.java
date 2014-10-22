@@ -3,12 +3,10 @@ package de.aima13.whoami.modules;
 import de.aima13.whoami.Analyzable;
 import org.apache.commons.lang3.text.WordUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -137,10 +135,10 @@ public class Games implements Analyzable {
 			}
 		}
 
-		if (gameList.size()>0) {
+		if (gameList.size() > 0) {
 			gameList.sortByLatestCreated();
-			logthis("Ah, du hast dir endlich mal " + gameList.get(0).name + " installiert? Wurde auch " +
-					"Zeit...");
+			logthis("Ah, du hast dir endlich mal " + gameList.get(0).name + " installiert? " +
+					"Wurde auch Zeit...");
 			gameList.sortByLatestModified();
 			logthis("Wie läuft's eigentlich mit " + gameList.get(0).name + "?");
 		}
@@ -155,29 +153,38 @@ public class Games implements Analyzable {
 
 		if (steamAppsPath != null) {
 			logthis("Aktive Steam-Installation gefunden in "
-					+ steamAppsPath.toFile().getAbsolutePath());
+					+ steamAppsPath.toAbsolutePath().toString());
 			Path commonFolder = steamAppsPath.resolve("common");
+
 			try (DirectoryStream<Path> gameFolderStream = Files.newDirectoryStream(commonFolder)) {
-				for (Path gameFolderPath : gameFolderStream) {
-					try {
-						File gameFolder = gameFolderPath.toFile();
-						if (gameFolder.isDirectory()) {
-							BasicFileAttributes folderAttributes = Files.readAttributes
-									(gameFolderPath, BasicFileAttributes.class);
-							Date createDate = new Date(folderAttributes.creationTime()
-									.to(TimeUnit.MILLISECONDS));
-							Date modifyDate = new Date(gameFolder.lastModified());
-							gameList.addUnique(new GameEntry(gameFolder.getName(),
-									createDate, modifyDate));
-						}
-					} catch (Exception e) {
-					} //Bei Problemen mit einzelnen Ordnern -> komplett überspringen
-				}
+				addSteamGames(gameFolderStream);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		} else {
-			logthis("Keine Steam-Installation gefunden.");
+			logthis("Steam-Installation scheint inaktiv.");
+		}
+	}
+
+	private void addSteamGames(DirectoryStream<Path> gameFolderStream) {
+		String gameName;
+		BasicFileAttributes attributes;
+		Date create;
+		Date modify;
+
+		for (Path gameFolderPath : gameFolderStream) {
+			try {
+				if (Files.isDirectory(gameFolderPath)) {
+					attributes = Files.readAttributes(gameFolderPath, BasicFileAttributes.class);
+					create = new Date(attributes.creationTime().to(TimeUnit.MILLISECONDS));
+					modify = new Date(attributes.lastModifiedTime().to(TimeUnit.MILLISECONDS));
+
+					gameName = gameFolderPath.getFileName().toString();
+
+					gameList.addUnique(new GameEntry(gameName, create, modify));
+				}
+			} catch (Exception e) {
+			} //Bei Problemen mit einzelnen Ordnern -> komplett überspringen, bewusst ignorieren
 		}
 	}
 
