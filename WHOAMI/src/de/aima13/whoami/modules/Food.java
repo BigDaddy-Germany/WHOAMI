@@ -6,19 +6,21 @@ import de.aima13.whoami.support.DataSourceManager;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.nio.file.Path;
 
 /**
  * Created by momoXD007 on 17.10.14.
  */
 public class Food implements Analyzable {
 
-	private List<File> myFoodFiles;
-	private List<File> myDbs;
+	private List<Path> myFoodFiles;
+	private List<Path> myDbs;
 	//besonderheiten
 	private String myHtml = "<h1>Essen</h1>\n";
 	private TreeMap<String, String> myCsvData = new TreeMap<String, String>();
@@ -51,7 +53,7 @@ public class Food implements Analyzable {
 	}
 
 	@Override
-	public void setFileInputs(List<File> files) throws Exception {
+	public void setFileInputs(List<Path> files) throws Exception {
 		if (files == null) {
 			throw new IllegalArgumentException("I need input to do stuff");
 		}
@@ -93,9 +95,9 @@ public class Food implements Analyzable {
 	public void run() {
 		//*********************debugging*******
 
-		File f = new File("/Volumes/internal/debugg/Firefox/witzig/places.sqlite");
-		myFoodFiles = new ArrayList<File>();
-		myFoodFiles.add(f);
+		//		Path f = new Path("/Volumes/internal/debugg/Firefox/witzig/places.sqlite");
+		//	myFoodFiles = new ArrayList<Path>();
+		//	myFoodFiles.add(f);
 		//String x = this.parseChefkochUrl("http://www.chefkoch" +
 				//".de/rezepte/1108101216891426/Apfelkuchen-mit-Streuseln-vom-Blech.html");
 
@@ -103,22 +105,22 @@ public class Food implements Analyzable {
 
 
 		//sqlite daten rausspeichern
-		myDbs = new ArrayList<File>();
+		myDbs = new ArrayList<Path>();
 		int foundDbs = 0;
 
 		try {
-			for (File curr : myFoodFiles) {
+			for (Path curr : myFoodFiles) {
 				if (curr != null) {
 					String path;
 					try {
-						path = curr.getCanonicalPath();
-					} catch (IOException e) {
+						path = curr.toString();//getCanonicalPath();
+					} catch (Exception e) {
 						e.printStackTrace();
 						path = "";
 					}
 
 					if (path.contains(".sqlite")) {
-						myDbs.add(curr);
+						myDbs.add( curr);
 						foundDbs++;
 					} else if (path.contains("History")) {
 						myDbs.add(curr);
@@ -154,19 +156,26 @@ public class Food implements Analyzable {
 
 			//TODO: Run Methode in sinnvolle Untermethoden aufschlüsseln
 			//TODO: IN FOR EACH SCHLEIFE UMWANDELN DA PERFORMANTER
-			File latestReciept = myFoodFiles.get(0);
+			Path latestReciept = myFoodFiles.get(0);
 
 			for (int i = 1; i < myFoodFiles.size(); i++) {
-				File curr;
+				Path curr;
 				curr = myFoodFiles.get(i);
-				if (latestReciept.lastModified() < curr.lastModified()) {
-					latestReciept = curr;
-				}
+				try {
+						if (Files.getLastModifiedTime(latestReciept).toMillis() < Files
+								.getLastModifiedTime(curr).toMillis()){
+
+							latestReciept = curr;
+						}
+					}catch(IOException e){
+
+			}
 			}
 			//Dateiendung wird hier mit ausgegeben
-			myHtml += "<p>Zuletzt hast du das Rezept:\"" + latestReciept.getName()
-					+ "\" bearbeitet.</p>\n";
-			myCsvData.put("Zuletzt geändertes Rezept", latestReciept.getName());
+			myHtml += "<p>Zuletzt hast du das Rezept:\"" + latestReciept.getName(latestReciept
+					.getNameCount()-1).toString()+ "\" bearbeitet.</p>\n";
+			myCsvData.put("Zuletzt geändertes Rezept",  latestReciept.getName(latestReciept
+			.getNameCount()-1).toString());
 		}
 		else {
 			myHtml += "<p>Keine Rezepte gefunden. Mami kocht wohl immer noch am besten, was?</p>\n";
@@ -322,13 +331,13 @@ private ResultSet[] getViewCountAndUrl(String[] searchUrl) {
 	String sqlStatement="SELECT url,visit_count ";
 	DataSourceManager dbManager = null;
 	int x=0;
-	for (File db: myDbs){
+	for (Path db: myDbs){
 
 		if(db!=null){
 			String path="";
 			try {
-				path = db.getCanonicalPath();
-			}catch(IOException e){
+				path = db.toString();
+			}catch(Exception e){
 				path="";
 			}
 			path=path.toLowerCase();
