@@ -78,7 +78,7 @@ public class Games implements Analyzable {
 		}
 	}
 
-	private LinkedList<File> exeFiles;
+	private LinkedList<Path> exePaths;
 
 	private String steamNickname = null;
 	private Path steamAppsPath = null;
@@ -101,18 +101,18 @@ public class Games implements Analyzable {
 	/**
 	 * Nimmt Suchergebnisse entgegen und legt Executables und SteamApps-Ordner gleich getrennt ab
 	 *
-	 * @param files Suchergebnisse
+	 * @param paths Suchergebnisse
 	 */
 	@Override
-	public void setFileInputs(List<File> files) {
+	public void setFileInputs(List<Path> paths) {
 		//Eingabedateien gleich in eigene Liste kopieren
-		exeFiles = new LinkedList<>();
-		for (File currentFile : files) {
-			if (currentFile.isFile() && currentFile.getAbsolutePath().toLowerCase().endsWith(".exe")) {
-				exeFiles.add(currentFile);
+		exePaths = new LinkedList<>();
+		for (Path currentPath : paths) {
+			if (currentPath.toAbsolutePath().toString().toLowerCase().endsWith(".exe")) {
+				exePaths.add(currentPath);
 			} else {
 				throw new RuntimeException("Input passt nicht zu Filter: "
-						+ currentFile.getAbsolutePath());
+						+ currentPath.toAbsolutePath().toString());
 			}
 		}
 	}
@@ -130,24 +130,26 @@ public class Games implements Analyzable {
 	@Override
 	public void run() {
 		gameList = new GameList();
-		for (File current : exeFiles) {
+		for (Path current : exePaths) {
 			//Haben wir die Steam-Executable gefunden?
-			if (current.getName().toLowerCase().equals("steam.exe")) {
+			if (current.getFileName().toString().toLowerCase().equals("steam.exe")) {
 				processSteamLibrary(current);
 			}
 		}
 
-		gameList.sortByLatestCreated();
-		logthis("Ah, du hast dir endlich mal " + gameList.get(0).name + " installiert? Wurde auch " +
-				"Zeit...");
-		gameList.sortByLatestModified();
-		logthis("Wie läuft's eigentlich mit " + gameList.get(0).name + "?");
+		if (gameList.size()>0) {
+			gameList.sortByLatestCreated();
+			logthis("Ah, du hast dir endlich mal " + gameList.get(0).name + " installiert? Wurde auch " +
+					"Zeit...");
+			gameList.sortByLatestModified();
+			logthis("Wie läuft's eigentlich mit " + gameList.get(0).name + "?");
+		}
 	}
 
-	private void processSteamLibrary(File steamExe) {
+	private void processSteamLibrary(Path steamExe) {
 		//SteamApps-Verzeichnis extrahieren
 		try {
-			steamAppsPath = Paths.get(steamExe.getParentFile().getAbsolutePath()).resolve("SteamApps");
+			steamAppsPath = steamExe.getParent().resolve("SteamApps");
 		} catch (Exception e) {
 		} //Fehler resultieren in später behandeltem Initalwert
 
@@ -174,6 +176,8 @@ public class Games implements Analyzable {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		} else {
+			logthis("Keine Steam-Installation gefunden.");
 		}
 	}
 
