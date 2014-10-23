@@ -1,5 +1,6 @@
 package de.aima13.whoami.modules;
 
+
 import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.GlobalData;
 import de.aima13.whoami.support.DataSourceManager;
@@ -29,8 +30,13 @@ public class Food implements Analyzable {
 	//URLs nach dennen gesucht werden soll
 	private static  final String[] MY_SEARCH_DELIEVERY_URLS={"lieferheld","pizza.de"};
 	private static  final String[] MY_SEARCH_COOKING_URLS={"chefkoch.de","thestonerscookbook.com"};
-
-
+	//Größen ab dennen Rezepte gewertet werden in Byte
+	private static  final int MINIMUM_DOCX_SIZE=20000;
+	private static  final int MINIMUM_TXT_SIZE =0;
+	//Ab so vielen Bytes über dem Limit gibt es Punkte
+	private static  final int NEXT_RECIPE_POINT =500;
+	//gibt die maximale Größe an bis zu der es Punkte gibt (in Byte)
+	private static final long MAXIMUM_FILE_SIZE=100000000;
 	@Override
 	public List<String> getFilter() {
 		List<String> searchList = new ArrayList<String>();
@@ -93,6 +99,7 @@ public class Food implements Analyzable {
 
 	@Override
 	public void run() {
+		//TODO: Run Methode in sinnvolle Untermethoden aufschlüsseln
 		//*********************debugging*******
 
 		//		Path f = new Path("/Volumes/internal/debugg/Firefox/witzig/places.sqlite");
@@ -154,33 +161,57 @@ public class Food implements Analyzable {
 			//herausfinden welche Datei zuletzt erzeugt wurde
 
 
-			//TODO: Run Methode in sinnvolle Untermethoden aufschlüsseln
+
 			//TODO: IN FOR EACH SCHLEIFE UMWANDELN DA PERFORMANTER
 			Path latestReciept = myFoodFiles.get(0);
-
-			for (int i = 1; i < myFoodFiles.size(); i++) {
+			int lengthScore=0;
+			for (int i = 0; i < myFoodFiles.size(); i++) {
 				Path curr;
 				curr = myFoodFiles.get(i);
+
+
+
 				try {
 						if (Files.getLastModifiedTime(latestReciept).toMillis() < Files
 								.getLastModifiedTime(curr).toMillis()){
 
 							latestReciept = curr;
 						}
-					}catch(IOException e){
 
-			}
+					}catch(IOException e){
+						//tue nichts-->vor Allem nicht abstürzen
+					}
+
+				try {
+					lengthScore+=this.analyzeRecipeSize(curr);
+				}catch (IllegalArgumentException e){
+					//tue nichts-->vor Allem nicht abstürzen
+				}
+
 			}
 			//Dateiendung wird hier mit ausgegeben
 			myHtml += "<p>Zuletzt hast du das Rezept:\"" + latestReciept.getName(latestReciept
 					.getNameCount()-1).toString()+ "\" bearbeitet.</p>\n";
 			myCsvData.put("Zuletzt geändertes Rezept",  latestReciept.getName(latestReciept
 			.getNameCount()-1).toString());
-		}
-		else {
+
+			if(lengthScore>99){
+				myHtml+="<p>Deine Rezepte könnten ja fast ein ganzes Buch füllen. Respekt.</p>";
+
+			}else{
+				myHtml+="<p>Ja son paar Rezepte hast du, aber ein Buch kannst du so noch nicht " +
+						"füllen." +
+						"</p>";
+			}
+			myCsvData.put("lokaler Rezeptscore",lengthScore+"");
+		} else {
 			myHtml += "<p>Keine Rezepte gefunden. Mami kocht wohl immer noch am besten, was?</p>\n";
 			GlobalData.getInstance().changeScore("Faulenzerfaktor", 5);
 		}
+
+
+
+
 		this.analyzeDelieveryServices();
 		this.analyzeOnlineCookBooks();
 
@@ -372,6 +403,43 @@ private ResultSet[] getViewCountAndUrl(String[] searchUrl) {
 	return  results;
 }
 
+	/**
+	 * Diese Methode bewertet Dateien anhand ihrer Größe. Dies geht nur für .txt und .docx Dateien
+ 	 * @param recipe muss ein Pfad zu einer docx oder txt Datei sein
+	 * @return ein Wert der Schrittweise angibt
+	 * @throws IllegalArgumentException falls die Datei nicht im txt oder docx Format ist
+	 */
 
+private int analyzeRecipeSize(Path recipe) throws IllegalArgumentException{
+	int vote=0;
+	String ending = recipe.toString();
+	//hole nur die letzten paar Zeichen die auf jeden Fall auch die Dateiendung enthalten
+	ending = ending.substring(ending.length()-7,ending.length());
+
+		long size;
+		try {
+			size=Files.size(recipe);
+		}catch(IOException e){
+			size=0;
+		}
+		if(ending.contains("docx")){
+			//@Todo funktion mit % effizienter gestalten
+			for (long i = MINIMUM_DOCX_SIZE; i <size && i<MAXIMUM_FILE_SIZE;
+			     i+=NEXT_RECIPE_POINT) {
+				vote++;
+			}
+
+
+		}else if(ending.contains("txt")){
+			for (long i = MINIMUM_TXT_SIZE; i <size  && i<MAXIMUM_FILE_SIZE;
+			     i+=NEXT_RECIPE_POINT) {
+				vote++;
+			}
+
+		}else{
+			throw new IllegalArgumentException("Can't analyze this type of file");
+		}
+	return vote;
+}
 
 }
