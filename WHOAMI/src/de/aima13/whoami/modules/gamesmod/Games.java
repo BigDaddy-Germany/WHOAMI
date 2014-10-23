@@ -1,4 +1,4 @@
-package de.aima13.whoami.modules;
+package de.aima13.whoami.modules.gamesmod;
 
 import de.aima13.whoami.Analyzable;
 import org.apache.commons.lang3.text.WordUtils;
