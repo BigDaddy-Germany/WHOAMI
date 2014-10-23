@@ -8,7 +8,7 @@ import java.util.SortedMap;
 public class GlobalData implements Representable {
 
 	/**
-	 * @todo Global Data muss Thrad-safe sein
+	 * @todo Global Data muss Thread-safe sein
 	 */
 
 	/**
