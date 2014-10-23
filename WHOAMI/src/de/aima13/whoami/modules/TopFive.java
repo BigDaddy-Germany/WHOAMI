@@ -4,6 +4,7 @@ import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.support.DataSourceManager;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
