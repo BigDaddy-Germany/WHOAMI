@@ -3,6 +3,7 @@ package de.aima13.whoami.modules;
 
 import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.GlobalData;
+import de.aima13.whoami.Whoami;
 import de.aima13.whoami.support.DataSourceManager;
 
 import java.io.File;
@@ -99,18 +100,27 @@ public class Food implements Analyzable {
 
 	@Override
 	public void run() {
-		//TODO: Run Methode in sinnvolle Untermethoden aufschlüsseln
-		//*********************debugging*******
+		if(Whoami.getTimeProgress()<100) {
+			this.dbExtraction();
+		}
+		if(Whoami.getTimeProgress()<100) {
+			this.recipeAnalysis();
+		}
 
-		//		Path f = new Path("/Volumes/internal/debugg/Firefox/witzig/places.sqlite");
-		//	myFoodFiles = new ArrayList<Path>();
-		//	myFoodFiles.add(f);
-		//String x = this.parseChefkochUrl("http://www.chefkoch" +
-				//".de/rezepte/1108101216891426/Apfelkuchen-mit-Streuseln-vom-Blech.html");
+		if(Whoami.getTimeProgress()<100) {
+			this.analyzeDelieveryServices();
+		}
+		if(Whoami.getTimeProgress()<100) {
+			this.analyzeOnlineCookBooks();
+		}
 
-		//*************************************************************
+	}
 
-
+	/**
+	 * Filtert aus allen Daten die für dieses Modul die SQlite DBs heraus da diese anders
+	 * behandelt werden als "normale" Dateien.
+	 */
+	private void dbExtraction(){
 		//sqlite daten rausspeichern
 		myDbs = new ArrayList<Path>();
 		int foundDbs = 0;
@@ -141,27 +151,29 @@ public class Food implements Analyzable {
 			}
 		}catch(Exception e){e.printStackTrace();}
 
-			//Db-Files aus myFoodFiles Liste löschen
-			for(int i=0; i<foundDbs; i++) {
-				try {
+		//Db-Files aus myFoodFiles Liste löschen
+		for(int i=0; i<foundDbs; i++) {
+			try {
 
-					myFoodFiles.remove(myDbs.get(i));
-				}catch(Exception e){
-					e.printStackTrace();
-				}
+				myFoodFiles.remove(myDbs.get(i));
+			}catch(Exception e){
+				e.printStackTrace();
 			}
+		}
+	}
 
-
-
+	/**
+	 * Diese Methode analaysiert Rezepte und bewertet sie anhand der Dateigröße und dem
+	 * lastModified Date.Es leifert den Hauptteil zur Analyse.
+	 */
+	private void recipeAnalysis(){
+		//eigentliche Rezeptanalyse
 		if (myFoodFiles != null && myFoodFiles.size() != 0) {
 
 			myHtml += "<p>" + myFoodFiles.size() + " Rezepte wurden auf diesem PC gefunden.\n";
 			myCsvData.put("Anzahl Rezepte", "" + myFoodFiles.size());
 
 			//herausfinden welche Datei zuletzt erzeugt wurde
-
-
-
 			//TODO: IN FOR EACH SCHLEIFE UMWANDELN DA PERFORMANTER
 			Path latestReciept = myFoodFiles.get(0);
 			int lengthScore=0;
@@ -172,15 +184,15 @@ public class Food implements Analyzable {
 
 
 				try {
-						if (Files.getLastModifiedTime(latestReciept).toMillis() < Files
-								.getLastModifiedTime(curr).toMillis()){
+					if (Files.getLastModifiedTime(latestReciept).toMillis() < Files
+							.getLastModifiedTime(curr).toMillis()){
 
-							latestReciept = curr;
-						}
-
-					}catch(IOException e){
-						//tue nichts-->vor Allem nicht abstürzen
+						latestReciept = curr;
 					}
+
+				}catch(IOException e){
+					//tue nichts-->vor Allem nicht abstürzen
+				}
 
 				try {
 					lengthScore+=this.analyzeRecipeSize(curr);
@@ -193,7 +205,7 @@ public class Food implements Analyzable {
 			myHtml += "<p>Zuletzt hast du das Rezept:\"" + latestReciept.getName(latestReciept
 					.getNameCount()-1).toString()+ "\" bearbeitet.</p>\n";
 			myCsvData.put("Zuletzt geändertes Rezept",  latestReciept.getName(latestReciept
-			.getNameCount()-1).toString());
+					.getNameCount()-1).toString());
 
 			if(lengthScore>99){
 				myHtml+="<p>Deine Rezepte könnten ja fast ein ganzes Buch füllen. Respekt.</p>";
@@ -208,16 +220,7 @@ public class Food implements Analyzable {
 			myHtml += "<p>Keine Rezepte gefunden. Mami kocht wohl immer noch am besten, was?</p>\n";
 			GlobalData.getInstance().changeScore("Faulenzerfaktor", 5);
 		}
-
-
-
-
-		this.analyzeDelieveryServices();
-		this.analyzeOnlineCookBooks();
-
-
 	}
-
 	/**
 	 * Diese Methode liefert einen Beitrag zur Analyse indem sie die Browserverläufe nach
 	 * bestimmten Lieferservice anlaysiert.
@@ -409,7 +412,6 @@ private ResultSet[] getViewCountAndUrl(String[] searchUrl) {
 	 * @return ein Wert der Schrittweise angibt
 	 * @throws IllegalArgumentException falls die Datei nicht im txt oder docx Format ist
 	 */
-
 private int analyzeRecipeSize(Path recipe) throws IllegalArgumentException{
 	int vote=0;
 	String ending = recipe.toString();
