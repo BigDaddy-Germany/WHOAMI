@@ -41,7 +41,7 @@
         <resources>
             <resource>
                 <targetPath>.</targetPath>
-                <directory>${basedir}/resources/</directory>
+                <directory>${basedir}/res/</directory>
             </resource>
         </resources>
 
