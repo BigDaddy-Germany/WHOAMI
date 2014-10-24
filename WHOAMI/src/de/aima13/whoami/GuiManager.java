@@ -11,11 +11,13 @@ public class GuiManager {
 
 	public static boolean confirmAgb() {
 		System.out.println(GUI_PREFIX + "GUI AGB");
-		return true;
+		Gui.showEulaGui();
+		return Gui.eulaConfirmed();
 	}
 
 	public static void showGoodBye() {
-		System.out.println(GUI_PREFIX + "GUI GOOD BYE");
+		// Gui zeigt keinen GoodBye
+		System.out.println(GUI_PREFIX + "GUI GOOD BYE EULA DECLINED");
 	}
 
 	public static void showProgress() {
