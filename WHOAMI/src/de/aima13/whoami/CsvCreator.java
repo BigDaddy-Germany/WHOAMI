@@ -2,7 +2,6 @@ package de.aima13.whoami;
 
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
-import com.sun.org.apache.bcel.internal.generic.BREAKPOINT;
 
 import java.io.*;
 import java.util.List;
