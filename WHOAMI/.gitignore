@@ -1,7 +1,9 @@
 out/*
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/copyright/profiles_settings.xml
-.idea/misc.xml
-.idea/ant.xml
+/target/
+/*.xml
+!/pom.xml
+/.idea/*
+!/.idea/codeStyleSettings.xml
+/*.iml
+
 WHOAMI_Analyze_Results*.csv
