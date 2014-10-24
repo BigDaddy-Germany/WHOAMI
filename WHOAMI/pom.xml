@@ -34,7 +34,6 @@
 			<version>2.4</version>
 		</dependency>
     </dependencies>
-	
 
     <build>
 	<defaultGoal>clean package</defaultGoal>
@@ -50,7 +49,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.4</version>
+                <version>3.2</version>
                 <configuration>
                     <showDeprecation>true</showDeprecation>
                     <source>1.7</source>
@@ -59,8 +58,20 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>de.aima13.whoami.Whoami</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.0</version>
+                <version>2.3</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
