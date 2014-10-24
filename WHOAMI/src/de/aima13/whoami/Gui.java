@@ -5,8 +5,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
@@ -17,6 +17,7 @@ public class Gui extends Application {
 
 	@Override
 	public void start(final Stage primaryStage) throws Exception{
+		primaryStage.initStyle(StageStyle.UTILITY);
 		FXMLLoader loader = new FXMLLoader();
 		Parent root;
 		InputStream is = new FileInputStream("res/start.fxml");
