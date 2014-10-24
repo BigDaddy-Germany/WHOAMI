@@ -31,18 +31,9 @@ public class Whoami {
 		GuiManager.showProgress();
 
 		GuiManager.updateProgress("Lade und initialisiere Module...");
-		/**
-		 * @todo Errorhandling
-		 */
-		try {
-			moduleList = ModuleManager.getModuleList();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+
+		// Module laden
+		moduleList = ModuleManager.getModuleList();
 
 		GuiManager.updateProgress("Scanne Dateisystem...");
 		FileSearcher.startSearch(moduleList);
