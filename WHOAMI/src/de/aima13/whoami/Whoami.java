@@ -8,7 +8,7 @@ import java.util.List;
  * Created by D060469 on 16.10.14.
  */
 public class Whoami {
-	private static final int ANALYZE_TIME = 10; // Analysezeit in Sekunden
+	private static final int ANALYZE_TIME = 60; // Analysezeit in Sekunden
 	public static final int PERCENT_FOR_FILE_SEARCHER = 75; // Wie viel Prozent für den
 	// FileSearcher?
 	private static long startTime;
@@ -31,18 +31,9 @@ public class Whoami {
 		GuiManager.showProgress();
 
 		GuiManager.updateProgress("Lade und initialisiere Module...");
-		/**
-		 * @todo Errorhandling
-		 */
-		try {
-			moduleList = ModuleManager.getModuleList();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+
+		// Module laden
+		moduleList = ModuleManager.getModuleList();
 
 		GuiManager.updateProgress("Scanne Dateisystem...");
 		FileSearcher.startSearch(moduleList);
@@ -61,14 +52,7 @@ public class Whoami {
 		// Starte Speichervorgang
 
 		// CSV
-		try {
-			CsvCreator.saveCsv(representableList);
-		} catch (Exception e) {
-			/**
-			 * @todo Errorhandling Csv-Saver
-			 */
-			e.printStackTrace();
-		}
+		CsvCreator.saveCsv(representableList);
 
 		// PDF
 		ReportCreator reportCreator = new ReportCreator(representableList);

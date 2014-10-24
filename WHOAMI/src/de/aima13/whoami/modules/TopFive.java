@@ -4,9 +4,11 @@ import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.support.DataSourceManager;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.nio.file.Path;
 
 /**
  * Created by Marvin on 16.10.14.
@@ -15,7 +17,7 @@ import java.util.*;
  * @version 1.0
  */
 public class TopFive implements Analyzable {
-	private List<File> browserDatabases = new ArrayList<File>();
+	private List<Path> browserDatabases = new ArrayList<Path>();
 	private SortedMap<String, Integer> results = new TreeMap<String, Integer>();
 	private SortedMap<String, String> csvOutput = new TreeMap<String, String>();
 	private String htmlOutput = "";
@@ -43,13 +45,8 @@ public class TopFive implements Analyzable {
 	}
 
 	@Override
-	public void setFileInputs(List<File> files) throws IllegalArgumentException {
-		if (files != null && !files.isEmpty()) {
-			browserDatabases = files;
-		}
-		else {
-			throw new IllegalArgumentException("No sqlite Database specified");
-		}
+	public void setFileInputs(List<Path> files) throws IllegalArgumentException {
+		browserDatabases = files;
 	}
 
 	/**
@@ -102,7 +99,7 @@ public class TopFive implements Analyzable {
 	 */
 	@Override
 	public void run() {
-		for (File db : browserDatabases) {
+		for (Path db : browserDatabases) {
 			try {
 				ResultSet mostVisted = analyzeBrowserHistory(db);
 				while (mostVisted.next()) {
@@ -112,7 +109,7 @@ public class TopFive implements Analyzable {
 					visitCount = mostVisted.getInt("visit_count");
 					urlName = mostVisted.getString("hosts");
 					if (urlName != null && !urlName.equals("") && visitCount > 0) {
-						if (db.getAbsolutePath().contains("Firefox")) {
+						if (db.toString().contains("Firefox")) {
 							//Firefox Korrektur da Bsp.
 							// ed.miehnnam-wbhd.nalpsgnuselrov. -> vorlesungsplan.dhbw-mannheim.de
 							urlName = new StringBuffer(urlName).reverse().substring(1).toString();
@@ -131,6 +128,7 @@ public class TopFive implements Analyzable {
 				// kann nicht auf Spalten zugreifen oder Ergebnis leer
 			}
 		}
+		// Erzeuge immer egal ob for schleife durchlaufen wurde oder nicht
 		prepareOutput();
 	}
 
@@ -182,12 +180,12 @@ public class TopFive implements Analyzable {
 	 * @param sqliteDb File zur sqlite Datenbank.
 	 * @return Ergebnisse der jeweiligen Abfrage f&uuml;r Firefox oder Chrome oder null.
 	 */
-	private ResultSet analyzeBrowserHistory(File sqliteDb) {
+	private ResultSet analyzeBrowserHistory(Path sqliteDb) {
 		DataSourceManager dbManager = null;
 		ResultSet mostVisited = null;
 		try {
 			dbManager = new DataSourceManager(sqliteDb);
-			if (sqliteDb.getAbsolutePath().contains("Firefox")) {
+			if (sqliteDb.toString().contains("Firefox")) {
 				mostVisited = dbManager.querySqlStatement("SELECT SUM(moz_places.visit_count) " +
 						"visit_count, " +
 						"moz_places.rev_host hosts " +
@@ -196,7 +194,7 @@ public class TopFive implements Analyzable {
 						"ORDER BY visit_count DESC " +
 						"LIMIT 5;");
 			}
-			else if (sqliteDb.getAbsolutePath().contains("Chrome")) {
+			else if (sqliteDb.toString().contains("Chrome")) {
 				mostVisited = dbManager.querySqlStatement(
 						"SELECT SUM(visit_count) visit_count ,substr(B.url, 0 ,instr(B.url," +
 								"'/')) hosts FROM (SELECT visit_count," +

@@ -1,52 +1,74 @@
 package de.aima13.whoami.modules;
 
 import de.aima13.whoami.Analyzable;
+import de.aima13.whoami.support.Utilities;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.*;
 
 /**
- * Created by D060469 on 16.10.14.
+ * Demo-Modul als Kopiervorlage und zum Testen
  */
 public class SampleModule implements Analyzable {
 	public SampleModule() {
-		System.out.println("Ich wurde konstruiert.");
+		System.out.println("SampleModule wurde konstruiert.");
 	}
 
 	@Override
 	public List<String> getFilter() {
-		System.out.println("Nun gebe ich meine Filtereinstellungen aus.");
+		System.out.println("SampleModule verrät uns seinen Filter.");
 
 		List<String> filter = new ArrayList<>();
-		filter.add("**PF3*");
-		filter.add("**.php");
+		filter.add("**.txt");
 
 		return filter;
 	}
 
 	@Override
-	public void setFileInputs(List<File> files) throws Exception {
-		System.out.println("Setze Dateien im Testmodul. Folgende Dateien gesetzt:");
-		for (File file : files) {
-			System.out.println(" - " + file.getName());
+	public void setFileInputs(List<Path> files) throws Exception {
+		System.out.println("SampleModule bekommt " + files.size() + " Dateien.");
+		if (files.size() > 0) {
+			System.out.println("Eine davon ist: " + files.get(0).getFileName());
 		}
 	}
 
 	@Override
 	public String getHtml() {
-		return "Hallo. Ich bin das TestModul. Dies ist mein HTML-Text.";
+		return "<b>Hallo!</b> Ich bin das SampleModule.<br>Dies ist mein <i>HTML-Text</i>.";
 	}
 
 	@Override
-	public SortedMap<String,String> getCsvContent() {
+	public SortedMap<String, String> getCsvContent() {
 		SortedMap<String, String> csvContent = new TreeMap<>();
-		csvContent.put("TestHead", "Test Value");
+		csvContent.put("SampleModuleHeader", "SampleModule test value");
 
 		return csvContent;
 	}
 
+	public class SamplePerson {
+		public String surname;
+		public String lastname;
+	}
+
+	public class SampleData {
+		public String myText;
+		public Float myNumber;
+		public int[] myArray;
+		public List<SamplePerson> myList;
+	}
+
 	@Override
 	public void run() {
-		System.out.println("Ich laufe!");
+		System.out.println("SampleModule wurde gestartet!");
+
+		SampleData data = Utilities.loadDataFromJson("/data/SampleModule_TestData.json",
+				SampleData.class);
+
+		System.out.println("Sampled: " + data.myText);
+		System.out.println("Sampled: " + data.myNumber);
+		System.out.println("Sampled: " + Arrays.toString(data.myArray));
+		for (SamplePerson whoami : data.myList) {
+			System.out.println("Sampled: Liste -> " + whoami.lastname + ", " + whoami.surname);
+		}
 	}
 }
