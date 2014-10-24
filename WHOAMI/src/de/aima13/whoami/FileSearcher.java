@@ -128,7 +128,7 @@ public class FileSearcher {
 			try {
 				resultEntry.getKey().setFileInputs(new ArrayList<> (resultEntry.getValue()));
 			} catch (Exception e) {
-				e.printStackTrace();
+				// e.printStackTrace();
 			}
 		}
 	}
