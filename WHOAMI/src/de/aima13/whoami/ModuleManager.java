@@ -2,6 +2,7 @@ package de.aima13.whoami;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -20,12 +21,11 @@ public class ModuleManager {
 	 * Gibt eine Liste der Instanzen aller Module zurück
 	 * @return Die Liste der Module
 	 * @throws ClassNotFoundException
-	 * @throws IllegalAccessException
 	 * @throws InstantiationException
 	 * @throws IOException
 	 */
 	public static List<Analyzable> getModuleList() throws ClassNotFoundException,
-			IllegalAccessException, InstantiationException, IOException {
+			InstantiationException, IOException {
 
 		List<Analyzable> moduleList = new ArrayList<>();
 
@@ -35,8 +35,22 @@ public class ModuleManager {
 		// Liste aller Klassen abfragen und iterieren
 		final Class[] classes = getClasses(MODULE_PACKAGE);
 		for (Class cl : classes) {
-			Analyzable module = (Analyzable) cl.newInstance();
-			moduleList.add(module);
+			Analyzable module = null;
+			try {
+				Class[] moduleInterfaces = cl.getInterfaces();
+				for (Class moduleInterface : moduleInterfaces) {
+					if (moduleInterface.equals(Analyzable.class)) {
+						module = (Analyzable) cl.newInstance();
+						moduleList.add(module);
+						break;
+					}
+				}
+
+			} catch (IllegalAccessException e) {
+				// do nothing.
+			} catch (InstantiationException e) {
+				// do nothing.
+			}
 		}
 
 		return moduleList;
@@ -55,12 +69,16 @@ public class ModuleManager {
 		String path = packageName.replace('.', '/');
 		Enumeration<URL> resources = CLASS_LOADER.getResources(path);
 
-		List<File> dirs = new ArrayList<File>();
+		List<File> dirs = new ArrayList<>();
 		while (resources.hasMoreElements()) {
 			URL resource = resources.nextElement();
-			dirs.add(new File(resource.getFile()));
+			try {
+				dirs.add(new File(resource.toURI()));
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
 		}
-		ArrayList<Class> classes = new ArrayList<Class>();
+		ArrayList<Class> classes = new ArrayList<>();
 		for (File directory : dirs) {
 			classes.addAll(findClasses(directory, packageName));
 		}
