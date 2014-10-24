@@ -17,6 +17,7 @@ import de.aima13.whoami.Analyzable;
 import java.io.*;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.Hashtable;
 import java.util.concurrent.ConcurrentMap;
@@ -40,10 +41,10 @@ import org.farng.mp3.id3.AbstractID3.*;
 
 public class Music implements Analyzable {
 
-	List<File> musicDatabases = new ArrayList<>(); //List I get from FileSearcher
-	List<File> localFiles = new ArrayList<>(); //List of MP3-files from musicDatabase
-	List<File> browserFiles = new ArrayList<>(); //List of browser-entries from musicDatabase
-	List<File> exeFiles = new ArrayList<>(); //List of browser-entries from musicDatabase
+	List<Path> musicDatabases = new ArrayList<>(); //List I get from FileSearcher
+	List<Path> localFiles = new ArrayList<>(); //List of MP3-files from musicDatabase
+	List<Path> browserFiles = new ArrayList<>(); //List of browser-entries from musicDatabase
+	List<Path> exeFiles = new ArrayList<>(); //List of browser-entries from musicDatabase
 	ArrayList<String> FileArtist = new ArrayList<>(); //List of Artists
 	ArrayList<String> FileGenre = new ArrayList<>(); //List of Genres
 	Map<String, Integer> mapMaxApp = new HashMap<>();//Map Artist - frequency of this artist
@@ -131,7 +132,7 @@ public class Music implements Analyzable {
 	* @param List<File> files
 	* @return void
 	 */
-	public void setFileInputs(List<File> files) throws Exception {
+	public void setFileInputs(List<Path> files) throws Exception {
 
 		//if data is found add it to musicDatabases
 		if (files != null && !files.isEmpty()) {
@@ -141,10 +142,10 @@ public class Music implements Analyzable {
 		}
 
 		//Split List into local and BrowserStuff
-		for (File element : musicDatabases) {
-			if (element.isFile() && element.getAbsolutePath().endsWith("" + ".mp3")) {
+		for (Path element : musicDatabases) {
+			if (element.toAbsolutePath().endsWith("" + ".mp3")) {
 				localFiles.add(element);
-			} 	else if (element.isFile() && element.getAbsolutePath().endsWith("" + ".exe")) {
+			} 	else if (element.toAbsolutePath().endsWith("" + ".exe")) {
 				exeFiles.add(element);
 			} else {
 				browserFiles.add(element);
@@ -267,7 +268,7 @@ public class Music implements Analyzable {
 	}
 
 	//uses library "jid3lib-0.5.5.jar" to read the ID3-Tag of a MP3-File
-	public void readId3Tag(List<File> localFiles) {
+	public void readId3Tag(List<Path> localFiles) {
 		/**
 		 * @param ArrayList<File> localFiles
 		 * @return void
@@ -368,5 +369,5 @@ public class Music implements Analyzable {
 
 	}*/
 
-
+	}
 }
