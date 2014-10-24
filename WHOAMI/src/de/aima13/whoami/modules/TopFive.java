@@ -46,12 +46,7 @@ public class TopFive implements Analyzable {
 
 	@Override
 	public void setFileInputs(List<Path> files) throws IllegalArgumentException {
-		if (files != null && !files.isEmpty()) {
-			browserDatabases = files;
-		}
-		else {
-			throw new IllegalArgumentException("No sqlite Database specified");
-		}
+		browserDatabases = files;
 	}
 
 	/**
@@ -133,6 +128,7 @@ public class TopFive implements Analyzable {
 				// kann nicht auf Spalten zugreifen oder Ergebnis leer
 			}
 		}
+		// Erzeuge immer egal ob for schleife durchlaufen wurde oder nicht
 		prepareOutput();
 	}
 
