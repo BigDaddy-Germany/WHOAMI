@@ -1,11 +1,8 @@
 package de.aima13.whoami.modules;
 
-import com.google.gson.Gson;
 import de.aima13.whoami.Analyzable;
-import de.aima13.whoami.Whoami;
+import de.aima13.whoami.support.Utilities;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -64,21 +61,14 @@ public class SampleModule implements Analyzable {
 	public void run() {
 		System.out.println("SampleModule wurde gestartet!");
 
-		InputStream stream = Whoami.class.getResourceAsStream("/data/SampleModule_TestData.json");
-		try {
-			String input = org.apache.commons.io.IOUtils.toString(stream);
+		SampleData data = Utilities.loadDataFromJson("/data/SampleModule_TestData.json",
+				SampleData.class);
 
-			Gson deserializer = new Gson();
-			SampleData data = deserializer.fromJson(input, SampleData.class);
-
-			System.out.println("Sampled: " + data.myText);
-			System.out.println("Sampled: " + data.myNumber);
-			System.out.println("Sampled: " + Arrays.toString(data.myArray));
-			for (SamplePerson whoami : data.myList) {
-				System.out.println("Sampled: Liste -> " + whoami.lastname + ", " + whoami.surname);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		System.out.println("Sampled: " + data.myText);
+		System.out.println("Sampled: " + data.myNumber);
+		System.out.println("Sampled: " + Arrays.toString(data.myArray));
+		for (SamplePerson whoami : data.myList) {
+			System.out.println("Sampled: Liste -> " + whoami.lastname + ", " + whoami.surname);
 		}
 	}
 }
