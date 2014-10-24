@@ -17,18 +17,27 @@ public class FileSearcher {
 	// Dieser Pfad wird als root dir zum Suchen genutzt, wenn ungleich null
 
 	private static final String[] DEBUG_TEST_DIR = {
-			"C:\\"
+
+			"/Volumes/internal/debugg",
+		//	"C:\\Users\\D060469\\Desktop\\myTestFolder2"
 	};
 
 
+	//private static final String[] DEBUG_TEST_DIR = null;
+
+
+	//};
+
+
 	// private static final String[] DEBUG_TEST_DIR = null;
+
 
 	/**
 	 * Interne Klasse zum Nutzen des SimpleFileVisitors
 	 */
 	private static class FileFinder extends SimpleFileVisitor<Path> {
 		private Map<Analyzable, PathMatcher> matcherMap;
-		private Map<Analyzable, List<File>> resultMap;
+		private Map<Analyzable, List<Path>> resultMap;
 
 		/**
 		 * Konstruktor zum Erstellen der Instanz
@@ -41,7 +50,7 @@ public class FileSearcher {
 			// Create Map: Module <-> Results
 			this.resultMap = new HashMap<>();
 			for (Map.Entry<Analyzable, PathMatcher> matcherEntry : this.matcherMap.entrySet()) {
-				this.resultMap.put(matcherEntry.getKey(), new ArrayList<File>());
+				this.resultMap.put(matcherEntry.getKey(), new ArrayList<Path>());
 			}
 		}
 
@@ -50,7 +59,7 @@ public class FileSearcher {
 		 *
 		 * @return Liste der Paths
 		 */
-		public Map<Analyzable, List<File>> getResults() {
+		public Map<Analyzable, List<Path>> getResults() {
 			return this.resultMap;
 		}
 
@@ -75,7 +84,7 @@ public class FileSearcher {
 					if (matcherEntry.getValue().matches(file)) {
 
 						// Zuweisung durchführen
-						this.resultMap.get(matcherEntry.getKey()).add(file.toFile());
+						this.resultMap.get(matcherEntry.getKey()).add(file);
 					}
 				}
 
@@ -112,12 +121,12 @@ public class FileSearcher {
 		startFinder(fileFinder);
 
 		// Alle Ergebnisse wurden in dieser Instanz gespeichert
-		Map<Analyzable, List<File>> results = fileFinder.getResults();
+		Map<Analyzable, List<Path>> results = fileFinder.getResults();
 
 		// Durch Module iterieren und Ergebnisse zurweisen
-		for (Map.Entry<Analyzable, List<File>> resultEntry : results.entrySet()) {
+		for (Map.Entry<Analyzable, List<Path>> resultEntry : results.entrySet()) {
 			try {
-				resultEntry.getKey().setFileInputs(new ArrayList<File> (resultEntry.getValue()));
+				resultEntry.getKey().setFileInputs(new ArrayList<> (resultEntry.getValue()));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

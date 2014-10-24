@@ -37,10 +37,10 @@ public class ModuleManager {
 		for (Class cl : classes) {
 			Analyzable module = null;
 			try {
-				module = (Analyzable) cl.newInstance();
-				Class[] moduleInterfaces = module.getClass().getInterfaces();
+				Class[] moduleInterfaces = cl.getInterfaces();
 				for (Class moduleInterface : moduleInterfaces) {
 					if (moduleInterface.equals(Analyzable.class)) {
+						module = (Analyzable) cl.newInstance();
 						moduleList.add(module);
 						break;
 					}
