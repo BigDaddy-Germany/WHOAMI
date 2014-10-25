@@ -65,7 +65,7 @@ public class Utilities {
 			baseName += ".backup";
 		}
 
-		currentName = baseName + extension;
+		currentName = baseName + "." + extension;
 
 		int i = 0;
 		Path newFile = Paths.get(currentName);
@@ -75,7 +75,7 @@ public class Utilities {
 				// Harte Grenze bei 1000
 				return null;
 			}
-			currentName = baseName + "." + i + extension;
+			currentName = baseName + "." + i + "." + extension;
 			newFile = Paths.get(currentName);
 		}
 		return currentName;
@@ -120,7 +120,7 @@ public class Utilities {
 		int indexSlash = Math.max(fileName.lastIndexOf('/'), fileName.lastIndexOf('\\'));
 
 		if (indexDot > indexSlash) {
-			baseName = fileName.substring(indexSlash+1, indexDot-1);
+			baseName = fileName.substring(indexSlash+1, indexDot);
 		} else {
 			baseName = fileName.substring(indexSlash+1);
 		}

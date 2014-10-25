@@ -35,8 +35,6 @@ public class CsvCreator {
 	public static boolean saveCsv(List<Representable> representables) {
 		SortedMap<String, String> completeCsvContent = new TreeMap<>();
 
-		System.out.println("\n\nStarting CsvCreator\n----------------\n");
-
 		// CSV Werte aus allen Representables ziehen
 		for (Representable representable : representables) {
 			SortedMap<String, String> moduleCsvContent = representable.getCsvContent();
@@ -57,8 +55,6 @@ public class CsvCreator {
 				}
 			}
 		}
-
-		System.out.println((new File(".")).getAbsolutePath());
 
 		// Header und Values als Stringarray exportieren
 		String[] csvHeader = completeCsvContent
