@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Created by D060469 on 16.10.14.
  */
-public class Whoami {
+public class Whoami implements  Runnable{
 	private static final int ANALYZE_TIME = 60; // Analysezeit in Sekunden
 	public static final int PERCENT_FOR_FILE_SEARCHER = 75; // Wie viel Prozent für den
 	// FileSearcher?
@@ -15,20 +15,34 @@ public class Whoami {
 
 	public static void main(String[] args) {
 		startTime = System.currentTimeMillis();
-
-		List<Analyzable> moduleList = new ArrayList<>();                // Liste der Module
-		List<Representable> representableList = new ArrayList<>();      // Liste der Representables
-
-		// Gui starten und AGB zur Bestätigung anzeigen
+			// Gui starten und AGB zur Bestätigung anzeigen
 		GuiManager.startGui();
 		if (!GuiManager.confirmAgb()) {
 			// Beenden des Programms, falls der User die AGB ablehnt
-			GuiManager.showGoodBye();
 			System.exit(0);
 		}
+	}
 
-		// Fortschrittsanzeige einnblenden und immer wieder updaten
-		GuiManager.showProgress();
+	/**
+	 * Information über die bisherige und restliche Laufzeit des Programms
+	 * @return Ganzzahliger Prozentwert zwischen 0 und 100 (100: Zeit ist um)
+	 */
+	public static int getTimeProgress() {
+		float elapsedTime = (float) ((System.currentTimeMillis() - startTime) / 1000);
+		int timeProgress = (int) (elapsedTime / ANALYZE_TIME * 100);
+
+		if (timeProgress < 100) {
+			return timeProgress;
+		} else {
+			return 100;
+		}
+	}
+
+	@Override
+	public void run() {
+		System.out.println("\n\nIch runne mal die Module");
+		List<Analyzable> moduleList = new ArrayList<>();                // Liste der Module
+		List<Representable> representableList = new ArrayList<>();      // Liste der Representables
 
 		GuiManager.updateProgress("Lade und initialisiere Module...");
 		/**
@@ -73,23 +87,10 @@ public class Whoami {
 			 */
 			e.printStackTrace();
 		}
+		GuiManager.updateProgress("Bin fertig :)");
 
+		GuiManager.closeAnalysisProgess();
 		// Anzeigen des Berichtes
 		GuiManager.showReport(reportCreator.getHtml());
-	}
-
-	/**
-	 * Information über die bisherige und restliche Laufzeit des Programms
-	 * @return Ganzzahliger Prozentwert zwischen 0 und 100 (100: Zeit ist um)
-	 */
-	public static int getTimeProgress() {
-		float elapsedTime = (float) ((System.currentTimeMillis() - startTime) / 1000);
-		int timeProgress = (int) (elapsedTime / ANALYZE_TIME * 100);
-
-		if (timeProgress < 100) {
-			return timeProgress;
-		} else {
-			return 100;
-		}
 	}
 }
