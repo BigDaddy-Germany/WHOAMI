@@ -28,7 +28,7 @@ public class GlobalData implements Representable {
 	}
 
 	@Override
-	public String csvPrefix() {
+	public String getCsvPrefix() {
 		return null;
 	}
 

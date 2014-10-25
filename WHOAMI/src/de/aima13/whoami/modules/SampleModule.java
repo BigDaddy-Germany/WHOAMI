@@ -43,7 +43,7 @@ public class SampleModule implements Analyzable {
 	}
 
 	@Override
-	public String csvPrefix() {
+	public String getCsvPrefix() {
 		return null;
 	}
 

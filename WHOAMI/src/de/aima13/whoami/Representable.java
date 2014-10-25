@@ -24,7 +24,7 @@ public interface Representable {
 	 * Rückgabe des Prefixes, welcher den Spalten der CSV-Datei voran gestellt werden soll
 	 * @return Der Prefix ohne Leer- oder Sonderzeichen (maschinenlesbar)
 	 */
-	public String csvPrefix();
+	public String getCsvPrefix();
 
 	/**
 	 * Rückgabe des beigesteuerten Teils der CSV-Datei

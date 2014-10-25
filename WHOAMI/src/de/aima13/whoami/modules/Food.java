@@ -81,7 +81,7 @@ public class Food implements Analyzable {
 	}
 
 	@Override
-	public String csvPrefix() {
+	public String getCsvPrefix() {
 		return null;
 	}
 
