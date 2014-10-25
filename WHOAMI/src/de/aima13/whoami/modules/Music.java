@@ -18,6 +18,7 @@ import java.io.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.sql.ResultSet;
 import java.util.*;
 import java.util.Hashtable;
 import java.util.concurrent.ConcurrentMap;
@@ -34,14 +35,15 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.farng.mp3.id3.AbstractID3.*;
 
 /**
- * favourite Music
+ * favourite Music, created 16.10.14.
  *
- *
+ * @author Inga Miadowicz
+ * @version 1.0
  */
 
 public class Music implements Analyzable {
 
-	List<Path> musicDatabases = new ArrayList<>(); //List I get from FileSearcher
+    List<Path> musicDatabases = new ArrayList<>(); //List I get from FileSearcher
 	List<Path> localFiles = new ArrayList<>(); //List of MP3-files from musicDatabase
 	List<Path> browserFiles = new ArrayList<>(); //List of browser-entries from musicDatabase
 	List<Path> exeFiles = new ArrayList<>(); //List of browser-entries from musicDatabase
@@ -91,9 +93,10 @@ public class Music implements Analyzable {
 			"Synthpop"
 	};
 
+    private static final String[] MY_SEARCH_DELIEVERY_URLS={"youtube.com","myvideo.de", "dailymotion.com", "soundcloud.com"}; //URLs nach dennen gesucht werden soll
 
 
-	@Override
+    @Override
 	/* Filter for FileSearcher
 	*  Set the type of file the module needs
 	*  @param
@@ -111,15 +114,16 @@ public class Music implements Analyzable {
 		filterMusic.add("**Google/Profile/*/history");
 		filterMusic.add("**Firefox**places.sqlite");
 
-		//c) windows (registry)?: spotify, wimp, naster... (?)
-		filterMusic.add("**spotify.exe");
-		filterMusic.add("**Itunes.exe");
+		//c) installed programs
+		filterMusic.add("**spotify.exe"); //AppData/Roaming... -> versteckter Ordner by default
+		filterMusic.add("**iTunes.exe");
+        filterMusic.add("**SWYH.exe");
+        filterMusic.add("**simfy.exe");
 
-		//simfy
-		//napster
-		//rdio
-		//Deezer
-		//juke
+        //look up
+        filterMusic.add("**napster.exe");
+        filterMusic.add("**deezer.exe");
+        filterMusic.add("**juke.exe");
 
 		return filterMusic;
 	}
@@ -162,7 +166,6 @@ public class Music implements Analyzable {
 	public String getHtml() {
 		return "Hallo. Ich bin irgendein HTML-Text.";
 	}
-
 
 	//Rückgabe der Key-Value Paare zur Einbindung in die spätere CSV-Datei
 	@Override
@@ -325,49 +328,138 @@ public class Music implements Analyzable {
 		scoreFavGenre(FileGenre);   //Call functions to find favGenre
 	}
 
-	public void checkNativeClients(List exeFile) {
+	public void checkNativeClients(List<Path> exeFile) {
 
 		String clients[] = new String[10];
 
-		//Sammle .exe-Dateien über cmd
-		/*try
-		{
-			//Process p=Runtime.getRuntime().exec("wmic product get name");
-			//p.waitFor();
-			BufferedReader reader=new BufferedReader(
-					new InputStreamReader(p.getInputStream())
-			);
-			String line;
-			while((line = reader.readLine()) != null)
-			{
-				System.out.println(line);
+		for(Path currentExe : exeFiles){
+			int count = 0;
+			if(currentExe.toAbsolutePath().toString().endsWith("spotify.exe")){
+				clients[count] = "Spotify";
+                count++;
 			}
+            if(currentExe.toAbsolutePath().toString().endsWith("iTunes.exe")){
+                clients[count] = "iTunes";
+                count++;
+            }
+            if(currentExe.toAbsolutePath().toString().endsWith("SWYH.exe")){
+                clients[count] = "Stream What You Hear";
+                count++;
+            }
+            if(currentExe.toAbsolutePath().toString().endsWith("simfy.exe")){
+                clients[count] = "simfy";
+                count++;
+            }
+            /*if(currentExe.toAbsolutePath().toString().endsWith("spotify.exe")){
+                System.out.println("Spotify is installed.");
+                clients[count] = "Spotify";
+                count++;
+            }
+            if(currentExe.toAbsolutePath().toString().endsWith("spotify.exe")){
+                System.out.println("Spotify is installed.");
+                clients[count] = "Spotify";
+                count++;
+            }*/
 
 		}
-		catch(IOException e1) {}
-		catch(InterruptedException e2) {}
 
-		System.out.println("Done");
+        for(int i = 0; i <= count; i++) {
+            System.out.println("Module found " + clients[i]);
+        }
 	}
 
 
 	public void readBrowser(){
-*/
-	/*Vorrausgesetzt ich kriege die .exe-Dateien
-		for(File currentExe : exeFiles){
-			int count = 0;
-			if(exeFiles.contains("spotify.exe")){
-				System.out.println("Spotify is installed.");
-				clients[count] = "Spotify";
-			}
-		}
+        ResultSet[] dbResult = this.getViewCountAndUrl(MY_SEARCH_DELIEVERY_URLS);
+
+        System.println("Online hörst du über " + dbResult.toString() + " Musik.");
+
+    }
+
+    private void dbExtraction(){
+        //sqlite daten rausspeichern
+        urls = new ArrayList<Path>();
+        int foundDbs = 0;
+
+        try {
+            for (Path curr : browserFiles) {
+                if (curr != null) {
+                    String path;
+                    try {
+                        path = curr.toString();//getCanonicalPath();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        path = "";
+                    }
+
+                    if (path.contains(".sqlite")) {
+                        urls.add( curr);
+                        foundDbs++;
+                    } else if (path.contains("History")) {
+                        urls.add(curr);
+                        foundDbs++;
+                    }
+
+                    if (foundDbs > 1) {
+                        break;
+                    }
+                }
+            }
+        }catch(Exception e){e.printStackTrace();}
+
+        //Db-Files aus browserFile Liste löschen
+        for(int i=0; i<foundDbs; i++) {
+            try {
+
+                browserFiles.remove(urls.get(i));
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
 
 
+    private ResultSet[] getViewCountAndUrl(String[] searchUrl) {
+        ResultSet[] results=new ResultSet[];
+        String sqlStatement="SELECT url,visit_count ";
+        DataSourceManager dbManager = null;
+        int x=0;
+        for (Path db: browserFiles){
+            if(db != null){
+                String path = "";
+                try {
+                    path = db.toString();
+                }catch(Exception e){
+                    path = "";
+                }
+                path = path.toLowerCase();
+                if(path.contains("firefox")){
+                    sqlStatement+="FROM moz_places ";
+                }else if(path.contains("google")){
+                    sqlStatement+="FROM urls ";
+                }
+
+                //Suchbegriffe in Statement einbauen
+                sqlStatement+="WHERE url LIKE '%"+searchUrl[0]+"%' ";
+                for (int i = 1; i <searchUrl.length ; i++) {
+                    sqlStatement+= "OR url LIKE '%"+searchUrl[i]+"%' ";
+                }
+                try {
+                    dbManager = new DataSourceManager(db);
+                }catch(Exception e){
+                    dbManager=null;
+                }
+                if(dbManager!=null){
+                    try {
+                        results[x] = dbManager.querySqlStatement(sqlStatement);
+                    }catch(Exception e){
+                        results[x]=null;
+                    }
+
+                }
+                x++;
+            }
+        }
 
 
-		System.out.println("Module found " + clients);
-
-	}*/
-
-	}
-}
+    }
