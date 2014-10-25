@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * Created by D060469 on 16.10.14.
+ * Created by Marco Dörfler on 16.10.14.
  * Erstellen und Speichern des Reportes aus allen Representables
  */
 public class ReportCreator {
@@ -41,12 +41,21 @@ public class ReportCreator {
 	/**
 	 * Constructor
 	 * @param representables Liste aller Representables, die in den Bericht aufgenommen werden
+	 *
+	 * @author Marco Dörfler
 	 */
 	public ReportCreator(List<Representable> representables) {
 		this.representableList = representables;
 	}
 
 
+	/**
+	 * HTML parsen und als HTML speichern
+	 * Vorsicht: Hat nur ein Modul fehlerhaften HTML-Code kann kein Report gespeichert werden!
+	 * @return Erfolgsmeldung: PDF gespeichert oder nicht
+	 *
+	 * @author Marco Dörfler
+	 */
 	public boolean savePdf() {
 		try {
 			// Evt. vorhandene Datei umbenennen
@@ -84,10 +93,12 @@ public class ReportCreator {
 				System.err.println("Bericht nur bis zu fehlerhafter Stelle erstellt.");
 				System.err.println("\n\nStackTrace:");
 				e.printStackTrace();
-			}
 
-			// Dokument schließen
-			pdfFile.close();
+				return false;
+			} finally {
+				// PDF schließen
+				pdfFile.close();
+			}
 
 			System.out.println("PDF created");
 
@@ -105,6 +116,8 @@ public class ReportCreator {
 	/**
 	 * Erzeuge nur wenn nötig den HTML-Code und speicher diesen
 	 * @return der HTML-Code
+	 *
+	 * @author Marco Dörfler
 	 */
 	public String getHtml() {
 		if (this.htmlContent == null) {
@@ -117,6 +130,8 @@ public class ReportCreator {
 	 * Lade HTML Template aus den Resourcen und fülle es mit den Daten der Representables
 	 * Rendere danach das Template
 	 * @return Der HTML-Code des Berichts
+	 *
+	 * @author Marco Dörfler
 	 */
 	private String createHtml() {
 		// Template laden
@@ -151,6 +166,8 @@ public class ReportCreator {
 	/**
 	 * Lade alle HTML-Snippets der Representables
 	 * @return Liste der HTML-Snippets
+	 *
+	 * @author Marco Dörfler
 	 */
 	private List<String> getHtmlSnippets() {
 		List<String> htmlSnippets = new ArrayList<>();

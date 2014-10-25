@@ -54,6 +54,8 @@ public class Utilities {
 	 *
 	 * @param backup soll backup als suffix genutzt werden?
 	 * @return Der neue Dateiname oder im Misserfolg null
+	 *
+	 * @author Marco Dörfler
 	 */
 	public static String getNewFileName(String favoredName, boolean backup) {
 		String currentName;
@@ -84,6 +86,8 @@ public class Utilities {
 	/**
 	 * Neuen Dateinamen suchen, der noch nicht vergeben ist (Suffix backup)
 	 * @return Der neue Dateiname oder im Misserfolg null
+	 *
+	 * @author Marco Dörfler
 	 */
 	public static String getNewFileName(String favoredName) {
 		return getNewFileName(favoredName, true);
@@ -93,6 +97,8 @@ public class Utilities {
 	 * Dateiendung einer Datei berechnen
 	 * @param fileName Name der Datei
 	 * @return Die Endung der Datei (ohne Punkt)
+	 *
+	 * @author Marco Dörfler
 	 */
 	public static String getFileExtenstion(String fileName) {
 		String extension = "";
@@ -112,6 +118,8 @@ public class Utilities {
 	 * (Keine Ordnerstruktur mehr, keine Endung mehr
 	 * @param fileName Der Name der Datei
 	 * @return Der Basename der Datei
+	 *
+	 * @author Marco Dörfler
 	 */
 	public static String getFileBaseName(String fileName) {
 		String baseName = "";

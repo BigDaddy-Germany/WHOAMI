@@ -11,7 +11,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
- * Created by D060469 on 16.10.14.
+ * Created by Marco Dörfler on 16.10.14.
  * Erstellt eine CSV und speichert diese
  */
 public class CsvCreator {
@@ -30,7 +30,8 @@ public class CsvCreator {
 	 * Starten der Speicherung
 	 *
 	 * @param representables Liste alle zu präsentierenden CSV Werte
-	 * @throws Exception Ein Fehler ist aufgetreten
+	 *
+	 * @author Marco Dörfler
 	 */
 	public static boolean saveCsv(List<Representable> representables) {
 		SortedMap<String, String> completeCsvContent = new TreeMap<>();
@@ -165,6 +166,8 @@ public class CsvCreator {
 	 * Untersuchen auf eventuell bereits vorhandener CSV-Dateien
 	 * @param moduleHeader String-Array des aktuellen Headers
 	 * @return enum zur Statusunterscheidung
+	 *
+	 * @author Marco Dörfler
 	 */
 	private static CSV_STATUS getCsvStatus(String[] moduleHeader) {
 		try {
