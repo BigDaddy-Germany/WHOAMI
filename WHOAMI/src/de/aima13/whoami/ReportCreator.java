@@ -1,5 +1,7 @@
 package de.aima13.whoami;
 
+import com.itextpdf.text.Document;
+import com.itextpdf.text.PageSize;
 import org.stringtemplate.v4.ST;
 
 import java.util.ArrayList;
@@ -14,6 +16,8 @@ public class ReportCreator {
 	private final String TEMPLATE_LOCATION = "/data/ReportTemplate.html";
 	private String htmlContent;
 
+	
+
 	/**
 	 * Constructor
 	 * @param representables Liste aller Representables, die in den Bericht aufgenommen werden
@@ -24,8 +28,9 @@ public class ReportCreator {
 
 
 	public void savePdf() throws Exception {
-		System.out.println("Html Code erzeugt.");
-		System.out.println(this.getHtml());
+		com.itextpdf.text.Document pdfFile = new Document(PageSize.A4);
+
+
 
 	}
 
