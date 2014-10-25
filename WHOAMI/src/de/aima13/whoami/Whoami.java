@@ -56,14 +56,7 @@ public class Whoami {
 
 		// PDF
 		ReportCreator reportCreator = new ReportCreator(representableList);
-		try {
-			reportCreator.savePdf();
-		} catch (Exception e) {
-			/**
-			 * @todo Errorhandling Report-Creator
-			 */
-			e.printStackTrace();
-		}
+		reportCreator.savePdf();
 
 		// Anzeigen des Berichtes
 		GuiManager.showReport(reportCreator.getHtml());
