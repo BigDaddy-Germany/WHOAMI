@@ -5,7 +5,9 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.html.simpleparser.HTMLWorker;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.tool.xml.XMLWorker;
 import com.itextpdf.tool.xml.XMLWorkerHelper;
+import com.itextpdf.tool.xml.exceptions.RuntimeWorkerException;
 import de.aima13.whoami.support.Utilities;
 import org.stringtemplate.v4.ST;
 
@@ -135,15 +137,8 @@ public class ReportCreator {
 			template.addAggr("modules.{title, content}", reprTitle, reprContent);
 		}
 
-		String htmlCode = template.render();
-
-		System.out.println("HTML Created:");
-		System.out.println("-----------------");
-		System.out.println(htmlCode);
-		System.out.println("\n\n");
-
 		// Template rendern und zurückgeben
-		return htmlCode;
+		return template.render();
 	}
 
 	/**
@@ -152,6 +147,7 @@ public class ReportCreator {
 	 */
 	private List<String> getHtmlSnippets() {
 		List<String> htmlSnippets = new ArrayList<>();
+
 
 		for (Representable representable : this.representableList) {
 			htmlSnippets.add(representable.getHtml());
