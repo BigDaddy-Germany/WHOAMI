@@ -60,6 +60,16 @@ public class TopFive implements Analyzable {
 		return htmlOutput;
 	}
 
+	@Override
+	public String getReportTitle() {
+		return null;
+	}
+
+	@Override
+	public String csvPrefix() {
+		return null;
+	}
+
 	/**
 	 * Methode iteriert über die Ergebnisse in der TreeMap. Und liefert den maximalen Wert der
 	 * TreeMap.
