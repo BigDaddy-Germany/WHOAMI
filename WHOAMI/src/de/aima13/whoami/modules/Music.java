@@ -276,9 +276,9 @@ public class Music implements Analyzable {
 
 		String genre = ""; //String of Genre
 
-		for (File file : localFiles) {
+		for (Path file : localFiles) {
 			try {
-				String fileLocation = file.getPath(); //Get path to file
+				String fileLocation = file.toAbsolutePath().toString(); //Get path to file
 				MP3File mp3file = new MP3File(fileLocation); //create new object from ID3tag-package
 
 				if (mp3file.hasID3v2Tag()) {
