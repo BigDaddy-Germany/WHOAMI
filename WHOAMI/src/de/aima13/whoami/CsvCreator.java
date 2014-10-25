@@ -2,6 +2,7 @@ package de.aima13.whoami;
 
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
+import de.aima13.whoami.support.Utilities;
 
 import java.io.*;
 import java.util.List;
@@ -101,7 +102,7 @@ public class CsvCreator {
 			case WRONG_FORMAT:
 				// Nach neuem, nicht vergebenem Namen suchen
 				String newFileName;
-				if ((newFileName = getNewFileName()) == null) {
+				if ((newFileName = Utilities.getNewFileName(FILE_NAME)) == null) {
 					// Kein neuer nutzbarer Name gefunden
 					return false;
 				}
@@ -122,7 +123,7 @@ public class CsvCreator {
 				try {
 					if (!csvFile.canWrite() && !csvFile.setWritable(true)) {
 						// Datei kann nicht benutzt werden. Suche nach anderem Namen
-						if ((newFileName = getNewFileName()) == null) {
+						if ((newFileName = Utilities.getNewFileName(FILE_NAME)) == null) {
 							// Kein neuer nutzbarer Name gefunden
 							return false;
 						}
@@ -161,46 +162,6 @@ public class CsvCreator {
 
 		// wenn wir hier gelandet sind, sollte es geklappt haben.
 		return true;
-	}
-
-
-	/**
-	 * Neuen Dateinamen suchen, der noch nicht vergeben ist
-	 *
-	 * @param backup soll backup als suffix genutzt werden?
-	 * @return Der neue Dateiname oder im Misserfolg null
-	 */
-	private static String getNewFileName(boolean backup) {
-		String currentName;
-		String baseName = FILE_NAME.substring(0, FILE_NAME.length() - 4);
-		String extension = FILE_NAME.substring(FILE_NAME.length() - 4);
-
-		if (backup) {
-			baseName += ".backup";
-		}
-
-		currentName = baseName + extension;
-
-		int i = 0;
-		File newFile = new File(currentName);
-		while (newFile.exists()) {
-			i++;
-			if (i == 1000) {
-				// Harte Grenze bei 1000
-				return null;
-			}
-			currentName = baseName + "." + i + extension;
-			newFile = new File(currentName);
-		}
-		return currentName;
-	}
-
-	/**
-	 * Neuen Dateinamen suchen, der noch nicht vergeben ist (Suffix backup)
-	 * @return Der neue Dateiname oder im Misserfolg null
-	 */
-	private static String getNewFileName() {
-		return getNewFileName(true);
 	}
 
 
