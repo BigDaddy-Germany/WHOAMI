@@ -38,6 +38,16 @@ public class SampleModule implements Analyzable {
 	}
 
 	@Override
+	public String getReportTitle() {
+		return null;
+	}
+
+	@Override
+	public String csvPrefix() {
+		return null;
+	}
+
+	@Override
 	public SortedMap<String, String> getCsvContent() {
 		SortedMap<String, String> csvContent = new TreeMap<>();
 		csvContent.put("SampleModuleHeader", "SampleModule test value");

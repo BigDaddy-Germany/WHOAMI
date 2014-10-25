@@ -15,6 +15,18 @@ public interface Representable {
 	public String getHtml();
 
 	/**
+	 * Rückgabe des Titels, der im Report auftauchen soll
+	 * @return Der Titel im menschenlesbaren Format
+	 */
+	public String getReportTitle();
+
+	/**
+	 * Rückgabe des Prefixes, welcher den Spalten der CSV-Datei voran gestellt werden soll
+	 * @return Der Prefix ohne Leer- oder Sonderzeichen (maschinenlesbar)
+	 */
+	public String csvPrefix();
+
+	/**
 	 * Rückgabe des beigesteuerten Teils der CSV-Datei
 	 * @return Teil der CSV als Key-Value Paare (SortedMap)
 	 */

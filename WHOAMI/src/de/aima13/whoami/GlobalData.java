@@ -23,6 +23,16 @@ public class GlobalData implements Representable {
 	}
 
 	@Override
+	public String getReportTitle() {
+		return null;
+	}
+
+	@Override
+	public String csvPrefix() {
+		return null;
+	}
+
+	@Override
 	public SortedMap<String, String> getCsvContent() {
 
 		return null;
