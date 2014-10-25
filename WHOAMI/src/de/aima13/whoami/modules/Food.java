@@ -76,6 +76,16 @@ public class Food implements Analyzable {
 	}
 
 	@Override
+	public String getReportTitle() {
+		return null;
+	}
+
+	@Override
+	public String getCsvPrefix() {
+		return null;
+	}
+
+	@Override
 	public SortedMap<String, String> getCsvContent() {
 
 		return myCsvData;

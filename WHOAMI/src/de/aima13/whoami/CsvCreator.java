@@ -42,11 +42,16 @@ public class CsvCreator {
 
 			if (moduleCsvContent != null) {
 				// Header werden mit Prefix versehen -> keine Namensgleichheit
-				String prefix = representable.getClass().getSimpleName();
+				String prefix = representable.getCsvPrefix();
+				// Wenn das Modul noch keinen Prefix zurückgibt, wird der Klassenname genutzt
+				if (representable.getCsvPrefix() == null) {
+					prefix = representable.getClass().getSimpleName();
+				}
 
 				for (Map.Entry<String, String> moduleCsvCol : moduleCsvContent.entrySet()) {
 					// Titel mit Prefix versehen und Spalte hinzufügen
-					completeCsvContent.put(prefix + PREFIX_SEPERATOR + moduleCsvCol.getKey(),
+					completeCsvContent.put(prefix + PREFIX_SEPERATOR + moduleCsvCol.getKey()
+							.replace(" ", "-"),
 							moduleCsvCol.getValue());
 				}
 			}

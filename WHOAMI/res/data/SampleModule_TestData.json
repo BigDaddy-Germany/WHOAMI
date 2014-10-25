@@ -1,0 +1,9 @@
+{
+	"myText":"Lorem Ipsum dolor sit amet!",
+	"myNumber":42.42,
+	"myArray":[1,2,3,5,8],
+	"myList":[
+		{"surname":"Hans-Dieter","lastname":"Müller"},
+		{"surname":"Lieschen","lastname":"Müller"}
+	]
+}
