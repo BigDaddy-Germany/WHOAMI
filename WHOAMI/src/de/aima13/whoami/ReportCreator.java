@@ -77,12 +77,19 @@ public class ReportCreator {
 			ByteArrayInputStream htmlSourceInputStream = new ByteArrayInputStream(
 					htmlSource.getBytes(StandardCharsets.UTF_8.toString())
 			);
-			XMLWorkerHelper.getInstance().parseXHtml(writer, pdfFile, htmlSourceInputStream);
+			try {
+				XMLWorkerHelper.getInstance().parseXHtml(writer, pdfFile, htmlSourceInputStream);
+			} catch (RuntimeWorkerException e) {
+				System.err.println("Parsen des Berichtes wegen fehlerhaftem HTML abgebrochen.");
+				System.err.println("Bericht nur bis zu fehlerhafter Stelle erstellt.");
+				System.err.println("\n\nStackTrace:");
+				e.printStackTrace();
+			}
 
 			// Dokument schließen
 			pdfFile.close();
 
-			System.out.println("PDF Created!");
+			System.out.println("PDF created");
 
 			// Wenn bis hier alles durchgelaufen ist, war es erfolgreich
 			return true;
