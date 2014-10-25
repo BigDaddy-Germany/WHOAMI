@@ -55,6 +55,8 @@ public class Music implements Analyzable {
 	String favArtist = ""; //favourite Artist
 	String favGenre="";    //favourite Genre
 
+    private static final String[] MY_SEARCH_DELIEVERY_URLS={"youtube.com","myvideo.de", "dailymotion.com",
+                                                            "soundcloud.com", "deezer.com", }; //URLs nach denen gesucht werden soll
 	String[] arrayGenre =  {	// Position in array is Byte of id3Tag for Genre:
 								// GenreID is 3: Genre to ID is "Dance"
 
@@ -93,8 +95,6 @@ public class Music implements Analyzable {
 			"Synthpop"
 	};
 
-    private static final String[] MY_SEARCH_DELIEVERY_URLS={"youtube.com","myvideo.de", "dailymotion.com", "soundcloud.com"}; //URLs nach dennen gesucht werden soll
-
 
     @Override
 	/* Filter for FileSearcher
@@ -120,10 +120,7 @@ public class Music implements Analyzable {
         filterMusic.add("**SWYH.exe");
         filterMusic.add("**simfy.exe");
 
-        //look up
-        filterMusic.add("**napster.exe");
-        filterMusic.add("**deezer.exe");
-        filterMusic.add("**juke.exe");
+           //jukebox, napster kostenpflichtig?
 
 		return filterMusic;
 	}
