@@ -4,6 +4,7 @@ package de.aima13.whoami;
  * Created by D060469 on 16.10.14.
  */
 public class GuiManager {
+	public static ProgressController pgController;
 	final static String GUI_PREFIX = "................";
 	public static void startGui() {
 		System.out.println(GUI_PREFIX + "GUI STARTED");
@@ -25,10 +26,13 @@ public class GuiManager {
 	}
 
 	public static void updateProgress(String status) {
-		System.out.println(GUI_PREFIX + "GUI UPDATED: " + status);
+		pgController.addComment(status);
 	}
 
 	public static void showReport(String reportHtml) {
 		System.out.println(GUI_PREFIX + "GUI REPORT");
+	}
+	public static void closeAnalysisProgess(){
+		pgController.finishedScanningClose();
 	}
 }

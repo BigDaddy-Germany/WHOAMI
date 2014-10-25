@@ -1,20 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.*?>
-<?import javafx.scene.effect.*?>
-<?import javafx.geometry.*?>
 <?import java.lang.*?>
+<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.aima13.whoami.ProgressController">
    <children>
-      <TextArea editable="false" layoutX="25.0" layoutY="14.0" minHeight="150.0" minWidth="200.0" prefColumnCount="1" prefHeight="340.0" prefRowCount="2" prefWidth="0.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="15.0" />
-      <ProgressBar layoutX="50.0" layoutY="368.0" maxHeight="-Infinity" minHeight="20.0" minWidth="200.0" prefWidth="500.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0">
-         <effect>
-            <Glow level="0.56" />
-         </effect>
+      <TextArea fx:id="mainTextArea" editable="false" layoutX="25.0" layoutY="14.0" minHeight="150.0" minWidth="200.0" prefColumnCount="1" prefHeight="340.0" prefRowCount="2" prefWidth="0.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="15.0" />
+      <ProgressBar fx:id="runningBar" layoutX="50.0" layoutY="368.0" maxHeight="-Infinity" minHeight="20.0" minWidth="200.0" prefWidth="500.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0">
       </ProgressBar>
    </children>
    <cursor>
