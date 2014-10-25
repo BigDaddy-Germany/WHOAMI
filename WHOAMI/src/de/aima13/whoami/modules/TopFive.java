@@ -66,7 +66,7 @@ public class TopFive implements Analyzable {
 	}
 
 	@Override
-	public String csvPrefix() {
+	public String getCsvPrefix() {
 		return null;
 	}
 

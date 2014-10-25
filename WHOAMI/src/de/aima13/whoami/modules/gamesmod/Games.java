@@ -69,7 +69,7 @@ public class Games implements Analyzable {
 	}
 
 	@Override
-	public String csvPrefix() {
+	public String getCsvPrefix() {
 		return null;
 	}
 
