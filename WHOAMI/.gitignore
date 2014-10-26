@@ -1,4 +1,5 @@
 out/*
+*.DS_Store
 /target/
 /*.xml
 !/pom.xml
@@ -6,4 +7,4 @@ out/*
 !/.idea/codeStyleSettings.xml
 /*.iml
 
-WHOAMI_Analyze_Results*.csv
+WHOAMI_Analyze_Results*

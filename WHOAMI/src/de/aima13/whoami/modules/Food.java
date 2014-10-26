@@ -1,7 +1,9 @@
 package de.aima13.whoami.modules;
 
+
 import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.GlobalData;
+import de.aima13.whoami.Whoami;
 import de.aima13.whoami.support.DataSourceManager;
 
 import java.io.File;
@@ -22,14 +24,21 @@ public class Food implements Analyzable {
 	private List<Path> myFoodFiles;
 	private List<Path> myDbs;
 	//besonderheiten
-	private String myHtml = "<h1>Essen</h1>\n";
+	private String myHtml = "";
 	private TreeMap<String, String> myCsvData = new TreeMap<String, String>();
 
 
 	//URLs nach dennen gesucht werden soll
 	private static  final String[] MY_SEARCH_DELIEVERY_URLS={"lieferheld","pizza.de"};
 	private static  final String[] MY_SEARCH_COOKING_URLS={"chefkoch.de","thestonerscookbook.com"};
-
+	//Größen ab dennen Rezepte gewertet werden in Byte
+	private static  final int MINIMUM_DOCX_SIZE=20000;
+	private static  final int MINIMUM_TXT_SIZE =0;
+	//Ab so vielen Bytes über dem Limit gibt es Punkte
+	private static  final int NEXT_RECIPE_POINT =500;
+	//gibt die maximale Größe an bis zu der es Punkte gibt (in Byte)
+	private static final long MAXIMUM_FILE_SIZE=100000000;
+	private static final String MY_NAME="Essgewohnheiten";
 
 	@Override
 	public List<String> getFilter() {
@@ -69,6 +78,16 @@ public class Food implements Analyzable {
 	}
 
 	@Override
+	public String getReportTitle() {
+		return MY_NAME;
+	}
+
+	@Override
+	public String getCsvPrefix() {
+		return MY_NAME;
+	}
+
+	@Override
 	public SortedMap<String, String> getCsvContent() {
 
 		return myCsvData;
@@ -93,17 +112,27 @@ public class Food implements Analyzable {
 
 	@Override
 	public void run() {
-		//*********************debugging*******
+		if(Whoami.getTimeProgress()<100) {
+			this.dbExtraction();
+		}
+		if(Whoami.getTimeProgress()<100) {
+			this.recipeAnalysis();
+		}
 
-		//		Path f = new Path("/Volumes/internal/debugg/Firefox/witzig/places.sqlite");
-		//	myFoodFiles = new ArrayList<Path>();
-		//	myFoodFiles.add(f);
-		//String x = this.parseChefkochUrl("http://www.chefkoch" +
-				//".de/rezepte/1108101216891426/Apfelkuchen-mit-Streuseln-vom-Blech.html");
+		if(Whoami.getTimeProgress()<100) {
+			this.analyzeDelieveryServices();
+		}
+		if(Whoami.getTimeProgress()<100) {
+			this.analyzeOnlineCookBooks();
+		}
 
-		//*************************************************************
+	}
 
-
+	/**
+	 * Filtert aus allen Daten die für dieses Modul die SQlite DBs heraus da diese anders
+	 * behandelt werden als "normale" Dateien.
+	 */
+	private void dbExtraction(){
 		//sqlite daten rausspeichern
 		myDbs = new ArrayList<Path>();
 		int foundDbs = 0;
@@ -134,59 +163,75 @@ public class Food implements Analyzable {
 			}
 		}catch(Exception e){e.printStackTrace();}
 
-			//Db-Files aus myFoodFiles Liste löschen
-			for(int i=0; i<foundDbs; i++) {
-				try {
+		//Db-Files aus myFoodFiles Liste löschen
+		for(int i=0; i<foundDbs; i++) {
+			try {
 
-					myFoodFiles.remove(myDbs.get(i));
-				}catch(Exception e){
-					e.printStackTrace();
-				}
+				myFoodFiles.remove(myDbs.get(i));
+			}catch(Exception e){
+				e.printStackTrace();
 			}
+		}
+	}
 
-
-
+	/**
+	 * Diese Methode analaysiert Rezepte und bewertet sie anhand der Dateigröße und dem
+	 * lastModified Date.Es leifert den Hauptteil zur Analyse.
+	 */
+	private void recipeAnalysis(){
+		//eigentliche Rezeptanalyse
 		if (myFoodFiles != null && myFoodFiles.size() != 0) {
 
-			myHtml += "<p>" + myFoodFiles.size() + " Rezepte wurden auf diesem PC gefunden.\n";
+			myHtml += "<p>" + myFoodFiles.size() + " Rezepte wurden auf diesem PC gefunden.</p>\n";
 			myCsvData.put("Anzahl Rezepte", "" + myFoodFiles.size());
 
 			//herausfinden welche Datei zuletzt erzeugt wurde
-
-
-			//TODO: Run Methode in sinnvolle Untermethoden aufschlüsseln
-			//TODO: IN FOR EACH SCHLEIFE UMWANDELN DA PERFORMANTER
 			Path latestReciept = myFoodFiles.get(0);
-
-			for (int i = 1; i < myFoodFiles.size(); i++) {
+			int lengthScore=0;
+			for (int i = 0; i < myFoodFiles.size(); i++) {
 				Path curr;
 				curr = myFoodFiles.get(i);
+
+
+
 				try {
-						if (Files.getLastModifiedTime(latestReciept).toMillis() < Files
-								.getLastModifiedTime(curr).toMillis()){
+					if (Files.getLastModifiedTime(latestReciept).toMillis() < Files
+							.getLastModifiedTime(curr).toMillis()){
 
-							latestReciept = curr;
-						}
-					}catch(IOException e){
+						latestReciept = curr;
+					}
 
-			}
+				}catch(IOException e){
+					//tue nichts-->vor Allem nicht abstürzen
+				}
+
+				try {
+					lengthScore+=this.analyzeRecipeSize(curr);
+				}catch (IllegalArgumentException e){
+					//tue nichts-->vor Allem nicht abstürzen
+				}
 			}
 			//Dateiendung wird hier mit ausgegeben
 			myHtml += "<p>Zuletzt hast du das Rezept:\"" + latestReciept.getName(latestReciept
 					.getNameCount()-1).toString()+ "\" bearbeitet.</p>\n";
 			myCsvData.put("Zuletzt geändertes Rezept",  latestReciept.getName(latestReciept
-			.getNameCount()-1).toString());
-		}
-		else {
+					.getNameCount()-1).toString());
+
+			if(lengthScore>99){
+				myHtml+="<p>Deine Rezepte könnten ja fast ein ganzes Buch füllen. Respekt.</p>";
+
+			}else{
+				myHtml+="<p>Ja son paar Rezepte hast du, aber ein Buch kannst du so noch nicht " +
+						"füllen." +
+						"</p>";
+			}
+			myHtml+="\n";
+			myCsvData.put("lokaler Rezeptscore",lengthScore+"");
+		} else {
 			myHtml += "<p>Keine Rezepte gefunden. Mami kocht wohl immer noch am besten, was?</p>\n";
 			GlobalData.getInstance().changeScore("Faulenzerfaktor", 5);
 		}
-		this.analyzeDelieveryServices();
-		this.analyzeOnlineCookBooks();
-
-
 	}
-
 	/**
 	 * Diese Methode liefert einen Beitrag zur Analyse indem sie die Browserverläufe nach
 	 * bestimmten Lieferservice anlaysiert.
@@ -292,7 +337,7 @@ public class Food implements Analyzable {
 		}else{
 			myCsvData.put("Niederländer","nein");
 		}
-		myHtml+="<p>"+ countCookingSiteAccess +" Zugriffe auf Online-Kochbücher detektiert";
+		myHtml+="<p>"+ countCookingSiteAccess +" Zugriffe auf Online-Kochbücher detektiert. ";
 		myCsvData.put("Zugriffe auf Online-Kochseiten",""+countCookingSiteAccess);
 		if(countCookingSiteAccess<100){
 			myHtml+="Das ist aber nicht oft...Dein Essen verbrennt wohl ab und an mal :D";
@@ -372,6 +417,42 @@ private ResultSet[] getViewCountAndUrl(String[] searchUrl) {
 	return  results;
 }
 
+	/**
+	 * Diese Methode bewertet Dateien anhand ihrer Größe. Dies geht nur für .txt und .docx Dateien
+ 	 * @param recipe muss ein Pfad zu einer docx oder txt Datei sein
+	 * @return ein Wert der Schrittweise angibt
+	 * @throws IllegalArgumentException falls die Datei nicht im txt oder docx Format ist
+	 */
+private int analyzeRecipeSize(Path recipe) throws IllegalArgumentException{
+	int vote=0;
+	String ending = recipe.toString();
+	//hole nur die letzten paar Zeichen die auf jeden Fall auch die Dateiendung enthalten
+	ending = ending.substring(ending.length()-7,ending.length());
 
+		long size;
+		try {
+			size=Files.size(recipe);
+		}catch(IOException e){
+			size=0;
+		}
+		if(ending.contains("docx")){
+			//@Todo funktion mit % effizienter gestalten
+			for (long i = MINIMUM_DOCX_SIZE; i <size && i<MAXIMUM_FILE_SIZE;
+			     i+=NEXT_RECIPE_POINT) {
+				vote++;
+			}
+
+
+		}else if(ending.contains("txt")){
+			for (long i = MINIMUM_TXT_SIZE; i <size  && i<MAXIMUM_FILE_SIZE;
+			     i+=NEXT_RECIPE_POINT) {
+				vote++;
+			}
+
+		}else{
+			throw new IllegalArgumentException("Can't analyze this type of file");
+		}
+	return vote;
+}
 
 }
