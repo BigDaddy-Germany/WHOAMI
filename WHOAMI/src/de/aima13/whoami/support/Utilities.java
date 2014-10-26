@@ -1,7 +1,11 @@
 package de.aima13.whoami.support;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Lose Sammlung statischer Hilfsfunktionen, die zu allgemein sind um in den Kontext anderer
@@ -44,4 +48,93 @@ public class Utilities {
 			throw new RuntimeException("JSON fehlerhaft: " + jsonPath);
 		}
 	}
+
+	/**
+	 * Neuen Dateinamen suchen, der noch nicht vergeben ist
+	 *
+	 * @param backup soll backup als suffix genutzt werden?
+	 * @return Der neue Dateiname oder im Misserfolg null
+	 *
+	 * @author Marco Dörfler
+	 */
+	public static String getNewFileName(String favoredName, boolean backup) {
+		String currentName;
+
+		String baseName = getFileBaseName(favoredName);
+		String extension = getFileExtenstion(favoredName);
+
+		if (backup) {
+			baseName += ".backup";
+		}
+
+		currentName = baseName + "." + extension;
+
+		int i = 0;
+		Path newFile = Paths.get(currentName);
+		while (Files.exists(newFile)) {
+			i++;
+			if (i == 1000) {
+				// Harte Grenze bei 1000
+				return null;
+			}
+			currentName = baseName + "." + i + "." + extension;
+			newFile = Paths.get(currentName);
+		}
+		return currentName;
+	}
+
+	/**
+	 * Neuen Dateinamen suchen, der noch nicht vergeben ist (Suffix backup)
+	 * @return Der neue Dateiname oder im Misserfolg null
+	 *
+	 * @author Marco Dörfler
+	 */
+	public static String getNewFileName(String favoredName) {
+		return getNewFileName(favoredName, true);
+	}
+
+	/**
+	 * Dateiendung einer Datei berechnen
+	 * @param fileName Name der Datei
+	 * @return Die Endung der Datei (ohne Punkt)
+	 *
+	 * @author Marco Dörfler
+	 */
+	public static String getFileExtenstion(String fileName) {
+		String extension = "";
+
+		int indexDot = fileName.lastIndexOf('.');
+		int indexSlash = Math.max(fileName.lastIndexOf('/'), fileName.lastIndexOf('\\'));
+
+		if (indexDot > indexSlash) {
+			extension = fileName.substring(indexDot+1);
+		}
+
+		return extension;
+	}
+
+	/**
+	 * Berechnet den Basename einer Datei
+	 * (Keine Ordnerstruktur mehr, keine Endung mehr
+	 * @param fileName Der Name der Datei
+	 * @return Der Basename der Datei
+	 *
+	 * @author Marco Dörfler
+	 */
+	public static String getFileBaseName(String fileName) {
+		String baseName = "";
+
+		int indexDot = fileName.lastIndexOf('.');
+		int indexSlash = Math.max(fileName.lastIndexOf('/'), fileName.lastIndexOf('\\'));
+
+		if (indexDot > indexSlash) {
+			baseName = fileName.substring(indexSlash+1, indexDot);
+		} else {
+			baseName = fileName.substring(indexSlash+1);
+		}
+
+		return baseName;
+	}
+
+
 }

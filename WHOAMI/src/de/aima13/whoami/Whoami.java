@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by D060469 on 16.10.14.
+ * Created by Marco Dörfler on 16.10.14.
+ *
+ * Hauptklasse mit Main-Methode
  */
 public class Whoami {
 	private static final int ANALYZE_TIME = 60; // Analysezeit in Sekunden
@@ -13,6 +15,12 @@ public class Whoami {
 	// FileSearcher?
 	private static long startTime;
 
+	/**
+	 * Standard Main-Methode
+	 * @param args Commandline Argumente
+	 *
+	 * @author Marco Dörfler
+	 */
 	public static void main(String[] args) {
 		startTime = System.currentTimeMillis();
 
@@ -56,14 +64,7 @@ public class Whoami {
 
 		// PDF
 		ReportCreator reportCreator = new ReportCreator(representableList);
-		try {
-			reportCreator.savePdf();
-		} catch (Exception e) {
-			/**
-			 * @todo Errorhandling Report-Creator
-			 */
-			e.printStackTrace();
-		}
+		reportCreator.savePdf();
 
 		// Anzeigen des Berichtes
 		GuiManager.showReport(reportCreator.getHtml());
@@ -72,6 +73,8 @@ public class Whoami {
 	/**
 	 * Information über die bisherige und restliche Laufzeit des Programms
 	 * @return Ganzzahliger Prozentwert zwischen 0 und 100 (100: Zeit ist um)
+	 *
+	 * @author Marco Dörfler
 	 */
 	public static int getTimeProgress() {
 		float elapsedTime = (float) ((System.currentTimeMillis() - startTime) / 1000);
