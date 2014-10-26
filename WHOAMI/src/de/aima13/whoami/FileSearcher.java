@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 
 /**
- * Created by D060469 on 16.10.14.
+ * Created by Marco Dörfler on 16.10.14.
  * Diese Klasse kümmert sich um den Suchlauf nach Dateien und die Einsortierung der
  * Ergebnisse in die einzelnen Module
  */
@@ -16,24 +16,21 @@ public class FileSearcher {
 
 	// Dieser Pfad wird als root dir zum Suchen genutzt, wenn ungleich null
 
-	private static final String[] DEBUG_TEST_DIR = {
+	/* private static final String[] DEBUG_TEST_DIR = {
 
 			"/Volumes/internal/debugg",
 		//	"C:\\Users\\D060469\\Desktop\\myTestFolder2"
-	};
+	}; */
 
 
-	//private static final String[] DEBUG_TEST_DIR = null;
+	private static final String[] DEBUG_TEST_DIR = null;
 
-
-	//};
-
-
-	// private static final String[] DEBUG_TEST_DIR = null;
 
 
 	/**
 	 * Interne Klasse zum Nutzen des SimpleFileVisitors
+	 *
+	 * @author Marco Dörfler
 	 */
 	private static class FileFinder extends SimpleFileVisitor<Path> {
 		private Map<Analyzable, PathMatcher> matcherMap;
@@ -43,6 +40,8 @@ public class FileSearcher {
 		 * Konstruktor zum Erstellen der Instanz
 		 *
 		 * @param matcherMap Bereits zusammengesetzte Matcher zu Modulen
+		 *
+		 * @author Marco Dörfler
 		 */
 		private FileFinder(Map<Analyzable, PathMatcher> matcherMap) {
 			this.matcherMap = matcherMap;
@@ -58,6 +57,8 @@ public class FileSearcher {
 		 * Rückgabe der Suchergebnisse
 		 *
 		 * @return Liste der Paths
+		 *
+		 * @author Marco Dörfler
 		 */
 		public Map<Analyzable, List<Path>> getResults() {
 			return this.resultMap;
@@ -73,6 +74,8 @@ public class FileSearcher {
 		 * @return Konstante von FileVisitResult - Wie soll weitergemacht werden?
 		 *
 		 * @throws IOException Fehler beim Lesen von Dateien
+		 *
+		 * @author Marco Dörfler
 		 */
 		@Override
 		public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
@@ -99,6 +102,15 @@ public class FileSearcher {
 			}
 		}
 
+		/**
+		 * Sollte ein Fehler auftreten, Subtree überspringen
+		 * @param file Die besuchte Datei
+		 * @param exc Die Exception, welche beim Besuchen aufgetreten ist
+		 * @return Flag, wie das Programm weiter vorgehen soll
+		 * @throws IOException ein weiterer Fehler ist aufgetreten
+		 *
+		 * @author Marco Dörfler
+		 */
 		@Override
 		public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
 			return FileVisitResult.SKIP_SUBTREE;
@@ -113,6 +125,8 @@ public class FileSearcher {
 	/**
 	 * Startet die Suche nach Dateien
 	 * @param analyzables Liste der Module aus der Hauptklasse
+	 *
+	 * @author Marco Dörfler
 	 */
 	public static void startSearch(List<Analyzable> analyzables) {
 		// Sammelt alle Ergebnisse über alle gestarteten FileWalks
@@ -128,7 +142,7 @@ public class FileSearcher {
 			try {
 				resultEntry.getKey().setFileInputs(new ArrayList<> (resultEntry.getValue()));
 			} catch (Exception e) {
-				e.printStackTrace();
+				// e.printStackTrace();
 			}
 		}
 	}
@@ -141,6 +155,8 @@ public class FileSearcher {
 	 * Zusammenstellen der Filter und Erstellen eines Glob-Patterns
 	 * @param analyzables Liste der Module aus der Hauptklasse
 	 * @return Zusammengesetztes Glob-Pattern
+	 *
+	 * @author Marco Dörfler
 	 */
 	private static Map<Analyzable, PathMatcher> getMatchers(List<Analyzable> analyzables) {
 		Map<Analyzable, PathMatcher> matcherMap = new HashMap<>();
@@ -174,6 +190,8 @@ public class FileSearcher {
 	 * Durchsucht alle gewünschten Ordner/Laufwerke und speichert die Ergebnisse
 	 * direkt im übergebenen FileFinder. Daher keine Rückgabe
 	 * @param fileFinder die Instanz des FileFinders, welche genutzt werden soll
+	 *
+	 * @author Marco Dörfler
 	 */
 	private static void startFinder(FileFinder fileFinder) {
 

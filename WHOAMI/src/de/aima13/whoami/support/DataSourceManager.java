@@ -1,8 +1,9 @@
 package de.aima13.whoami.support;
 
-import java.io.File;
-import java.sql.*;
+import org.sqlite.JDBC;
+
 import java.nio.file.Path;
+import java.sql.*;
 
 /**
  * Created by Marvin on 18.10.2014.
@@ -20,6 +21,9 @@ public class DataSourceManager {
 	 */
 	public DataSourceManager(Path sqliteDatabase) throws ClassNotFoundException, SQLException {
 		Class.forName("org.sqlite.JDBC");
+
+        System.out.println("Found " + JDBC.class.getName() + "!");
+
 		dbConnection = DriverManager.getConnection
 					("jdbc:sqlite:" + sqliteDatabase.toString());
 

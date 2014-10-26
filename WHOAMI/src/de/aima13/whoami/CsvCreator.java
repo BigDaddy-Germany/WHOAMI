@@ -2,7 +2,7 @@ package de.aima13.whoami;
 
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
-import com.sun.org.apache.bcel.internal.generic.BREAKPOINT;
+import de.aima13.whoami.support.Utilities;
 
 import java.io.*;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
- * Created by D060469 on 16.10.14.
+ * Created by Marco Dörfler on 16.10.14.
  * Erstellt eine CSV und speichert diese
  */
 public class CsvCreator {
@@ -30,12 +30,11 @@ public class CsvCreator {
 	 * Starten der Speicherung
 	 *
 	 * @param representables Liste alle zu präsentierenden CSV Werte
-	 * @throws Exception Ein Fehler ist aufgetreten
+	 *
+	 * @author Marco Dörfler
 	 */
 	public static boolean saveCsv(List<Representable> representables) {
 		SortedMap<String, String> completeCsvContent = new TreeMap<>();
-
-		System.out.println("\n\nStarting CsvCreator\n----------------\n");
 
 		// CSV Werte aus allen Representables ziehen
 		for (Representable representable : representables) {
@@ -43,17 +42,20 @@ public class CsvCreator {
 
 			if (moduleCsvContent != null) {
 				// Header werden mit Prefix versehen -> keine Namensgleichheit
-				String prefix = representable.getClass().getSimpleName();
+				String prefix = representable.getCsvPrefix();
+				// Wenn das Modul noch keinen Prefix zurückgibt, wird der Klassenname genutzt
+				if (representable.getCsvPrefix() == null) {
+					prefix = representable.getClass().getSimpleName();
+				}
 
 				for (Map.Entry<String, String> moduleCsvCol : moduleCsvContent.entrySet()) {
 					// Titel mit Prefix versehen und Spalte hinzufügen
-					completeCsvContent.put(prefix + PREFIX_SEPERATOR + moduleCsvCol.getKey(),
+					completeCsvContent.put(prefix + PREFIX_SEPERATOR + moduleCsvCol.getKey()
+							.replace(" ", "-"),
 							moduleCsvCol.getValue());
 				}
 			}
 		}
-
-		System.out.println((new File(".")).getAbsolutePath());
 
 		// Header und Values als Stringarray exportieren
 		String[] csvHeader = completeCsvContent
@@ -97,7 +99,7 @@ public class CsvCreator {
 			case WRONG_FORMAT:
 				// Nach neuem, nicht vergebenem Namen suchen
 				String newFileName;
-				if ((newFileName = getNewFileName()) == null) {
+				if ((newFileName = Utilities.getNewFileName(FILE_NAME)) == null) {
 					// Kein neuer nutzbarer Name gefunden
 					return false;
 				}
@@ -118,7 +120,7 @@ public class CsvCreator {
 				try {
 					if (!csvFile.canWrite() && !csvFile.setWritable(true)) {
 						// Datei kann nicht benutzt werden. Suche nach anderem Namen
-						if ((newFileName = getNewFileName()) == null) {
+						if ((newFileName = Utilities.getNewFileName(FILE_NAME)) == null) {
 							// Kein neuer nutzbarer Name gefunden
 							return false;
 						}
@@ -161,49 +163,11 @@ public class CsvCreator {
 
 
 	/**
-	 * Neuen Dateinamen suchen, der noch nicht vergeben ist
-	 *
-	 * @param backup soll backup als suffix genutzt werden?
-	 * @return Der neue Dateiname oder im Misserfolg null
-	 */
-	private static String getNewFileName(boolean backup) {
-		String currentName;
-		String baseName = FILE_NAME.substring(0, FILE_NAME.length() - 4);
-		String extension = FILE_NAME.substring(FILE_NAME.length() - 4);
-
-		if (backup) {
-			baseName += ".backup";
-		}
-
-		currentName = baseName + extension;
-
-		int i = 0;
-		File newFile = new File(currentName);
-		while (newFile.exists()) {
-			i++;
-			if (i == 1000) {
-				// Harte Grenze bei 1000
-				return null;
-			}
-			currentName = baseName + "." + i + extension;
-			newFile = new File(currentName);
-		}
-		return currentName;
-	}
-
-	/**
-	 * Neuen Dateinamen suchen, der noch nicht vergeben ist (Suffix backup)
-	 * @return Der neue Dateiname oder im Misserfolg null
-	 */
-	private static String getNewFileName() {
-		return getNewFileName(true);
-	}
-
-
-	/**
 	 * Untersuchen auf eventuell bereits vorhandener CSV-Dateien
 	 * @param moduleHeader String-Array des aktuellen Headers
 	 * @return enum zur Statusunterscheidung
+	 *
+	 * @author Marco Dörfler
 	 */
 	private static CSV_STATUS getCsvStatus(String[] moduleHeader) {
 		try {

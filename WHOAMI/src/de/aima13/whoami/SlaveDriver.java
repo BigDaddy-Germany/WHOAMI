@@ -4,14 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by D060469 on 16.10.14.
+ * Created by Marco Dörfler on 16.10.14.
  */
 public class SlaveDriver {
 
 
 	/**
+	 * Module parallel als Threads starten
+	 *
 	 * @param analyzables Liste der zu startenden Module
-	 * werden
+	 *
+	 * @author Marco Dörfler
 	 */
 	public static void startModules(List<Analyzable> analyzables) {
 		// Liste der erstellten Threads
