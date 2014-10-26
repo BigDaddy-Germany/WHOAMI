@@ -34,7 +34,7 @@ public class SampleModule implements Analyzable {
 
 	@Override
 	public String getHtml() {
-		return "<b>Hallo!</b> Ich bin das SampleModule.<br>Dies ist mein <i>HTML-Text</i>.";
+		return "<b>Hallo!</b> Ich bin das SampleModule.<br />Dies ist mein <i>HTML-Text</i>.";
 	}
 
 	@Override
