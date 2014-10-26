@@ -6,6 +6,9 @@ package de.aima13.whoami;
 public class GuiManager {
 	public static ProgressController pgController;
 	final static String GUI_PREFIX = "................";
+	private static String resultingHtml;
+	private static final boolean showGui = false;
+
 	public static void startGui() {
 		System.out.println(GUI_PREFIX + "GUI STARTED");
 	}
@@ -30,9 +33,21 @@ public class GuiManager {
 	}
 
 	public static void showReport(String reportHtml) {
+		resultingHtml = reportHtml;
+		pgController.finishedScanningClose();
 		System.out.println(GUI_PREFIX + "GUI REPORT");
 	}
-	public static void closeAnalysisProgess(){
-		pgController.finishedScanningClose();
+
+	private static void closeAnalysisProgess() {
+		System.out.println(GUI_PREFIX + "GUI ANALYSIS READY");
+	}
+
+	public static String getResultingHtml() {
+		return resultingHtml;
+	}
+
+	public static void closeProgressAndShowReport(String html) {
+		closeAnalysisProgess();
+		showReport(html);
 	}
 }

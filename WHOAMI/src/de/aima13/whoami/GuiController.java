@@ -33,8 +33,7 @@ public class GuiController implements Initializable {
 	@FXML // fx:id="aggreedOnEula"
 	private CheckBox aggreedOnEula; // Value injected by FXMLLoader
 
-	//JavaFX TextArea lassen sich dabei nicht gescheit handeln
-	private double END_SCROLL_POSITION = 182;
+	private double endScrollPosition = 182;
 	private boolean eulaAccepted = false;
 
 	/**
@@ -92,7 +91,7 @@ public class GuiController implements Initializable {
 	}
 
 	private boolean isScrolledDown(double position) {
-		return position == END_SCROLL_POSITION;
+		return position == endScrollPosition;
 	}
 
 	public boolean isEulaAccepted() {

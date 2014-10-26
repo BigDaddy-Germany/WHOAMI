@@ -21,6 +21,7 @@ public class Whoami implements  Runnable{
 			// Beenden des Programms, falls der User die AGB ablehnt
 			System.exit(0);
 		}
+		// hier gehts dann aus dem Application Thread weiter ins Run unten
 	}
 
 	/**
@@ -88,9 +89,7 @@ public class Whoami implements  Runnable{
 			e.printStackTrace();
 		}
 		GuiManager.updateProgress("Bin fertig :)");
-
-		GuiManager.closeAnalysisProgess();
 		// Anzeigen des Berichtes
-		GuiManager.showReport(reportCreator.getHtml());
+		GuiManager.closeProgressAndShowReport(reportCreator.getHtml());
 	}
 }
