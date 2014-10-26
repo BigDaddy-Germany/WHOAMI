@@ -1,7 +1,5 @@
 package de.aima13.whoami.support;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,15 +25,16 @@ public class Utilities {
 	public static <T> T loadDataFromJson(String jsonPath, Class<T> classOfData) {
 		String jsonText = null;
 
-		try (InputStream stream = de.aima13.whoami.Whoami.class.getResourceAsStream(jsonPath)) {
+		try {
 
-			if (stream != null) {
-				jsonText = org.apache.commons.io.IOUtils.toString(stream);
-			} else {
-				throw new IOException();
-			}
+			InputStream stream = de.aima13.whoami.Whoami.class.getResourceAsStream(jsonPath);
+			java.util.Scanner scanner = new java.util.Scanner(stream).useDelimiter("\\A");
+			jsonText = scanner.next();
 
-		} catch (IOException e) {
+		} catch (Exception e) {
+			//catch-all, weil alle Fehler auf eine nicht vorhandene oder leere Datei
+			// zurückzuführen sind, was es zur Development-Zeit zu beheben gilt
+			e.printStackTrace();
 			throw new RuntimeException("Ressourcenzugriff gescheitert: " + jsonPath);
 		}
 
@@ -85,6 +84,7 @@ public class Utilities {
 
 	/**
 	 * Neuen Dateinamen suchen, der noch nicht vergeben ist (Suffix backup)
+	 *
 	 * @return Der neue Dateiname oder im Misserfolg null
 	 *
 	 * @author Marco Dörfler
@@ -95,6 +95,7 @@ public class Utilities {
 
 	/**
 	 * Dateiendung einer Datei berechnen
+	 *
 	 * @param fileName Name der Datei
 	 * @return Die Endung der Datei (ohne Punkt)
 	 *
@@ -107,7 +108,7 @@ public class Utilities {
 		int indexSlash = Math.max(fileName.lastIndexOf('/'), fileName.lastIndexOf('\\'));
 
 		if (indexDot > indexSlash) {
-			extension = fileName.substring(indexDot+1);
+			extension = fileName.substring(indexDot + 1);
 		}
 
 		return extension;
@@ -116,6 +117,7 @@ public class Utilities {
 	/**
 	 * Berechnet den Basename einer Datei
 	 * (Keine Ordnerstruktur mehr, keine Endung mehr
+	 *
 	 * @param fileName Der Name der Datei
 	 * @return Der Basename der Datei
 	 *
@@ -128,13 +130,41 @@ public class Utilities {
 		int indexSlash = Math.max(fileName.lastIndexOf('/'), fileName.lastIndexOf('\\'));
 
 		if (indexDot > indexSlash) {
-			baseName = fileName.substring(indexSlash+1, indexDot);
+			baseName = fileName.substring(indexSlash + 1, indexDot);
 		} else {
-			baseName = fileName.substring(indexSlash+1);
+			baseName = fileName.substring(indexSlash + 1);
 		}
 
 		return baseName;
 	}
 
+	/**
+	 * Vergleicht zwei Texte auf In-Etwa-Gleichheit auf Basis ihrer Levenshtein-Distanz
+	 *
+	 * @param compareText1         Erster Vergleichstext
+	 * @param compareText2         Zweiter Vergleichstext
+	 * @param ratioMinimumSameness Geforderte Ähnlichkeit zwischen 0 und 1
+	 *                             Beispiel: 0.8 für 80%-ige Ähnlichkeit ist für die Strings
+	 *                             "Hallo Welt!" <-> "Hallo Wald!" gerade noch erfüllt
+	 *                             (20% von Maximaldistanz 11 sind 2.2 ~> 2 ~> passt!)
+	 * @return Sind die Texte in etwa gleich?
+	 */
+	public static boolean isAboutTheSameText(String compareText1, String compareText2,
+	                                         float ratioMinimumSameness) {
+		int distanceLimit;
+		int distance;
 
+		//Maximaler Abstand ist das längere Wort
+		distanceLimit = Math.max(compareText1.length(), compareText2.length());
+
+		//Setze Abbruchlimit auf Maximaldistanz*Fehlertoleranz (gerundet)
+		distanceLimit = Math.round(distanceLimit * (1 - ratioMinimumSameness));
+
+		//Distanz berechnen
+		distance = org.apache.commons.lang3.StringUtils.getLevenshteinDistance(
+				compareText1, compareText2, distanceLimit);
+
+		//Texte sind in etwa gleich, wenn Limit nicht überschritten (getLevenstheinDistance() == -1)
+		return (distance != -1);
+	}
 }
