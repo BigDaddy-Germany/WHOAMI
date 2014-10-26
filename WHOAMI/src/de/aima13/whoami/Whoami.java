@@ -27,6 +27,7 @@ public class Whoami {
 			System.exit(0);
 		}
 
+
 		// Fortschrittsanzeige einnblenden und immer wieder updaten
 		GuiManager.showProgress();
 
@@ -71,6 +72,12 @@ public class Whoami {
 			/**
 			 * @todo Errorhandling Report-Creator
 			 */
+			e.printStackTrace();
+		}
+
+		try {
+			Thread.sleep(1000*30);
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 

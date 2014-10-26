@@ -1,11 +1,18 @@
 package de.aima13.whoami;
 
+import javafx.application.Platform;
+import javafx.stage.Stage;
+
 /**
  * Created by D060469 on 16.10.14.
  */
 public class GuiManager {
 	final static String GUI_PREFIX = "................";
+	public static GuiController guiController;
+	public static ProgressController progressController;
+	public static Stage progressStage;
 	public static void startGui() {
+
 		System.out.println(GUI_PREFIX + "GUI STARTED");
 	}
 
@@ -21,6 +28,18 @@ public class GuiManager {
 	}
 
 	public static void showProgress() {
+//		Thread t =new Thread(new Runnable() {
+//			@Override
+//			public void run() {
+//				Platform.runLater(new Runnable() {
+//					@Override
+//					public void run() {
+//						progressStage.show();
+//					}
+//				});
+//			}
+//		});
+//		t.start();
 		System.out.println(GUI_PREFIX + "GUI PROGRESS STARTED");
 	}
 

@@ -1,5 +1,6 @@
 package de.aima13.whoami;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -64,7 +65,7 @@ public class GuiController implements Initializable {
 	@FXML
 	private void clickedOnCancel(ActionEvent event) {
 		eulaAccepted = false;
-		cancelButton.getScene().getWindow().hide();
+		System.exit(0);
 	}
 
 	public void updateOkButton() {
@@ -97,5 +98,15 @@ public class GuiController implements Initializable {
 
 	public boolean isEulaAccepted() {
 		return eulaAccepted;
+	}
+	public void hideEulaWindow(){
+
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				okButton.getScene().getWindow().hide();
+			}
+		});
+
 	}
 }

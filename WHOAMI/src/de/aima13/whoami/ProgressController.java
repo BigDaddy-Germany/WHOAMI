@@ -18,18 +18,13 @@ public class ProgressController implements Initializable{
 	private URL location;
 
 	@FXML // fx:id="runningProgressBar"
-	private ProgressBar runningProgressBar; // Value injected by FXMLLoader
+	private ProgressBar progressScanning; // Value injected by FXMLLoader
 
 	@FXML // fx:id="mainTextArea"
-	private TextArea mainTextArea; // Value injected by FXMLLoader
-
-	@FXML
-	void ignoreUser(ActionEvent event) {
-		event.consume();
-	}
+	private TextArea mainArea; // Value injected by FXMLLoader
 
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
-		mainTextArea.appendText("Achtung Ärmel hochkrempeln und Abfahrt...");
+		mainArea.appendText("Achtung Ärmel hochkrempeln und Abfahrt...");
 	}
 }
