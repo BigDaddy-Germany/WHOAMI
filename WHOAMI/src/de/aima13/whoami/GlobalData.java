@@ -37,6 +37,8 @@ public class GlobalData implements Representable {
 
 	/**
 	 * Instanz der Singleton-Klasse
+	 *
+	 * @author Marco Dörfler
 	 */
 	private static GlobalData instance;
 
@@ -96,6 +98,8 @@ public class GlobalData implements Representable {
 
 	/**
 	 * Privater Konstruktor, da Singleton
+	 *
+	 * @author Marco Dörfler
 	 */
 	private GlobalData() {
 
