@@ -1,22 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.effect.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.aima13.whoami.GuiController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="495.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.aima13.whoami.GuiController">
    <children>
-      <TextArea fx:id="agbArea" editable="false" layoutX="50.0" layoutY="14.0" onDragDetected="#updateOkButton" onMouseClicked="#updateOkButton" onScroll="#updateOkButton" onScrollFinished="#updateOkButton" prefHeight="371.0" prefWidth="541.0" wrapText="true" />
-      <CheckBox fx:id="aggreedOnEula" layoutX="50.0" layoutY="401.0" mnemonicParsing="false" onAction="#clickedOnEula" text="Ich habe die Endbenutzer-Lizenzvereinbarung gelesen und akzeptiert" />
+      <TextArea fx:id="agbArea" editable="false" layoutX="50.0" layoutY="43.0" onDragDetected="#updateOkButton" onMouseClicked="#updateOkButton" onScroll="#updateOkButton" onScrollFinished="#updateOkButton" prefHeight="342.0" prefWidth="541.0" wrapText="true" />
+      <CheckBox fx:id="aggreedOnEula" layoutX="50.0" layoutY="392.0" mnemonicParsing="false" onAction="#clickedOnEula" text="Ich habe die Endbenutzer-Lizenzvereinbarung gelesen und akzeptiert" />
 
-       <CheckBox fx:id="wantExecution" layoutX="50.0" layoutY="424.0" mnemonicParsing="false" onAction="#clickedOnWantToExecute" text="Ja, ich möchte das Programm ausführen" />
-      <Button fx:id="okButton" defaultButton="true" disable="true" layoutX="540.0" layoutY="420.0" mnemonicParsing="false" onAction="#clickedOnOk" prefHeight="30.0" prefWidth="50.0" text="OK">
+       <CheckBox fx:id="wantExecution" layoutX="50.0" layoutY="412.0" mnemonicParsing="false" onAction="#clickedOnWantToExecute" text="Ja, ich möchte das Programm jetzt ausführen!" />
+      <Button fx:id="okButton" defaultButton="true" disable="true" layoutX="467.0" layoutY="420.0" mnemonicParsing="false" onAction="#clickedOnOk" prefHeight="30.0" prefWidth="123.0" text="Scan starten">
          <font>
             <Font name="System Bold" size="14.0" />
-         </font></Button>
+         </font>
+         <effect>
+            <Reflection />
+         </effect></Button>
 
-       <Button fx:id="cancelButton" cancelButton="true" layoutX="450.0" layoutY="420.0" mnemonicParsing="false" onAction="#clickedOnCancel" prefHeight="30.0" prefWidth="80.0" text="Abbrechen" />
+       <Button fx:id="cancelButton" cancelButton="true" layoutX="381.0" layoutY="420.0" mnemonicParsing="false" onAction="#clickedOnCancel" prefHeight="30.0" prefWidth="80.0" text="Abbrechen">
+         <effect>
+            <Reflection />
+         </effect></Button>
    </children>
 </AnchorPane>
