@@ -78,7 +78,7 @@ public class Gui extends Application {
 		InputStream is = Whoami.class.getResourceAsStream("/start.fxml");
 		root = (Parent) loader.load(is);
 		guiController = loader.getController();
-		primaryStage.setTitle("Endnutzervereinbarung");
+		primaryStage.setTitle("Endnutzervereinbarung [WHOAMI-Scanner]");
 		Scene scene = new Scene(root);
 		scene.getStylesheets().addAll(Whoami.class.getResource("/gui/window.css")
 				.toExternalForm());
@@ -100,6 +100,7 @@ public class Gui extends Application {
 		final FXMLLoader secondLoader = new FXMLLoader();
 		final Stage secondaryStage = new Stage();
 		secondaryStage.initStyle(StageStyle.TRANSPARENT);
+		secondaryStage.setTitle("Analyse... [WHOAMI-Scanner]");
 		InputStream isSecond = Whoami.class.getResourceAsStream("/progressScreen.fxml");
 		Parent root2 = (Parent) secondLoader.load(isSecond);
 		Scene scene = new Scene(root2);
