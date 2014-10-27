@@ -72,14 +72,18 @@ public class Gui extends Application {
 	 * @throws IOException Wenn FXML Datei nicht gefunden wurde.
 	 */
 	private Stage initFirstStage(final Stage primaryStage) throws IOException {
-		primaryStage.initStyle(StageStyle.UTILITY);
+		primaryStage.initStyle(StageStyle.TRANSPARENT);
 		final FXMLLoader loader = new FXMLLoader();
 		Parent root;
 		InputStream is = Whoami.class.getResourceAsStream("/start.fxml");
 		root = (Parent) loader.load(is);
 		guiController = loader.getController();
 		primaryStage.setTitle("Endnutzervereinbarung");
-		primaryStage.setScene(new Scene(root));
+		Scene scene = new Scene(root);
+		scene.getStylesheets().addAll(Whoami.class.getResource("/gui/window.css")
+				.toExternalForm());
+		primaryStage.setScene(scene);
+		scene.setFill(null);
 		primaryStage.show();
 		primaryStage.setResizable(false);
 		return primaryStage;
@@ -95,10 +99,14 @@ public class Gui extends Application {
 	private Stage initSecondStage() throws IOException {
 		final FXMLLoader secondLoader = new FXMLLoader();
 		final Stage secondaryStage = new Stage();
-		secondaryStage.initStyle(StageStyle.UNDECORATED);
+		secondaryStage.initStyle(StageStyle.TRANSPARENT);
 		InputStream isSecond = Whoami.class.getResourceAsStream("/progressScreen.fxml");
 		Parent root2 = (Parent) secondLoader.load(isSecond);
-		secondaryStage.setScene(new Scene(root2));
+		Scene scene = new Scene(root2);
+		scene.getStylesheets().addAll(Whoami.class.getResource("/gui/window.css")
+				.toExternalForm());
+		secondaryStage.setScene(scene);
+		scene.setFill(null);
 		GuiManager.pgController = secondLoader.getController();
 
 		Platform.setImplicitExit(false);

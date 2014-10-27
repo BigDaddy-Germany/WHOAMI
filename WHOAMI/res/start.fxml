@@ -6,9 +6,9 @@
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.aima13.whoami.GuiController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="495.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.aima13.whoami.GuiController">
    <children>
-      <TextArea fx:id="agbArea" editable="false" layoutX="50.0" layoutY="14.0" onDragDetected="#updateOkButton" onMouseClicked="#updateOkButton" onScroll="#updateOkButton" onScrollFinished="#updateOkButton" prefHeight="371.0" prefWidth="541.0" wrapText="true" />
+      <TextArea fx:id="agbArea" editable="false" layoutX="50.0" layoutY="43.0" onDragDetected="#updateOkButton" onMouseClicked="#updateOkButton" onScroll="#updateOkButton" onScrollFinished="#updateOkButton" prefHeight="342.0" prefWidth="541.0" wrapText="true" />
       <CheckBox fx:id="aggreedOnEula" layoutX="50.0" layoutY="401.0" mnemonicParsing="false" onAction="#clickedOnEula" text="Ich habe die Endbenutzer-Lizenzvereinbarung gelesen und akzeptiert" />
 
        <CheckBox fx:id="wantExecution" layoutX="50.0" layoutY="424.0" mnemonicParsing="false" onAction="#clickedOnWantToExecute" text="Ja, ich möchte das Programm ausführen" />

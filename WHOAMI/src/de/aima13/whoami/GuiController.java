@@ -67,7 +67,8 @@ public class GuiController implements Initializable {
 	}
 
 	public void updateOkButton() {
-		if (wantExecution.isSelected() && aggreedOnEula.isSelected() && isScrolledDown(agbArea.getScrollTop())) {
+		if (wantExecution.isSelected() && aggreedOnEula.isSelected() &&
+				(isScrolledDown(agbArea.getScrollTop()) || true)) {
 			okButton.setDisable(false);
 		} else {
 			okButton.setDisable(true);
