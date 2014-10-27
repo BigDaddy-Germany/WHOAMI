@@ -1,13 +1,3 @@
-/* STILL TO DO
-a) lok. Dateien:
--> ArrayList und HashMap zusammen fassen
--> Unsere Kategorien?
-
-
- */
-
-
-
 package de.aima13.whoami.modules;
 
 import com.sun.deploy.util.StringUtils;
@@ -49,17 +39,19 @@ public class Music implements Analyzable {
 	List<Path> exeFiles = new ArrayList<>(); //List of browser-entries from musicDatabase
 	ArrayList<String> FileArtist = new ArrayList<>(); //List of Artists
 	ArrayList<String> FileGenre = new ArrayList<>(); //List of Genres
+	ArrayList<Path> urls = new ArrayList<>(); //List of URLs
 	Map<String, Integer> mapMaxApp = new HashMap<>();//Map Artist - frequency of this artist
 	Map<String, Integer> mapMaxGen = new HashMap<>();//Map Genre - frequency of this genre
 
-	public String html = "";
-	public String favArtist = "";
-	public String favGenre = "";
-	public String onlService = "";
-	public String cltProgram = "";
+
+	public String html = ""; //Output der HTML
+	public String favArtist = ""; //Ergebnis von ScoreUser
+	public String favGenre = ""; //Ergebnis von ScoreGenre
+	public String onlService = ""; //Genutzte Onlinedienste (siehe MY_SEARCH_DELIVERY_URLS)
+	public String cltProgram = ""; //Installierte Programme
 
 	private static final String[] MY_SEARCH_DELIEVERY_URLS = {"youtube.com", "myvideo.de", "dailymotion.com",
-			"soundcloud.com", "deezer.com",}; //URLs nach denen gesucht werden soll
+			"soundcloud.com", "deezer.com",};
 
 	String[] arrayGenre = {    // Position im Array ist Byte des id3Tag:
 			// z.B. GenreID ist 3: Genre zu 3 ist "Dance"
@@ -108,7 +100,6 @@ public class Music implements Analyzable {
 		 * @param
 		 */
 
-
 		getFilter();
 		readId3Tag(localFiles);
 		checkNativeClients(exeFiles);
@@ -139,7 +130,7 @@ public class Music implements Analyzable {
 
 
 		//b) Browser-history
-		filterMusic.add("**Google/Profile/*/history");
+		filterMusic.add("**Google/Chrome**History");
 		filterMusic.add("**Firefox**places.sqlite");
 
 		//c) installed programs
@@ -415,7 +406,6 @@ public class Music implements Analyzable {
 	/////////////////////////////////////////
 
 	public void checkNativeClients(List<Path> exeFiles) {
-
 		String clients[] = new String[4];
 		int count = 0;
 
@@ -463,23 +453,29 @@ public class Music implements Analyzable {
 		 * @param browserFiles
 		 * @return void
  		 */
+		System.out.println("URLs: " + browserFiles);
 		dbExtraction();
 		ResultSet[] dbResult = this.getViewCountAndUrl(MY_SEARCH_DELIEVERY_URLS);
 		int count = dbResult.length;
 
 		if(count == 0){
+			System.out.println("No online music services found.");
 		} else if(count == 1) {
 			onlService = dbResult[0].toString();
+			System.out.println("One online music service found.");
 		} else if(count == 2) {
 			onlService = dbResult[0].toString() + ", " + dbResult[1].toString();
+			System.out.println("Two online music services found.");
 		} else if(count == 3) {
 			onlService = dbResult[0].toString() + ", " + dbResult[1].toString() + ", " + dbResult[2].toString();
+			System.out.println("Three online music services found.");
 		} else if(count == 4){
 			onlService = dbResult[0].toString() + ", " + dbResult[1].toString() + ", " + dbResult[2].toString() + ", " + dbResult[3].toString();
+			System.out.println("Four online music services found.");
+		} else {
+			System.out.println("More than four music services");
 		}
 
-		System.out.println("Online hörst du über " + onlService + " Musik.");
-		//onlService = dbResult.toString();
 	}
 
 	private void dbExtraction() {
@@ -490,9 +486,7 @@ public class Music implements Analyzable {
 		 * @retrun void
 		 */
 
-
 		//sqlite daten rausspeichern
-		ArrayList<Path> urls = new ArrayList<Path>();
 		int foundDbs = 0;
 
 		try {
@@ -513,7 +507,6 @@ public class Music implements Analyzable {
 						urls.add(curr);
 						foundDbs++;
 					}
-
 					if (foundDbs > 1) {
 						break;
 					}
@@ -526,7 +519,6 @@ public class Music implements Analyzable {
 		//Db-Files aus browserFile Liste löschen
 		for (int i = 0; i < foundDbs; i++) {
 			try {
-
 				browserFiles.remove(urls.get(i));
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -536,12 +528,15 @@ public class Music implements Analyzable {
 
 
 	private ResultSet[] getViewCountAndUrl(String[] searchUrl) {
+		//System.out.println("ArrayList: " + urls);
 		ResultSet[] results = new ResultSet[10];
-		String sqlStatement = "SELECT url,visit_count ";
+		StringBuffer sql = new StringBuffer();
+		//String sqlStatement = "SELECT url,visit_count ";
+		sql.append("SELECT url,visit_count ");
 		DataSourceManager dbManager = null;
 		int x = 0;
-		for (Path db : browserFiles) {
-			if (db != null) {
+		for (Path db : browserFiles){
+			//if (db.toFile() != null) {
 				String path = "";
 				try {
 					path = db.toString();
@@ -550,34 +545,36 @@ public class Music implements Analyzable {
 				}
 				path = path.toLowerCase();
 				if (path.contains("firefox")) {
-					sqlStatement += "FROM moz_places ";
+					//sqlStatement += "FROM moz_places ";
+					sql.append("FROM moz_places ");
 				} else if (path.contains("google")) {
-					sqlStatement += "FROM urls ";
+					//sqlStatement += "FROM urls ";
+					sql.append("FROM urls ");
 				}
 
 				//Suchbegriffe in Statement einbauen
-				sqlStatement += "WHERE url LIKE '%" + searchUrl[0] + "%' ";
+				//sqlStatement += "WHERE url LIKE '%" + searchUrl[0] + "%' ";
+				sql.append("WHERE url LIKE '%" + searchUrl[0] + "%' ");
 				for (int i = 1; i < searchUrl.length; i++) {
-					sqlStatement += "OR url LIKE '%" + searchUrl[i] + "%' ";
+					//sqlStatement += "OR url LIKE '%" + searchUrl[i] + "%' ";
+					sql.append("OR url LIKE '%" + searchUrl[i] + "%' ");
 				}
 				try {
 					dbManager = new DataSourceManager(db);
-				} catch (Exception e) {
-					dbManager = null;
-				}
-				if (dbManager != null) {
-					try {
-						results[x] = dbManager.querySqlStatement(sqlStatement);
+					results[x] = dbManager.querySqlStatement(sql.toString()); //sqlStatement
+					System.out.println(results[x].getString(0));
 					} catch (Exception e) {
+						e.printStackTrace();
 						results[x] = null;
 					}
 
-				}
-				x++;
-			}
+			x++;
 		}
+
+	for(int i = 0; i < results.length; i++){
+		System.out.println("Ergebnis Nr. " + i + ": " + results[i]);
+	}
 
 	return results;
 	}
-
 }
