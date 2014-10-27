@@ -24,7 +24,7 @@ public class Food implements Analyzable {
 	private List<Path> myFoodFiles;
 	private List<Path> myDbs;
 	//besonderheiten
-	private String myHtml = "<h1>Essen</h1>\n";
+	private String myHtml = "";
 	private TreeMap<String, String> myCsvData = new TreeMap<String, String>();
 
 
@@ -38,6 +38,8 @@ public class Food implements Analyzable {
 	private static  final int NEXT_RECIPE_POINT =500;
 	//gibt die maximale Größe an bis zu der es Punkte gibt (in Byte)
 	private static final long MAXIMUM_FILE_SIZE=100000000;
+	private static final String MY_NAME="Essgewohnheiten";
+
 	@Override
 	public List<String> getFilter() {
 		List<String> searchList = new ArrayList<String>();
@@ -73,6 +75,16 @@ public class Food implements Analyzable {
 	public String getHtml() {
 
 		return myHtml;
+	}
+
+	@Override
+	public String getReportTitle() {
+		return MY_NAME;
+	}
+
+	@Override
+	public String getCsvPrefix() {
+		return MY_NAME;
 	}
 
 	@Override
@@ -170,11 +182,10 @@ public class Food implements Analyzable {
 		//eigentliche Rezeptanalyse
 		if (myFoodFiles != null && myFoodFiles.size() != 0) {
 
-			myHtml += "<p>" + myFoodFiles.size() + " Rezepte wurden auf diesem PC gefunden.\n";
+			myHtml += "<p>" + myFoodFiles.size() + " Rezepte wurden auf diesem PC gefunden.</p>\n";
 			myCsvData.put("Anzahl Rezepte", "" + myFoodFiles.size());
 
 			//herausfinden welche Datei zuletzt erzeugt wurde
-			//TODO: IN FOR EACH SCHLEIFE UMWANDELN DA PERFORMANTER
 			Path latestReciept = myFoodFiles.get(0);
 			int lengthScore=0;
 			for (int i = 0; i < myFoodFiles.size(); i++) {
@@ -199,7 +210,6 @@ public class Food implements Analyzable {
 				}catch (IllegalArgumentException e){
 					//tue nichts-->vor Allem nicht abstürzen
 				}
-
 			}
 			//Dateiendung wird hier mit ausgegeben
 			myHtml += "<p>Zuletzt hast du das Rezept:\"" + latestReciept.getName(latestReciept
@@ -215,6 +225,7 @@ public class Food implements Analyzable {
 						"füllen." +
 						"</p>";
 			}
+			myHtml+="\n";
 			myCsvData.put("lokaler Rezeptscore",lengthScore+"");
 		} else {
 			myHtml += "<p>Keine Rezepte gefunden. Mami kocht wohl immer noch am besten, was?</p>\n";
@@ -326,7 +337,7 @@ public class Food implements Analyzable {
 		}else{
 			myCsvData.put("Niederländer","nein");
 		}
-		myHtml+="<p>"+ countCookingSiteAccess +" Zugriffe auf Online-Kochbücher detektiert";
+		myHtml+="<p>"+ countCookingSiteAccess +" Zugriffe auf Online-Kochbücher detektiert. ";
 		myCsvData.put("Zugriffe auf Online-Kochseiten",""+countCookingSiteAccess);
 		if(countCookingSiteAccess<100){
 			myHtml+="Das ist aber nicht oft...Dein Essen verbrennt wohl ab und an mal :D";

@@ -60,6 +60,16 @@ public class TopFive implements Analyzable {
 		return htmlOutput;
 	}
 
+	@Override
+	public String getReportTitle() {
+		return null;
+	}
+
+	@Override
+	public String getCsvPrefix() {
+		return null;
+	}
+
 	/**
 	 * Methode iteriert über die Ergebnisse in der TreeMap. Und liefert den maximalen Wert der
 	 * TreeMap.
@@ -123,7 +133,11 @@ public class TopFive implements Analyzable {
 						}
 					}
 				}
+
+				//Connection,Statement,ResultSet closen
 				mostVisted.getStatement().getConnection().close();
+				mostVisted.getStatement().close();
+				mostVisted.close();
 			} catch (SQLException e) {
 				// kann nicht auf Spalten zugreifen oder Ergebnis leer
 			}
