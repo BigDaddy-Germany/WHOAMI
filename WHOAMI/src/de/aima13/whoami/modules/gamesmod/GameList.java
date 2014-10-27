@@ -1,5 +1,6 @@
 package de.aima13.whoami.modules.gamesmod;
 
+import de.aima13.whoami.support.Utilities;
 import org.apache.commons.lang3.text.WordUtils;
 
 import java.util.ArrayList;
@@ -13,12 +14,21 @@ import java.util.Comparator;
  */
 class GameList extends ArrayList<GameEntry> {
 	/**
-	 * Spiel nach Duplikatscheck hinzufügen
+	 * Spiel nach In-Etwa-Duplikatscheck hinzufügen
 	 *
 	 * @param game Neues Spiel
 	 */
 	public void addUnique(GameEntry game) {
-		//Falls Spieleordner in Kleinschreibung sind, Wortanfänge groß machen
+		//Falls Spiel schon enthalten, abbrechen und nichts hinzufügen
+		boolean found = false;
+		for(GameEntry compare: this) {
+			if (Utilities.isRoughlyEqual(game.name, compare.name, 0.8f)) {
+				return;
+			}
+		}
+
+		//Vor dem Hinzufügen aufhüschen:
+		// Falls Spieleordner in Kleinschreibung sind, Wortanfänge groß machen
 		if (game.name.toLowerCase().equals(game.name)) {
 			game.name = WordUtils.capitalize(game.name);
 		}
