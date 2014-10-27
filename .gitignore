@@ -1,1 +1,10 @@
+out/*
 *.DS_Store
+/target/
+/*.xml
+!/pom.xml
+/.idea/*
+!/.idea/codeStyleSettings.xml
+/*.iml
+
+WHOAMI_Analyze_Results*
