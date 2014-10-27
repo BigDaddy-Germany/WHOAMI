@@ -133,7 +133,11 @@ public class TopFive implements Analyzable {
 						}
 					}
 				}
+
+				//Connection,Statement,ResultSet closen
 				mostVisted.getStatement().getConnection().close();
+				mostVisted.getStatement().close();
+				mostVisted.close();
 			} catch (SQLException e) {
 				// kann nicht auf Spalten zugreifen oder Ergebnis leer
 			}
@@ -217,7 +221,7 @@ public class TopFive implements Analyzable {
 				);
 			}
 		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
+			// Deadlock auf DB
 		}
 		return mostVisited;
 	}

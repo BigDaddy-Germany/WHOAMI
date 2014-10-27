@@ -4,6 +4,8 @@ import org.sqlite.JDBC;
 
 import java.nio.file.Path;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Marvin on 18.10.2014.
@@ -11,7 +13,7 @@ import java.sql.*;
 public class DataSourceManager {
 
 	private Connection dbConnection = null;
-
+	private static List<Connection> openConnections = new ArrayList<Connection>();
 	/**
 	 * Konstruktor erzeugt eine Verbindung zur Datenbank und lädt den JDBC Treiber dafür.
 	 * Ebenso gibt es einen Hook, dass wenn die Runtime beendet wird, auf die Connection getrennt
@@ -23,19 +25,16 @@ public class DataSourceManager {
 		Class.forName("org.sqlite.JDBC");
 
         System.out.println("Found " + JDBC.class.getName() + "!");
-
-		dbConnection = DriverManager.getConnection
+		dbConnection = getAlreadyOpenConnection(sqliteDatabase.toString());
+		if(dbConnection == null){
+			dbConnection = DriverManager.getConnection
 					("jdbc:sqlite:" + sqliteDatabase.toString());
+		}
+
 
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {
-				try {
-					if (!dbConnection.isClosed() && dbConnection != null) {
-						dbConnection.close();
-					}
-				} catch (SQLException e) {
-
-				}
+				closeConnection();
 			}
 		});
 
@@ -59,10 +58,22 @@ public class DataSourceManager {
 	 *
 	 * @throws SQLException Fehler beim Ausführen des SQL Befehls.
 	 */
-	public ResultSet querySqlStatement(String statement) throws SQLException {
+	public synchronized ResultSet querySqlStatement(String statement) throws SQLException {
 		Statement s = dbConnection.createStatement();
 		ResultSet rs = s.executeQuery(statement);
 		return rs;
+	}
+	private Connection getAlreadyOpenConnection(String dbUrl){
+		for (Connection c : openConnections){
+			try {
+				if (c.getMetaData().getURL().equals(dbUrl)){
+					return c;
+				}
+			} catch (SQLException e) {
+				return null;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -70,7 +81,8 @@ public class DataSourceManager {
 	 */
 	public void closeConnection() {
 		try {
-			if (!dbConnection.isClosed() && dbConnection != null) {
+			if (dbConnection != null && !dbConnection.isClosed() ) {
+				openConnections.remove(dbConnection);
 				dbConnection.close();
 			}
 		} catch (SQLException e) {
