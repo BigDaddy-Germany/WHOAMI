@@ -1,9 +1,13 @@
 package de.aima13.whoami.support;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Lose Sammlung statischer Hilfsfunktionen, die zu allgemein sind um in den Kontext anderer
@@ -147,12 +151,20 @@ public class Utilities {
 	 *                             Beispiel: 0.8 für 80%-ige Ähnlichkeit ist für die Strings
 	 *                             "Hallo Welt!" <-> "Hallo Wald!" gerade noch erfüllt
 	 *                             (20% von Maximaldistanz 11 sind 2.2 ~> 2 ~> passt!)
+	 * @param optimizeInput        Vor dem Vergleich Strings mit optimizeForComparison() vorbehandeln
 	 * @return Sind die Texte in etwa gleich?
+	 *
+	 * @author Niko Berkmann
 	 */
-	public static boolean isAboutTheSameText(String compareText1, String compareText2,
-	                                         float ratioMinimumSameness) {
+	public static boolean isRoughlyEqual(String compareText1, String compareText2,
+	                                     float ratioMinimumSameness, boolean optimizeInput) {
 		int distanceLimit;
 		int distance;
+
+		if (optimizeInput) {
+			compareText1 = optimizeForComparison(compareText1);
+			compareText2 = optimizeForComparison(compareText2);
+		}
 
 		//Maximaler Abstand ist das längere Wort
 		distanceLimit = Math.max(compareText1.length(), compareText2.length());
@@ -166,5 +178,68 @@ public class Utilities {
 
 		//Texte sind in etwa gleich, wenn Limit nicht überschritten (getLevenstheinDistance() == -1)
 		return (distance != -1);
+	}
+
+	/**
+	 * Vergleicht zwei Texte auf In-Etwa-Gleichheit auf Basis ihrer Levenshtein-Distanz
+	 * Beinhaltet Voraboptimierung durch optimizeForComparison()
+	 *
+	 * @param compareText1         Erster Vergleichstext
+	 * @param compareText2         Zweiter Vergleichstext
+	 * @param ratioMinimumSameness Geforderte Ähnlichkeit zwischen 0 und 1
+	 *                             Beispiel: 0.8 für 80%-ige Ähnlichkeit ist für die Strings
+	 *                             "Hallo Welt!" <-> "Hallo Wald!" gerade noch erfüllt
+	 *                             (20% von Maximaldistanz 11 sind 2.2 ~> 2 ~> passt!)
+	 * @return Sind die Texte in etwa gleich?
+	 *
+	 * @author Niko Berkmann
+	 */
+	public static boolean isRoughlyEqual(String compareText1, String compareText2,
+	                                     float ratioMinimumSameness) {
+		return isRoughlyEqual(compareText1, compareText2, ratioMinimumSameness, true);
+	}
+
+	/**
+	 * Text für Vergleich optimieren: Reduktion auf Wörter, alles in Kleinschreibung,
+	 * Sonderzeichen löschen, Zahlen gewichten, Umschreiben von Umlauten
+	 *
+	 * @param text Zu optimierender Text
+	 * @return Für In-Etwa-Vergleich optimierter Text
+	 */
+	public static String optimizeForComparison(String text) {
+		StringBuilder optimizedText = new StringBuilder();
+		String wordSeparators = " _-+()[]{}&/`´'\"";
+		Map<String, String> umlautConverter = new HashMap<String, String>();
+		umlautConverter.put("ä", "ae");
+		umlautConverter.put("ö", "oe");
+		umlautConverter.put("ü", "ue");
+		umlautConverter.put("ß", "ss");
+
+		//Vereinheitlichen und Whitespace am Rand löschen
+		text = text.trim().toLowerCase();
+
+		String s;
+		for (char c : text.toCharArray()) {
+			s = Character.toString(c);
+
+			//Worttrennzeichen auf Leerzeichen vereinheitlichen
+			if (wordSeparators.contains(s)) {
+				optimizedText.append(' ');
+
+				//Zahlen mehr gewichten, weil sie bedeutender sind
+			} else if (Character.isDigit(c)) {
+				optimizedText.append(StringUtils.repeat(c, 5)); //Ziffern verfünffachen
+
+				//Umlaute umschreiben
+			} else if (umlautConverter.containsKey(s)) {
+				optimizedText.append(umlautConverter.get(s));
+
+				//Alle Buchstaben übernehmen...
+			} else if (Character.isAlphabetic(c)) {
+				optimizedText.append(c);
+			} //...und alle anderen Zeichen wegwerfen
+		}
+
+		return optimizedText.toString();
 	}
 }
