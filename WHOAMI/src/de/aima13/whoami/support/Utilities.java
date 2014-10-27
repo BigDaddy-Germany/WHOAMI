@@ -122,7 +122,7 @@ public class Utilities {
 	 * @author Marco Dörfler
 	 */
 	public static String getFileBaseName(String fileName) {
-		String baseName = "";
+		String baseName;
 
 		int indexDot = fileName.lastIndexOf('.');
 		int indexSlash = Math.max(fileName.lastIndexOf('/'), fileName.lastIndexOf('\\'));
