@@ -1,6 +1,8 @@
 package de.aima13.whoami.modules.gamesmod;
 
 import de.aima13.whoami.Analyzable;
+import de.aima13.whoami.Whoami;
+import de.aima13.whoami.support.Utilities;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -20,13 +22,13 @@ import java.util.concurrent.TimeUnit;
  */
 public class Games implements Analyzable {
 
-
 	private List<Path> exePaths;
-
-	private String steamNickname = null;
 	private Path steamAppsPath = null;
-
 	private GameList gameList;
+	private GameEntry resultFirstCreatedGame;
+	private GameEntry resultLastCreatedGame;
+	private GameEntry resultLastModifiedGame;
+	private boolean cancelledByTimeLimit = false;
 
 	/**
 	 * Spielemodul fragt nach einer Liste von Executables und benötigt den Pfad eines
@@ -58,9 +60,57 @@ public class Games implements Analyzable {
 		}
 	}
 
+	class GamesComments {
+		List<GameThreshold> gameThresholds;
+		String steamFound;
+		int minGamesForDistributorRecommendation;
+		String distributorRecommendation;
+		String firstCreated;
+		String lastModified;
+		String lastCreated;
+	}
+
+	class GameThreshold {
+		int limit;
+		String comment;
+	}
+
 	@Override
 	public String getHtml() {
-		return null;
+		StringBuilder html = new StringBuilder();
+
+		int count = gameList.size();
+		GamesComments gamesComments = Utilities.loadDataFromJson
+				("/data/Games_Comments.json", GamesComments.class);
+
+
+		//Anzahl Spiele mit Kommentar dazu
+		int i = 0;
+		GameThreshold threshold;
+		do {
+			threshold = gamesComments.gameThresholds.get(i++);
+		} while (gameList.size() > threshold.limit);
+
+		html.append("Es wurden " + gameList.size() + " Spiele gefunden. "
+				+ threshold.comment + " ");
+
+		//Steam kommentieren
+		if (steamAppsPath!=null) {
+			html.append(gamesComments.steamFound);
+		} else if (count > gamesComments.minGamesForDistributorRecommendation) {
+			html.append(gamesComments.distributorRecommendation);
+		}
+		html.append(" ");
+
+		//Datumsangaben der Executables kommentieren
+		if (gameList.size()>0) {
+			html.append("Spielst du eigentlich noch "+resultFirstCreatedGame.name+"? " +
+					""+gamesComments.firstCreated+" Wie läuft es denn so mit " +
+					""+resultLastModifiedGame.name+"? "+gamesComments.lastModified+" Als letztes " +
+					"wurde anscheinend "+resultLastCreatedGame.name+" installiert. " +
+					""+gamesComments.lastCreated);
+		}
+		return html.toString();
 	}
 
 	@Override
@@ -86,14 +136,21 @@ public class Games implements Analyzable {
 			if (current.getFileName().toString().toLowerCase().equals("steam.exe")) {
 				processSteamLibrary(current);
 			}
+
+			if (Whoami.getTimeProgress() >= 99) {
+				//Ausstieg wegen Timeboxing
+				cancelledByTimeLimit = true;
+				break;
+			}
 		}
 
+		//Dem Ergebnis dienliche Abschlussoperationen auch bei Timeboxing-Abbruch durchführen
 		if (gameList.size() > 0) {
 			gameList.sortByLatestCreated();
-			logthis("Ah, du hast dir endlich mal " + gameList.get(0).name + " installiert? " +
-					"Wurde auch Zeit...");
+			resultFirstCreatedGame = gameList.get(gameList.size()-1);
+			resultLastCreatedGame = gameList.get(0);
 			gameList.sortByLatestModified();
-			logthis("Wie läuft's eigentlich mit " + gameList.get(0).name + "?");
+			resultLastModifiedGame = gameList.get(0);
 		}
 	}
 
@@ -148,6 +205,12 @@ public class Games implements Analyzable {
 				}
 			} catch (Exception e) {
 			} //Bei Problemen mit einzelnen Ordnern -> komplett überspringen, bewusst ignorieren
+
+			if (Whoami.getTimeProgress() >= 99) {
+				//Ausstieg wegen Timeboxing
+				cancelledByTimeLimit = true;
+				return;
+			}
 		}
 	}
 
