@@ -135,8 +135,10 @@ public class Food implements Analyzable {
 	private void dbExtraction(){
 		//sqlite daten rausspeichern
 		myDbs = new ArrayList<Path>();
-		int foundDbs = 0;
-
+		 ArrayList<Path> myTrash = new ArrayList<>();
+		int foundDbs =0;
+		boolean ffFound=false;
+		boolean chromeFound=false;
 		try {
 			for (Path curr : myFoodFiles) {
 				if (curr != null) {
@@ -148,16 +150,16 @@ public class Food implements Analyzable {
 						path = "";
 					}
 
-					if (path.contains(".sqlite")) {
+					if (path.contains("places.sqlite") && !ffFound) {
+						foundDbs++;
 						myDbs.add( curr);
+						ffFound=true;
+					} else if (path.contains("History") && !chromeFound) {
 						foundDbs++;
-					} else if (path.contains("History")) {
 						myDbs.add(curr);
-						foundDbs++;
-					}
-
-					if (foundDbs > 1) {
-						break;
+						chromeFound=true;
+					}else if(path.contains(".sqlite")){
+						myTrash.add(curr);
 					}
 				}
 			}
@@ -172,6 +174,11 @@ public class Food implements Analyzable {
 				e.printStackTrace();
 			}
 		}
+		//remove other found sqlite files
+		for(Path curr : myTrash){
+			myFoodFiles.remove(curr);
+		}
+
 	}
 
 	/**
