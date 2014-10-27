@@ -75,7 +75,7 @@ public class Gui extends Application {
 		primaryStage.initStyle(StageStyle.UTILITY);
 		final FXMLLoader loader = new FXMLLoader();
 		Parent root;
-		InputStream is = new FileInputStream("res/start.fxml");
+		InputStream is = Whoami.class.getResourceAsStream("/start.fxml");
 		root = (Parent) loader.load(is);
 		guiController = loader.getController();
 		primaryStage.setTitle("Endnutzervereinbarung");
@@ -96,7 +96,7 @@ public class Gui extends Application {
 		final FXMLLoader secondLoader = new FXMLLoader();
 		final Stage secondaryStage = new Stage();
 		secondaryStage.initStyle(StageStyle.UNDECORATED);
-		InputStream isSecond = new FileInputStream("res/progressScreen.fxml");
+		InputStream isSecond = Whoami.class.getResourceAsStream("/progressScreen.fxml");
 		Parent root2 = (Parent) secondLoader.load(isSecond);
 		secondaryStage.setScene(new Scene(root2));
 		GuiManager.pgController = secondLoader.getController();
@@ -129,15 +129,7 @@ public class Gui extends Application {
 		final WebView browser = new WebView();
 		webEngine = browser.getEngine();
 
-
-		ScrollPane scrollPane = new ScrollPane();
-		scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-		scrollPane.setStyle("-fx-background-color: white");
-
-		scrollPane.setContent(browser);
-
-
-		rootBox.setCenter(scrollPane);
+		rootBox.setCenter(browser);
 		scene.setRoot(rootBox);
 
 		thirdStage.setScene(scene);
