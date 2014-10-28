@@ -127,6 +127,7 @@ public class Music implements Analyzable {
 		getFilter();
 		readId3Tag(localFiles);
 		checkNativeClients(exeFiles);
+		System.out.println("bf1" + browserFiles);
 		readBrowser(browserFiles);
 	}
 
@@ -193,11 +194,15 @@ public class Music implements Analyzable {
 			} else if (element.toString().contains(".exe")) {
 				exeFiles.add(element); //Liste aller ausführbarer Musikprogramme
 
-			} else if(element.toString().contains(".sqlite") || element.toString().contains
+			} else if (element.toString().contains(".sqlite") || element.toString().contains
 					("History")) {
 				browserFiles.add(element);
 			}
 		}
+
+		System.out.println("bf2: " + browserFiles);
+		System.out.println("lf: " + localFiles);
+		System.out.println("ef: " + exeFiles);
 	}
 
 	///////////////////////////////////////////////////////
@@ -471,15 +476,15 @@ public class Music implements Analyzable {
 			}
 		}
 
-		if(count == 0){
+		if (count == 0) {
 
-		} else if(count == 1) {
+		} else if (count == 1) {
 			cltProgram = clients[0];
-		} else if(count == 2) {
+		} else if (count == 2) {
 			cltProgram = clients[0] + ", " + clients[1];
-		} else if(count == 3) {
+		} else if (count == 3) {
 			cltProgram = clients[0] + ", " + clients[1] + ", " + clients[2];
-		} else if(count == 4){
+		} else if (count == 4) {
 			cltProgram = clients[0] + ", " + clients[1] + ", " + clients[2] + ", " + clients[3];
 		}
 	}
@@ -495,24 +500,25 @@ public class Music implements Analyzable {
 		 *
 		 * @param browserFiles
 		 * @return void
- 		 */
+		 */
 		/*System.out.println("URLs: " + browserFiles);
 
 		System.out.println("URLs after DBExtraction: " + browserFiles);
 		ResultSet[] dbResult = this.getViewCountAndUrl(MY_SEARCH_DELIEVERY_URLS);*/
+		System.out.println("bf: " + browserFiles);
+		dbExtraction();
+		Connection connection = null;
+		ResultSet resultSet = null;
+		Statement statement = null;
 
-	dbExtraction();
-	Connection connection = null;
-	ResultSet resultSet = null;
-	Statement statement = null;
-
-	try {
-		//for (int i = 0; i < urls.size(); i++) {
+		try {
+			//for (int i = 0; i < urls.size(); i++) {
 			Class.forName("org.sqlite.JDBC");
-			connection = DriverManager.getConnection("jdbc:sqlite:" +
-					"" + urls.get(0));
-			//"jdbc:sqlite:/home/username/
-			// .config/chromium/Default/History"
+			System.out.println("URLS:" + urls);
+			connection = DriverManager.getConnection
+					("jdbc:sqlite:" + urls.get(0));
+					//C:\Users\Inga\AppData\Local\Google\Chrome\User " +
+			//"Data\Default\History" lübbt
 			statement = connection.createStatement();
 			resultSet = statement.executeQuery("SELECT * FROM urls WHERE url LIKE '%youtube.com%'");
 
@@ -521,29 +527,20 @@ public class Music implements Analyzable {
 						", visit count [" + resultSet.getString("visit_count") + "]");
 			}
 		}
-	//}
+		//}
 
-	catch (Exception e)
-	{
-		e.printStackTrace ();
-	}
-
-	finally
-	{
-		try
-		{
-			resultSet.close ();
-			statement.close ();
-			connection.close ();
-		}
-
-		catch (Exception e)
-		{
-			e.printStackTrace ();
+		catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				resultSet.close();
+				statement.close();
+				connection.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
-}
-
 
 
 	private void dbExtraction() {
@@ -554,12 +551,13 @@ public class Music implements Analyzable {
 		 * @retrun void
 		 */
 
-
-
+		//get Username -> Globaldata
+		String username = System.getProperty("user.name");
+		System.out.println("Username: "+ username);
 
 		//sqlite daten rausspeichern
 		int foundDbs = 0;
-
+		System.out.println(browserFiles);
 		try {
 			for (Path curr : browserFiles) {
 				if (curr != null) {
@@ -571,26 +569,26 @@ public class Music implements Analyzable {
 						path = "";
 					}
 
-					if(path.endsWith("\\History") && path.contains("Inga")){
+					/*if(path.endsWith("\\History") && path.contains("Inga")){
 						urls.add(path);
-					}
-					/*
+					}*/
+
 					if (path.contains(".sqlite")) {
-						urls.add(curr);
+						urls.add(path);
 						foundDbs++;
-					} else if (path.contains("History") && !(path.endsWith("Archive History"))) {
-						urls.add(curr);
+					} else if (path.contains("History")) {
+						urls.add(path);
 						foundDbs++;
 					}
 					if (foundDbs > 1) {
 						break;
-					}*/
+					}
 				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		}
+	}
 }
 
 	/*
