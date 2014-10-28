@@ -4,10 +4,14 @@ import com.sun.deploy.util.StringUtils;
 import com.sun.org.apache.xalan.internal.xsltc.runtime.*;
 import de.aima13.whoami.Analyzable;
 
+import java.sql.Statement;
 import java.io.*;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.util.*;
 import java.util.Hashtable;
@@ -20,6 +24,7 @@ import org.farng.mp3.TagException;
 import org.farng.mp3.id3.AbstractID3;
 import org.farng.mp3.id3.AbstractID3v2;
 import org.farng.mp3.id3.ID3v1;
+import org.omg.CORBA.Environment;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -39,7 +44,7 @@ public class Music implements Analyzable {
 	List<Path> exeFiles = new ArrayList<>(); //List of browser-entries from musicDatabase
 	ArrayList<String> FileArtist = new ArrayList<>(); //List of Artists
 	ArrayList<String> FileGenre = new ArrayList<>(); //List of Genres
-	ArrayList<Path> urls = new ArrayList<>(); //List of URLs
+	ArrayList<String> urls = new ArrayList<>(); //List of URLs
 	Map<String, Integer> mapMaxApp = new HashMap<>();//Map Artist - frequency of this artist
 	Map<String, Integer> mapMaxGen = new HashMap<>();//Map Genre - frequency of this genre
 
@@ -49,13 +54,32 @@ public class Music implements Analyzable {
 	public String favGenre = ""; //Ergebnis von ScoreGenre
 	public String onlService = ""; //Genutzte Onlinedienste (siehe MY_SEARCH_DELIVERY_URLS)
 	public String cltProgram = ""; //Installierte Programme
+	String statementToGenre = "";
 
 	private static final String[] MY_SEARCH_DELIEVERY_URLS = {"youtube.com", "myvideo.de", "dailymotion.com",
-			"soundcloud.com", "deezer.com",};
+			"soundcloud.com", "deezer.com"};
 
 	String[] arrayGenre = {    // Position im Array ist Byte des id3Tag:
 			// z.B. GenreID ist 3: Genre zu 3 ist "Dance"
 			// Quelle: http://id3.org/id3v2.3.0
+
+			/*StatmentToGenre:
+			Other: 12
+			Mainstreamopfer: 14
+			Pop: 13
+			Partygirl: 3, 4
+			Faule Leseratte:
+			Raver: 18, 19, 26
+			Chiller: 16
+			Headbanger: 1, 9, 17, 22, 23
+			Kenner & Rotweintrinker: 0, 8, 25
+			Gangstarapper: 15
+			Hopper: 7
+			Zecke: 21
+			Oldy: 2, 11
+			Originell / Geschmack und Stil: 5, 10, 20, 24
+			Nirvana: 6
+			*/
 
 			//Dies sind die offiziellen ID3v1 Genres.
 			"Blues", "Classic Rock", "Country", "Dance", "Disco", "Funk", "Grunge",
@@ -218,6 +242,17 @@ public class Music implements Analyzable {
 					"<td>" + onlService + "</td>" +
 					"</tr>");
 		}
+		if (!(onlService.equals("")) && !(favArtist.equals("")) && !(favGenre.equals("")) && !
+				(cltProgram.equals(""))) {
+			buffer.append("<tr>" +
+					"<td><br /></td>" +
+					"<td><b>Fazit:</b> Dein Computer enthält Informationen zu allem was wir " +
+					"gesucht haben. " +
+					" " +
+					"</td>" +
+					"</tr>");
+		}
+
 
 		buffer.append("</table>");
 		html = buffer.toString();
@@ -296,7 +331,7 @@ public class Music implements Analyzable {
 			favGenre = (String) arrayGenre[a];
 		}
 
-		System.out.println(favGenre);
+		//Genre einteilung Text
 	}
 
 
@@ -370,6 +405,14 @@ public class Music implements Analyzable {
 
 					try {
 						genre = arrayGenre[gId]; //look up String to ID
+						/*if(gId <= 79){
+							statementToGenre = "Dein Lieblingsgenre '" + genre + "', " +
+									"' zeugt von Geschmack und Stil.";
+						}
+						if(gId > 79 && gId < ){
+							statementToGenre = "Dein Lieblingsgenre '" + genre + "', " +
+									"' zeugt von Geschmack und Stil.";
+						}*/
 					} catch (ArrayIndexOutOfBoundsException e) {
 						System.out.println("This Genre doesn't exist");
 					}
@@ -453,30 +496,55 @@ public class Music implements Analyzable {
 		 * @param browserFiles
 		 * @return void
  		 */
-		System.out.println("URLs: " + browserFiles);
-		dbExtraction();
-		ResultSet[] dbResult = this.getViewCountAndUrl(MY_SEARCH_DELIEVERY_URLS);
-		int count = dbResult.length;
+		/*System.out.println("URLs: " + browserFiles);
 
-		if(count == 0){
-			System.out.println("No online music services found.");
-		} else if(count == 1) {
-			onlService = dbResult[0].toString();
-			System.out.println("One online music service found.");
-		} else if(count == 2) {
-			onlService = dbResult[0].toString() + ", " + dbResult[1].toString();
-			System.out.println("Two online music services found.");
-		} else if(count == 3) {
-			onlService = dbResult[0].toString() + ", " + dbResult[1].toString() + ", " + dbResult[2].toString();
-			System.out.println("Three online music services found.");
-		} else if(count == 4){
-			onlService = dbResult[0].toString() + ", " + dbResult[1].toString() + ", " + dbResult[2].toString() + ", " + dbResult[3].toString();
-			System.out.println("Four online music services found.");
-		} else {
-			System.out.println("More than four music services");
+		System.out.println("URLs after DBExtraction: " + browserFiles);
+		ResultSet[] dbResult = this.getViewCountAndUrl(MY_SEARCH_DELIEVERY_URLS);*/
+
+	dbExtraction();
+	Connection connection = null;
+	ResultSet resultSet = null;
+	Statement statement = null;
+
+	try {
+		//for (int i = 0; i < urls.size(); i++) {
+			Class.forName("org.sqlite.JDBC");
+			connection = DriverManager.getConnection("jdbc:sqlite:" +
+					"" + urls.get(0));
+			//"jdbc:sqlite:/home/username/
+			// .config/chromium/Default/History"
+			statement = connection.createStatement();
+			resultSet = statement.executeQuery("SELECT * FROM urls WHERE url LIKE '%youtube.com%'");
+
+			while (resultSet.next()) {
+				System.out.println("URL [" + resultSet.getString("url") + "]" +
+						", visit count [" + resultSet.getString("visit_count") + "]");
+			}
+		}
+	//}
+
+	catch (Exception e)
+	{
+		e.printStackTrace ();
+	}
+
+	finally
+	{
+		try
+		{
+			resultSet.close ();
+			statement.close ();
+			connection.close ();
 		}
 
+		catch (Exception e)
+		{
+			e.printStackTrace ();
+		}
 	}
+}
+
+
 
 	private void dbExtraction() {
 		/**
@@ -485,6 +553,9 @@ public class Music implements Analyzable {
 		 * @param
 		 * @retrun void
 		 */
+
+
+
 
 		//sqlite daten rausspeichern
 		int foundDbs = 0;
@@ -500,33 +571,29 @@ public class Music implements Analyzable {
 						path = "";
 					}
 
+					if(path.endsWith("\\History") && path.contains("Inga")){
+						urls.add(path);
+					}
+					/*
 					if (path.contains(".sqlite")) {
 						urls.add(curr);
 						foundDbs++;
-					} else if (path.contains("History")) {
+					} else if (path.contains("History") && !(path.endsWith("Archive History"))) {
 						urls.add(curr);
 						foundDbs++;
 					}
 					if (foundDbs > 1) {
 						break;
-					}
+					}*/
 				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		//Db-Files aus browserFile Liste löschen
-		for (int i = 0; i < foundDbs; i++) {
-			try {
-				browserFiles.remove(urls.get(i));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
 		}
-	}
+}
 
-
+	/*
 	private ResultSet[] getViewCountAndUrl(String[] searchUrl) {
 		//System.out.println("ArrayList: " + urls);
 		ResultSet[] results = new ResultSet[10];
@@ -535,8 +602,9 @@ public class Music implements Analyzable {
 		sql.append("SELECT url,visit_count ");
 		DataSourceManager dbManager = null;
 		int x = 0;
-		for (Path db : browserFiles){
-			//if (db.toFile() != null) {
+		if(!(browserFiles.isEmpty())) {
+			for (Path db : browserFiles) {
+				//if (db.toFile() != null) {
 				String path = "";
 				try {
 					path = db.toString();
@@ -562,13 +630,15 @@ public class Music implements Analyzable {
 				try {
 					dbManager = new DataSourceManager(db);
 					results[x] = dbManager.querySqlStatement(sql.toString()); //sqlStatement
-					System.out.println(results[x].getString(0));
-					} catch (Exception e) {
-						e.printStackTrace();
-						results[x] = null;
-					}
-
-			x++;
+					System.out.println("STOOOOPPP");
+				} catch (Exception e) {
+					e.printStackTrace();
+					results[x] = null;
+				}
+				x++;
+			}
+		} else {
+			System.out.println("Angeblich leer: " + browserFiles);
 		}
 
 	for(int i = 0; i < results.length; i++){
@@ -577,4 +647,5 @@ public class Music implements Analyzable {
 
 	return results;
 	}
-}
+
+	*/
