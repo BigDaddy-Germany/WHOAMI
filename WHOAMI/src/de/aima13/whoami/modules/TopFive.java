@@ -221,7 +221,7 @@ public class TopFive implements Analyzable {
 				);
 			}
 		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
+			// Deadlock auf DB
 		}
 		return mostVisited;
 	}

@@ -1,6 +1,5 @@
 package de.aima13.whoami;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
