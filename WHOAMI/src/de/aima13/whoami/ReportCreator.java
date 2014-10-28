@@ -82,12 +82,13 @@ public class ReportCreator {
 
 			// HTML-Worker erstellen, um HTML-Content zu schreiben
 			String htmlSource = this.getHtml();
-			//htmlSource = "<p>Hallo Welt.</p>";
 			ByteArrayInputStream htmlSourceInputStream = new ByteArrayInputStream(
 					htmlSource.getBytes(StandardCharsets.UTF_8.toString())
 			);
 			try {
+				System.out.println(htmlSource);
 				XMLWorkerHelper.getInstance().parseXHtml(writer, pdfFile, htmlSourceInputStream);
+				System.out.println("nach html worker");
 			} catch (RuntimeWorkerException e) {
 				System.err.println("Parsen des Berichtes wegen fehlerhaftem HTML abgebrochen.");
 				System.err.println("Bericht nur bis zu fehlerhafter Stelle erstellt.");
@@ -95,9 +96,12 @@ public class ReportCreator {
 				e.printStackTrace();
 
 				return false;
-			} finally {
-				// PDF schließen
+			}
+
+			try {
 				pdfFile.close();
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 
 			System.out.println("PDF created");
