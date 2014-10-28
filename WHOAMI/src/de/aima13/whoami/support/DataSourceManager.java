@@ -30,14 +30,6 @@ public class DataSourceManager {
 			dbConnection = DriverManager.getConnection
 					("jdbc:sqlite:" + sqliteDatabase.toString());
 		}
-
-
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			public void run() {
-				closeConnection();
-			}
-		});
-
 	}
 
 	/**
@@ -79,14 +71,19 @@ public class DataSourceManager {
 	/**
 	 * Wrapper zum schließen und freigeben der Verbindung!
 	 */
-	public void closeConnection() {
+	private static void closeConnection(Connection c) {
 		try {
-			if (dbConnection != null && !dbConnection.isClosed() ) {
-				openConnections.remove(dbConnection);
-				dbConnection.close();
+			if (c != null && !c.isClosed() ) {
+				openConnections.remove(c);
+				c.close();
 			}
 		} catch (SQLException e) {
 
+		}
+	}
+	public static void closeRemainingOpenConnections(){
+		for (Connection c : openConnections){
+			closeConnection(c);
 		}
 	}
 
