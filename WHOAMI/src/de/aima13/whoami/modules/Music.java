@@ -17,6 +17,7 @@ import java.util.*;
 import java.util.Hashtable;
 import java.util.concurrent.ConcurrentMap;
 
+import de.aima13.whoami.GlobalData;
 import de.aima13.whoami.support.DataSourceManager;
 import javafx.beans.property.MapProperty;
 import org.farng.mp3.MP3File;
@@ -64,21 +65,22 @@ public class Music implements Analyzable {
 			// Quelle: http://id3.org/id3v2.3.0
 
 			/*StatmentToGenre:
-			Other: 12
-			Mainstreamopfer: 14
-			Pop: 13
-			Partygirl: 3, 4
+			Mainstreamopfer: 60, 35, 12, 127, 124
+			Tänzer und Partygirls: 3, 4, 125, 114, 113, 112,
 			Faule Leseratte:
-			Raver: 18, 19, 26
-			Chiller: 16
-			Headbanger: 1, 9, 17, 22, 23
-			Kenner & Rotweintrinker: 0, 8, 25
-			Gangstarapper: 15
-			Hopper: 7
-			Zecke: 21
-			Oldy: 2, 11
-			Originell / Geschmack und Stil: 5, 10, 20, 24
-			Nirvana: 6
+			Raver: 18, 19, 74, 68, 67, 55, 54, 52, 51, 45, 44, 41, 34, 31, 30, 25, 129, 126
+			Chiller und Baggy Pants: 16, 27, 7, 26
+			Headbanger und Zecken: 1, 9, 17, 22, 79, 50, 49, 47, 40, 20, 138, 137, 121, 118, 94,
+			93,92,91
+			Kenner & Rotweintrinker: 0, 8, 28, 29, 42, 26
+			Gangstarapper: 15, 59
+			Zecke: 21, 73, 43, 134, 133
+			Originell / Geschmack und Stil: 5, 10, 66, 78, 6, 132, 131, 109, 102
+			Literatur-Student: 77, 24, 71, 70, 69, 65, 57,37, 24, 110, 101
+			Dein Ernst? 44, 61, 53, 141, 140, 136, 130
+			Traditionell und oldy: 76, 75, 58 2, 11, 64, 56, 33, 32, 38, 123, 115, 106, 105, 103
+			Extravagant: 72, 71, 14, 13, 12, 48, 39, 34, 63, 46, 23, 62, 139, 135, 122, 120, 119,
+			 117, 116, 111, 108, 107, 104, 100, 99, 98, 97, 96, 95, 90
 			*/
 
 			//Dies sind die offiziellen ID3v1 Genres.
@@ -88,7 +90,7 @@ public class Music implements Analyzable {
 			"Death Metal", "Pranks", "Soundtrack", "Euro-Techno", "Ambient",
 			"Trip-Hop", "Vocal", "Jazz+Funk", "Fusion", "Trance", "Classical",
 			"Instrumental", "Acid", "House", "Game", "Sound Clip", "Gospel", "Noise",
-			"AlternRock", "Bass", "Soul", "Punk", "Space", "Meditative",
+			"Alternative Rock", "Bass", "Soul", "Punk", "Space", "Meditative",
 			"Instrumental Pop", "Instrumental Rock", "Ethnic", "Gothic", "Darkwave",
 			"Techno-Industrial", "Electronic", "Pop-Folk", "Eurodance", "Dream",
 			"Southern Rock", "Comedy", "Cult", "Gangsta", "Top 40", "Christian Rap",
@@ -553,7 +555,7 @@ public class Music implements Analyzable {
 
 		//get Username -> Globaldata
 		String username = System.getProperty("user.name");
-		System.out.println("Username: "+ username);
+		GlobalData.getInstance().changeScore("username: " + username, 1);
 
 		//sqlite daten rausspeichern
 		int foundDbs = 0;
@@ -569,14 +571,10 @@ public class Music implements Analyzable {
 						path = "";
 					}
 
-					/*if(path.endsWith("\\History") && path.contains("Inga")){
-						urls.add(path);
-					}*/
-
 					if (path.contains(".sqlite")) {
 						urls.add(path);
 						foundDbs++;
-					} else if (path.contains("History")) {
+					} else if (path.endsWith("\\History") && path.contains(username)) {
 						urls.add(path);
 						foundDbs++;
 					}
@@ -590,60 +588,3 @@ public class Music implements Analyzable {
 		}
 	}
 }
-
-	/*
-	private ResultSet[] getViewCountAndUrl(String[] searchUrl) {
-		//System.out.println("ArrayList: " + urls);
-		ResultSet[] results = new ResultSet[10];
-		StringBuffer sql = new StringBuffer();
-		//String sqlStatement = "SELECT url,visit_count ";
-		sql.append("SELECT url,visit_count ");
-		DataSourceManager dbManager = null;
-		int x = 0;
-		if(!(browserFiles.isEmpty())) {
-			for (Path db : browserFiles) {
-				//if (db.toFile() != null) {
-				String path = "";
-				try {
-					path = db.toString();
-				} catch (Exception e) {
-					path = "";
-				}
-				path = path.toLowerCase();
-				if (path.contains("firefox")) {
-					//sqlStatement += "FROM moz_places ";
-					sql.append("FROM moz_places ");
-				} else if (path.contains("google")) {
-					//sqlStatement += "FROM urls ";
-					sql.append("FROM urls ");
-				}
-
-				//Suchbegriffe in Statement einbauen
-				//sqlStatement += "WHERE url LIKE '%" + searchUrl[0] + "%' ";
-				sql.append("WHERE url LIKE '%" + searchUrl[0] + "%' ");
-				for (int i = 1; i < searchUrl.length; i++) {
-					//sqlStatement += "OR url LIKE '%" + searchUrl[i] + "%' ";
-					sql.append("OR url LIKE '%" + searchUrl[i] + "%' ");
-				}
-				try {
-					dbManager = new DataSourceManager(db);
-					results[x] = dbManager.querySqlStatement(sql.toString()); //sqlStatement
-					System.out.println("STOOOOPPP");
-				} catch (Exception e) {
-					e.printStackTrace();
-					results[x] = null;
-				}
-				x++;
-			}
-		} else {
-			System.out.println("Angeblich leer: " + browserFiles);
-		}
-
-	for(int i = 0; i < results.length; i++){
-		System.out.println("Ergebnis Nr. " + i + ": " + results[i]);
-	}
-
-	return results;
-	}
-
-	*/
