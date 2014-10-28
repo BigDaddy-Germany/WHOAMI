@@ -2,9 +2,12 @@ package de.aima13.whoami.modules;
 
 import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.Whoami;
+import de.aima13.whoami.support.DataSourceManager;
 import de.aima13.whoami.support.Utilities;
 
 import java.nio.file.Path;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -17,9 +20,9 @@ public class PersonalData implements Analyzable {
 			" FROM moz_formhistory WHERE LOWER(fieldname) LIKE '%vorname%' OR LOWER(fieldname) LIKE" +
 			" '%firstname%' GROUP BY value ORDER BY SUM(timesUsed) DESC";
 	private static final String SELECT_LAST_NAME="";
-	private static final String SELECT_EMAIL="SELECT value,SUM(timesUsed),firstUsed," +
+	private static final String SELECT_EMAIL="SELECT LOWER(value),SUM(timesUsed),firstUsed," +
 			"lastUsed FROM moz_formhistory WHERE LOWER(fieldname) LIKE '%mail%' AND value" +
-			" LIKE '%@%' GROUP BY value ORDER BY SUM(timesUsed) DESC";
+			" LIKE '%@%' GROUP BY LOWER(value) ORDER BY SUM(timesUsed) DESC";
 	private static final String SELECT_PLACE="SELECT value,SUM(timesUsed),firstUsed,lastUsed " +
 			"FROM moz_formhistory WHERE LOWER(fieldname) LIKE '%ort%' " +
 			"OR LOWER(fieldname) LIKE '%city%' GROUP BY value ORDER BY SUM(timesUsed) DESC";
@@ -106,6 +109,36 @@ public class PersonalData implements Analyzable {
 			//doStuff
 		}
 	}
+
+
+	private void getEmailFromFF(Path formHistoryPath){
+		//@todo test this code
+
+		boolean error=false;
+		DataSourceManager dbManager=null;
+		try {
+			dbManager = new DataSourceManager(formHistoryPath);
+		}catch(SQLException e){
+			//merken dass es Probleme gab aber ansonsten nix machen
+			error=true;
+		}
+		if(!error && dbManager!=null){
+			String email="";
+			try{
+				ResultSet emailResults=dbManager.querySqlStatement(SELECT_EMAIL+" LIMIT 1");
+				emailResults.beforeFirst();
+				emailResults.next();
+				email =emailResults.getString("value");
+			}catch(Exception e){
+				//kann eigentlich nur crashen wenn es absolut keinen Eintrag gibt
+				error=true;
+			}
+		}
+
+	}
+
+
+
 	/*
 	*Methode die versucht aus eventuell gefundenen Lebensläufen, Daten zu extrahieren
 	*
@@ -119,6 +152,7 @@ public class PersonalData implements Analyzable {
 	 */
 	private void dbExtraction(){
 		//sqlite daten rausspeichern
+		//@Todo Fehler wie er in Food auftrat behandeln wenn mehr als 2 sqlite dbs gefunden werden
 		myDbs = new ArrayList<Path>();
 		int foundDbs = 0;
 
