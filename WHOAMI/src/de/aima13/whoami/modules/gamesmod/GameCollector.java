@@ -10,6 +10,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import static de.aima13.whoami.support.Utilities.loadDataFromJson;
+
 /**
  * Der GameCollector verarbeitet EXEs und die Steam-Bibliothek und fügt diese zur Spieleliste hinzu
  *
@@ -18,6 +20,13 @@ import java.util.concurrent.TimeUnit;
 class GameCollector {
 
 	private GameDatabaseEntry[] gameDatabase;
+
+	/**
+	 * Initialisiert einen GameCollector und lädt dabei die Spieledatenbank aus den Ressourcen
+	 */
+	GameCollector() {
+		gameDatabase = loadDataFromJson("/data/Games_database.json", GameDatabaseEntry[].class);
+	}
 
 	class GameDatabaseEntry {
 		String file;
