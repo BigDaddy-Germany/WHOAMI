@@ -4,31 +4,26 @@ import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.Whoami;
 import de.aima13.whoami.support.Utilities;
 
-import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedMap;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Spielemodul sucht installierte Spiele, kommentiert diese und liefert Zocker-Score
+ * Dies ist die Hauptklasse, welche sich um die Durchführung und Ausgabe kümmert.
  *
  * @author Niko Berkmann
  */
 public class Games implements Analyzable {
 
 	private List<Path> exePaths;
-	private Path steamAppsPath = null;
-	private GameList gameList;
+	static Path steamAppsPath = null;
+	static GameList gameList;
 	private GameEntry resultFirstCreatedGame;
 	private GameEntry resultLastCreatedGame;
 	private GameEntry resultLastModifiedGame;
-	private boolean cancelledByTimeLimit = false;
+	static boolean cancelledByTimeLimit = false;
 
 	/**
 	 * Spielemodul fragt nach einer Liste von Executables und benötigt den Pfad eines
@@ -95,7 +90,7 @@ public class Games implements Analyzable {
 				+ threshold.comment + " ");
 
 		//Steam kommentieren
-		if (steamAppsPath!=null) {
+		if (steamAppsPath != null) {
 			html.append(gamesComments.steamFound);
 		} else if (count > gamesComments.minGamesForDistributorRecommendation) {
 			html.append(gamesComments.distributorRecommendation);
@@ -103,12 +98,12 @@ public class Games implements Analyzable {
 		html.append(" ");
 
 		//Datumsangaben der Executables kommentieren
-		if (gameList.size()>0) {
-			html.append("Spielst du eigentlich noch "+resultFirstCreatedGame.name+"? " +
-					""+gamesComments.firstCreated+" Wie läuft es denn so mit " +
-					""+resultLastModifiedGame.name+"? "+gamesComments.lastModified+" Als letztes " +
-					"wurde anscheinend "+resultLastCreatedGame.name+" installiert. " +
-					""+gamesComments.lastCreated);
+		if (gameList.size() > 0) {
+			html.append("Spielst du eigentlich noch " + resultFirstCreatedGame.name + "? " +
+					"" + gamesComments.firstCreated + " Wie läuft es denn so mit " +
+					"" + resultLastModifiedGame.name + "? " + gamesComments.lastModified + " Als letztes " +
+					"wurde anscheinend " + resultLastCreatedGame.name + " installiert. " +
+					"" + gamesComments.lastCreated);
 		}
 		return html.toString();
 	}
@@ -134,7 +129,7 @@ public class Games implements Analyzable {
 		for (Path current : exePaths) {
 			//Haben wir die Steam-Executable gefunden?
 			if (current.getFileName().toString().toLowerCase().equals("steam.exe")) {
-				processSteamLibrary(current);
+				GameCollector.processSteamLibrary(current);
 			}
 
 			if (Whoami.getTimeProgress() >= 99) {
@@ -147,7 +142,7 @@ public class Games implements Analyzable {
 		//Dem Ergebnis dienliche Abschlussoperationen auch bei Timeboxing-Abbruch durchführen
 		if (gameList.size() > 0) {
 			gameList.sortByLatestCreated();
-			resultFirstCreatedGame = gameList.get(gameList.size()-1);
+			resultFirstCreatedGame = gameList.get(gameList.size() - 1);
 			resultLastCreatedGame = gameList.get(0);
 			gameList.sortByLatestModified();
 			resultLastModifiedGame = gameList.get(0);
@@ -155,69 +150,9 @@ public class Games implements Analyzable {
 	}
 
 	/**
-	 * Verarbeitet gefundene Steam-Bibliothek und veranlasst deren Scan
-	 *
-	 * @param steamExe Pfad zur Steam-Programmdatei
-	 */
-	private void processSteamLibrary(Path steamExe) {
-		//SteamApps-Verzeichnis extrahieren
-		try {
-			steamAppsPath = steamExe.getParent().resolve("SteamApps");
-		} catch (Exception e) {
-		} //Fehler resultieren in später behandeltem Initalwert
-
-		if (steamAppsPath != null) {
-			logthis("Aktive Steam-Installation gefunden in "
-					+ steamAppsPath.toAbsolutePath().toString());
-			Path commonFolder = steamAppsPath.resolve("common");
-
-			try (DirectoryStream<Path> gameFolderStream = Files.newDirectoryStream(commonFolder)) {
-				addSteamGames(gameFolderStream);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		} else {
-			logthis("Steam-Installation scheint inaktiv.");
-		}
-	}
-
-	/**
-	 * Interpretiert alle Ordner als Spieleverzeichnis und fügt sie zur Liste hinzu
-	 *
-	 * @param gameFolderStream Stream des Verzeichnis Steam/SteamApps/common
-	 */
-	private void addSteamGames(DirectoryStream<Path> gameFolderStream) {
-		String gameName;
-		BasicFileAttributes attributes;
-		Date create;
-		Date modify;
-
-		for (Path gameFolderPath : gameFolderStream) {
-			try {
-				if (Files.isDirectory(gameFolderPath)) {
-					attributes = Files.readAttributes(gameFolderPath, BasicFileAttributes.class);
-					create = new Date(attributes.creationTime().to(TimeUnit.MILLISECONDS));
-					modify = new Date(attributes.lastModifiedTime().to(TimeUnit.MILLISECONDS));
-
-					gameName = gameFolderPath.getFileName().toString();
-
-					gameList.addUnique(new GameEntry(gameName, create, modify));
-				}
-			} catch (Exception e) {
-			} //Bei Problemen mit einzelnen Ordnern -> komplett überspringen, bewusst ignorieren
-
-			if (Whoami.getTimeProgress() >= 99) {
-				//Ausstieg wegen Timeboxing
-				cancelledByTimeLimit = true;
-				return;
-			}
-		}
-	}
-
-	/**
 	 * :TODO: Hilfsmethode, die es im Release auszumustern gilt
 	 */
-	private void logthis(String msg) {
+	static void logthis(String msg) {
 		System.out.println(msg);
 	}
 }
