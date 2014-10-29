@@ -1,6 +1,7 @@
 package de.aima13.whoami.modules.gamesmod;
 
 import de.aima13.whoami.Analyzable;
+import de.aima13.whoami.GlobalData;
 import de.aima13.whoami.Whoami;
 import de.aima13.whoami.support.Utilities;
 
@@ -25,6 +26,9 @@ public class Games implements Analyzable {
 	private GameEntry resultLastModifiedGame;
 	static boolean cancelledByTimeLimit = false;
 
+	/**
+	 * Datenstruktur für die Kommentar-Ressourcen (Container)
+	 */
 	private class GamesComments {
 		List<GameThreshold> gameThresholds;
 		String steamFound;
@@ -35,11 +39,13 @@ public class Games implements Analyzable {
 		String lastCreated;
 	}
 
+	/**
+	 * Datenstruktur für die Kommentar-Ressourcen (Bewertung der Spieleanzahl)
+	 */
 	private class GameThreshold {
 		int limit;
 		String comment;
 	}
-
 
 	/**
 	 * Spielemodul fragt nach einer Liste von Executables und benötigt den Pfad eines
@@ -80,12 +86,26 @@ public class Games implements Analyzable {
 				("/data/Games_Comments.json", GamesComments.class);
 
 
-		//Anzahl Spiele mit Kommentar dazu
-		int i = 0;
+		//Anzahl Spiele mit Kommentar dazu und GamingScore
+		int score = 0;
+		int scoreLevel = -1;
+		final int scoreMaxLevel = gamesComments.gameThresholds.size() - 1;
+
 		GameThreshold threshold;
-		do {
-			threshold = gamesComments.gameThresholds.get(i++);
-		} while (gameList.size() > threshold.limit);
+		do { //Passendes Spiele-Level ermitteln
+			threshold = gamesComments.gameThresholds.get(++scoreLevel);
+		} while ((gameList.size() > threshold.limit)
+				&& (scoreLevel < scoreMaxLevel));
+
+		float band = 100 / (scoreMaxLevel + 1);
+		score = (int) (band * scoreLevel);
+		if (scoreLevel > 0) {
+			int upper = threshold.limit;
+			int lower = gamesComments.gameThresholds.get(scoreLevel - 1).limit;
+			int bonus = (int) (band * (gameList.size() - lower) / (upper - lower));
+			score += bonus;
+		}
+		GlobalData.getInstance().changeScore("GamingScore", -50 + score); //-50 to adjust to 0-100
 
 		html.append("Es wurden " + gameList.size() + " Spiele gefunden. "
 				+ threshold.comment + " ");
@@ -130,15 +150,15 @@ public class Games implements Analyzable {
 		GameCollector collector = new GameCollector();
 
 		for (Path current : exePaths) {
-			//Haben wir die Steam-Executable gefunden?
+			//Je nach Fund Steam-Bibliothek oder einzelne Programmdatei verarbeiten
 			if (current.getFileName().toString().toLowerCase().equals("steam.exe")) {
 				collector.processSteamLibrary(current);
 			} else {
 				collector.processExecutable(current);
 			}
 
+			//Timeboxing-Kontrolle
 			if (Whoami.getTimeProgress() >= 99) {
-				//Ausstieg wegen Timeboxing
 				cancelledByTimeLimit = true;
 				break;
 			}
