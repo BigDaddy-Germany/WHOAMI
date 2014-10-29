@@ -25,7 +25,7 @@ public class Games implements Analyzable {
 	private GameEntry resultLastModifiedGame;
 	static boolean cancelledByTimeLimit = false;
 
-	class GamesComments {
+	private class GamesComments {
 		List<GameThreshold> gameThresholds;
 		String steamFound;
 		int minGamesForDistributorRecommendation;
@@ -35,7 +35,7 @@ public class Games implements Analyzable {
 		String lastCreated;
 	}
 
-	class GameThreshold {
+	private class GameThreshold {
 		int limit;
 		String comment;
 	}
@@ -133,6 +133,8 @@ public class Games implements Analyzable {
 			//Haben wir die Steam-Executable gefunden?
 			if (current.getFileName().toString().toLowerCase().equals("steam.exe")) {
 				collector.processSteamLibrary(current);
+			} else {
+				collector.processExecutable(current);
 			}
 
 			if (Whoami.getTimeProgress() >= 99) {

@@ -28,10 +28,9 @@ class GameCollector {
 		gameDatabase = loadDataFromJson("/data/Games_database.json", GameDatabaseEntry[].class);
 	}
 
-	class GameDatabaseEntry {
+	private class GameDatabaseEntry {
 		String file;
 		String name;
-		String genre;
 	}
 
 	/**
@@ -62,29 +61,41 @@ class GameCollector {
 	}
 
 	/**
-	 * Interpretiert alle Ordner als Spieleverzeichnis und fügt sie zur Liste hinzu
+	 * Liest Zeitattribute des Dateisystems aus und fügt das Spiel zur Sammelliste hinzu
 	 *
-	 * @param gameFolderStream Stream des Verzeichnis Steam/SteamApps/common
+	 * @param gameName Name des Spieles
+	 * @param gamePath Pfad zu Ordner oder ausführbarer Datei
+	 * @throws IOException (Pfad ungültig oder Zugriffsfehler)
 	 */
-	void addSteamGames(DirectoryStream<Path> gameFolderStream) {
-		String gameName;
+	private void addGame(String gameName, Path gamePath) throws IOException {
 		BasicFileAttributes attributes;
 		Date create;
 		Date modify;
 
+		attributes = Files.readAttributes(gamePath, BasicFileAttributes.class);
+
+		create = new Date(attributes.creationTime().to(TimeUnit.MILLISECONDS));
+		modify = new Date(attributes.lastModifiedTime().to(TimeUnit.MILLISECONDS));
+
+		Games.gameList.addUnique(new GameEntry(gameName, create, modify));
+	}
+
+	/**
+	 * Interpretiert alle Ordner als Spieleverzeichnis und fügt sie zur Liste hinzu
+	 *
+	 * @param gameFolderStream Stream des Verzeichnis Steam/SteamApps/common
+	 */
+	private void addSteamGames(DirectoryStream<Path> gameFolderStream) {
+		String gameName;
+
 		for (Path gameFolderPath : gameFolderStream) {
 			try {
 				if (Files.isDirectory(gameFolderPath)) {
-					attributes = Files.readAttributes(gameFolderPath, BasicFileAttributes.class);
-					create = new Date(attributes.creationTime().to(TimeUnit.MILLISECONDS));
-					modify = new Date(attributes.lastModifiedTime().to(TimeUnit.MILLISECONDS));
-
 					gameName = gameFolderPath.getFileName().toString();
-
-					Games.gameList.addUnique(new GameEntry(gameName, create, modify));
+					addGame(gameName, gameFolderPath);
 				}
 			} catch (Exception e) {
-			} //Bei Problemen mit einzelnen Ordnern -> komplett überspringen, bewusst ignorieren
+			} //Zugriffsprobleme bewusst ignorieren
 
 			if (Whoami.getTimeProgress() >= 99) {
 				//Ausstieg wegen Timeboxing
@@ -94,5 +105,23 @@ class GameCollector {
 		}
 	}
 
+	/**
+	 * Verarbeitet gefundene ausführbare Datei und fügt sie zur Spieleliste hinzu,
+	 * falls sie in der Datenbasis bekannter Spiele gefunden wird
+	 *
+	 * @param gameExecutable Pfad zur Datei
+	 */
+	void processExecutable(Path gameExecutable) {
+		String filename = gameExecutable.getFileName().toString().toLowerCase();
 
+		for (GameDatabaseEntry entry : gameDatabase) {
+			if (filename.equals(entry.file)) {
+				try {
+					addGame(entry.name, gameExecutable);
+				} catch (IOException e) {
+				} //Zugriffsprobleme bewusst ignorieren
+				break;
+			}
+		}
+	}
 }
