@@ -25,6 +25,22 @@ public class Games implements Analyzable {
 	private GameEntry resultLastModifiedGame;
 	static boolean cancelledByTimeLimit = false;
 
+	class GamesComments {
+		List<GameThreshold> gameThresholds;
+		String steamFound;
+		int minGamesForDistributorRecommendation;
+		String distributorRecommendation;
+		String firstCreated;
+		String lastModified;
+		String lastCreated;
+	}
+
+	class GameThreshold {
+		int limit;
+		String comment;
+	}
+
+
 	/**
 	 * Spielemodul fragt nach einer Liste von Executables und benötigt den Pfad eines
 	 * gegebenenfalls vorhandenen "SteamApps"-Ordners
@@ -53,21 +69,6 @@ public class Games implements Analyzable {
 						+ currentPath.toAbsolutePath().toString());
 			}
 		}
-	}
-
-	class GamesComments {
-		List<GameThreshold> gameThresholds;
-		String steamFound;
-		int minGamesForDistributorRecommendation;
-		String distributorRecommendation;
-		String firstCreated;
-		String lastModified;
-		String lastCreated;
-	}
-
-	class GameThreshold {
-		int limit;
-		String comment;
 	}
 
 	@Override
@@ -126,10 +127,12 @@ public class Games implements Analyzable {
 	@Override
 	public void run() {
 		gameList = new GameList();
+		GameCollector collector = new GameCollector();
+
 		for (Path current : exePaths) {
 			//Haben wir die Steam-Executable gefunden?
 			if (current.getFileName().toString().toLowerCase().equals("steam.exe")) {
-				GameCollector.processSteamLibrary(current);
+				collector.processSteamLibrary(current);
 			}
 
 			if (Whoami.getTimeProgress() >= 99) {

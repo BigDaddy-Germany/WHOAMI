@@ -17,12 +17,20 @@ import java.util.concurrent.TimeUnit;
  */
 class GameCollector {
 
+	private GameDatabaseEntry[] gameDatabase;
+
+	class GameDatabaseEntry {
+		String file;
+		String name;
+		String genre;
+	}
+
 	/**
 	 * Verarbeitet gefundene Steam-Bibliothek und veranlasst deren Scan
 	 *
 	 * @param steamExe Pfad zur Steam-Programmdatei
 	 */
-	static void processSteamLibrary(Path steamExe) {
+	void processSteamLibrary(Path steamExe) {
 		//SteamApps-Verzeichnis extrahieren
 		try {
 			Games.steamAppsPath = steamExe.getParent().resolve("SteamApps");
@@ -49,7 +57,7 @@ class GameCollector {
 	 *
 	 * @param gameFolderStream Stream des Verzeichnis Steam/SteamApps/common
 	 */
-	private static void addSteamGames(DirectoryStream<Path> gameFolderStream) {
+	void addSteamGames(DirectoryStream<Path> gameFolderStream) {
 		String gameName;
 		BasicFileAttributes attributes;
 		Date create;
