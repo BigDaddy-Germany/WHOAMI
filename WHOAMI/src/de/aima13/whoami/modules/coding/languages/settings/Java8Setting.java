@@ -15,7 +15,8 @@ public class Java8Setting extends LanguageSetting {
 				"Java",
 				"java",
 				Java8Parser.class,
-				Java8Lexer.class
+				Java8Lexer.class,
+				"compilationUnit"
 		);
 	}
 }

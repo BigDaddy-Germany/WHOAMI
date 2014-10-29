@@ -11,12 +11,15 @@ public abstract class LanguageSetting {
 	public final String FILE_EXTENSION;
 	public final Class<? extends Parser> PARSER;
 	public final Class<? extends Lexer> LEXER;
+	public final String START_SYMBOL;
 
 	protected LanguageSetting(String language_name, String file_extension,
-	                          Class<? extends Parser> parser, Class<? extends Lexer> lexer) {
+	                          Class<? extends Parser> parser, Class<? extends Lexer> lexer,
+	                          String start_symbol) {
 		LANGUAGE_NAME = language_name;
 		FILE_EXTENSION = file_extension;
 		PARSER = parser;
 		LEXER = lexer;
+		START_SYMBOL = start_symbol;
 	}
 }

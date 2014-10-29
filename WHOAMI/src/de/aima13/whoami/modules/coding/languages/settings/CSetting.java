@@ -15,7 +15,8 @@ public class CSetting extends LanguageSetting {
 				"C",
 				"c",
 				CParser.class,
-				CLexer.class
+				CLexer.class,
+				"compilationUnit"
 		);
 	}
 }
