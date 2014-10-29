@@ -2,10 +2,20 @@ package de.aima13.whoami.modules.coding;
 
 import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.modules.coding.languages.LanguageSetting;
+import de.aima13.whoami.modules.coding.languages.settings.CSetting;
 import de.aima13.whoami.support.Utilities;
+import org.antlr.v4.runtime.*;
 import org.reflections.Reflections;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -14,8 +24,15 @@ import java.util.*;
  * Created by Marco Dörfler on 28.10.14.
  */
 public class CodeAnalyzer implements Analyzable {
+	private final String CSV_PREFIX = "coding";
+	private final String REPORT_TITLE = "Code-Analyse";
+
 	private Map<LanguageSetting, List<Path>> languageFilesMap;
 	private List<String> moduleFilter;
+
+	private static enum CHECK_RESULT {
+		CANT_PARSE, CORRECT, SYNTAX_ERROR
+	}
 
 	/**
 	 * Im Konstruktor werden alle Settings geladen und instanziiert
@@ -104,12 +121,12 @@ public class CodeAnalyzer implements Analyzable {
 
 	@Override
 	public String getReportTitle() {
-		return null;
+		return REPORT_TITLE;
 	}
 
 	@Override
 	public String getCsvPrefix() {
-		return null;
+		return CSV_PREFIX;
 	}
 
 	@Override
@@ -119,6 +136,65 @@ public class CodeAnalyzer implements Analyzable {
 
 	@Override
 	public void run() {
+		System.out.println(this.checkSyntax(new CSetting(), Paths.get("C:\\ANTLR\\101-hello.c")));
+	}
 
+	/**
+	 * Diese Methode iteriert über alle gefundenen Sprachen und checkt deren syntaktische
+	 * Korrektheit.
+	 *
+	 * @param languageSetting Die Sprache, auf die geprüft werden soll
+	 * @param file Die Datei, die geprüft werden soll
+	 * @return ENUM, welches entscheidet, wie der Status der Datei ist
+	 *
+	 * @author Marco Dörfler
+	 */
+	private CHECK_RESULT checkSyntax(LanguageSetting languageSetting, Path file) {
+		try {
+			// ANTLRInputStrem erzeugen
+			ANTLRInputStream inputStream = new ANTLRInputStream(Files.newInputStream(file));
+
+			// Constructor des Lexers auslesen
+			// Umweg über Array nötig, da genauer Typ des Lexers nicht bekannt (nur Oberklasse)
+			Constructor<Lexer>[] lexerConstructors = (Constructor<Lexer>[]) languageSetting.LEXER.getConstructors();
+			Lexer lexer = lexerConstructors[0].newInstance(inputStream);
+
+			// Constructor des Parsers auslesen
+			// Umweg über Array nötig, da genauer Typ des Lexers nicht bekannt (nur Oberklasse)
+			CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+			Constructor<Parser>[] parserConstructors = (Constructor<Parser>[]) languageSetting.PARSER.getConstructors();
+
+			// Parser Instanziieren
+			Parser parser = parserConstructors[0].newInstance(commonTokenStream);
+
+			// Methode des Startsymbols auslesen
+			Method startMethod = languageSetting.PARSER.getMethod(languageSetting.START_SYMBOL);
+
+			// Antlr gibt bei Fehlern etwas auf dem Errorstream aus. Das soll unterdrückt werden,
+			// indem der Errorstream neu gesetzt wird (dieser tut nichts). Vorher sollte der
+			// aktuelle Errorstream gespeichert werden, sodass alles resettet werden kann
+			PrintStream standardErrorStream = System.err;
+			System.setErr(new PrintStream(new OutputStream() {
+				@Override
+				public void write(int b) throws IOException {
+				}
+			}));
+			// Methode aus der Instanz des Parsers heraus ausführen
+			startMethod.invoke(parser);
+			// Errorstream resetten
+			System.setErr(standardErrorStream);
+
+			// Entscheidung nach Syntaxfehlern
+			if (parser.getNumberOfSyntaxErrors() == 0) {
+				return CHECK_RESULT.CORRECT;
+			} else {
+				return CHECK_RESULT.SYNTAX_ERROR;
+			}
+
+		} catch (IOException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+			// Hier landen wir nur, wenn etwas schief gegangen ist. Was genau ist eigentlich
+			// uninteressant. Wichtig ist: Wir können die Datei nicht parsen. Warum auch immer.
+			return CHECK_RESULT.CANT_PARSE;
+		}
 	}
 }
