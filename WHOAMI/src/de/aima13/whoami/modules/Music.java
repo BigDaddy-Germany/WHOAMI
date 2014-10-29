@@ -64,23 +64,28 @@ public class Music implements Analyzable {
 			// z.B. GenreID ist 3: Genre zu 3 ist "Dance"
 			// Quelle: http://id3.org/id3v2.3.0
 
+			//NEUNZIG
+
 			/*StatmentToGenre:
 			Mainstreamopfer: 60, 35, 12, 127, 124
-			Tänzer und Partygirls: 3, 4, 125, 114, 113, 112,
+			Tänzer und Partygirls: 3, 4, 125, 114, 113, 112, 83, 86, 143
 			Faule Leseratte:
-			Raver: 18, 19, 74, 68, 67, 55, 54, 52, 51, 45, 44, 41, 34, 31, 30, 25, 129, 126
-			Chiller und Baggy Pants: 16, 27, 7, 26
+			Raver: 18, 19, 74, 68, 67, 55, 54, 52, 51, 45, 44, 41, 34, 31, 30, 25, 129, 126, 84,
+			147, 156,158, 176, 177, 189, 191
+			Chiller und Baggy Pants: 16, 27, 7, 26, 154
 			Headbanger und Zecken: 1, 9, 17, 22, 79, 50, 49, 47, 40, 20, 138, 137, 121, 118, 94,
-			93,92,91
-			Kenner & Rotweintrinker: 0, 8, 28, 29, 42, 26
+			93,92,91, 81, 144, 149, 163, 167, 179,189,, 190
+			Kenner & Rotweintrinker: 0, 8, 28, 29, 42, 26, 166,171
 			Gangstarapper: 15, 59
-			Zecke: 21, 73, 43, 134, 133
-			Originell / Geschmack und Stil: 5, 10, 66, 78, 6, 132, 131, 109, 102
-			Literatur-Student: 77, 24, 71, 70, 69, 65, 57,37, 24, 110, 101
-			Dein Ernst? 44, 61, 53, 141, 140, 136, 130
-			Traditionell und oldy: 76, 75, 58 2, 11, 64, 56, 33, 32, 38, 123, 115, 106, 105, 103
+			Zecke: 21, 73, 43, 134, 133, 175, 176
+			Originell / Geschmack und Stil: 5, 10, 66, 78, 6, 132, 131, 109, 102, 80,162,185, 187
+			Literatur-Student: 77, 24, 71, 70, 69, 65, 57,37, 24, 110, 101,183, 184, 186
+			Dein Ernst? 44, 61, 53, 141, 140, 136, 130, 146, 172, 161, 173
+			Traditionell und oldy: 76, 75, 58 2, 11, 64, 56, 33, 32, 38, 123, 115, 106, 105, 103,
+			 82, 90, 150, 181, 182
 			Extravagant: 72, 71, 14, 13, 12, 48, 39, 34, 63, 46, 23, 62, 139, 135, 122, 120, 119,
-			 117, 116, 111, 108, 107, 104, 100, 99, 98, 97, 96, 95, 90
+			 117, 116, 111, 108, 107, 104, 100, 99, 98, 97, 96, 95, 90, 85, 87, 88, 89, 142, 145,
+			  148, 151, 152, 153, 155, 157, 160, 164, 165,168, 169, 170, 174, 178, 188
 			*/
 
 			//Dies sind die offiziellen ID3v1 Genres.
