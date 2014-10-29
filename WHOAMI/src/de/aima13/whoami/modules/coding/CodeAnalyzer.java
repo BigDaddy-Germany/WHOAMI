@@ -2,13 +2,11 @@ package de.aima13.whoami.modules.coding;
 
 import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.modules.coding.languages.LanguageSetting;
+import de.aima13.whoami.support.Utilities;
 import org.reflections.Reflections;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedMap;
+import java.util.*;
 
 /**
  * Modul zum Analysieren des auf dem System gefundenen Codes
@@ -16,7 +14,7 @@ import java.util.SortedMap;
  * Created by Marco Dörfler on 28.10.14.
  */
 public class CodeAnalyzer implements Analyzable {
-	private List<LanguageSetting> languageSettings;
+	private Map<LanguageSetting, List<Path>> languageFilesMap;
 	private List<String> moduleFilter;
 
 	/**
@@ -25,7 +23,7 @@ public class CodeAnalyzer implements Analyzable {
 	 * @author Marco Dörfler
 	 */
 	public CodeAnalyzer() {
-		this.languageSettings = new ArrayList<>();
+		this.languageFilesMap = new HashMap<>();
 
 		Reflections reflections = new Reflections("de.aima13.whoami.modules.coding.languages" +
 				".settings");
@@ -35,7 +33,8 @@ public class CodeAnalyzer implements Analyzable {
 
 		for (Class<? extends LanguageSetting> settingClass : settingClasses) {
 			try {
-				this.languageSettings.add(settingClass.newInstance());
+				// Sprache wird mit leerer Dateiliste instanziiert
+				this.languageFilesMap.put(settingClass.newInstance(), new ArrayList<Path>());
 			} catch (InstantiationException | IllegalAccessException e) {
 				// Code kann nicht analysiert werden
 			}
@@ -60,7 +59,7 @@ public class CodeAnalyzer implements Analyzable {
 
 			// Da nur eine Endung pro Sprache unterstützt wird, reicht eine einfache Iteration
 			// und Erstellen eines Patterns pro Endung
-			for (LanguageSetting setting : this.languageSettings) {
+			for (LanguageSetting setting : this.languageFilesMap.keySet()) {
 				this.moduleFilter.add("**." + setting.FILE_EXTENSION);
 			}
 		}
@@ -68,9 +67,34 @@ public class CodeAnalyzer implements Analyzable {
 		return this.moduleFilter;
 	}
 
+	/**
+	 * Erhaltene Dateien müssen den Programmiersprachen zugeordnet werden
+	 *
+	 * @param files Liste der gefundenen Dateien
+	 *
+	 * @author Marco Dörfler
+	 */
 	@Override
-	public void setFileInputs(List<Path> files) throws Exception {
+	public void setFileInputs(List<Path> files) {
+		// Erstelle (nur für Zuordnung) Map: Extension -> List of Files
+		Map<String, List<Path>> extensionFilesMap = new HashMap<>();
+		for (Map.Entry<LanguageSetting, List<Path>> languageFilesEntry : this.languageFilesMap
+				.entrySet()) {
+			extensionFilesMap.put(languageFilesEntry.getKey().FILE_EXTENSION,
+					languageFilesEntry.getValue());
+		}
 
+		// Iteriere über Dateien
+		for (Path file : files) {
+			// Versuche Liste der Dateien zu erreichen und füge Datei ein
+			List<Path> fileList = extensionFilesMap.get(Utilities.getFileExtenstion(file
+					.toString()));
+
+			// Wenn entsprechende Liste gefunden wurde, sortiere die Datei ein.
+			if (fileList != null) {
+				fileList.add(file);
+			}
+		}
 	}
 
 	@Override
