@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * Spielemodul sucht installierte Spiele, kommentiert diese und liefert Zocker-Score
@@ -131,17 +132,27 @@ public class Games implements Analyzable {
 
 	@Override
 	public String getReportTitle() {
-		return null;
+		return "Freizeitgestaltung";
 	}
 
 	@Override
 	public String getCsvPrefix() {
-		return null;
+		return "Spiele";
 	}
 
 	@Override
 	public SortedMap<String, String> getCsvContent() {
-		return null;
+		TreeMap<String, String> csvContent = new TreeMap();
+
+		csvContent.put("Anzahl",Integer.toString(gameList.size()));
+		csvContent.put("ÄltesteInstallation",
+				resultFirstCreatedGame==null ? "-" : resultFirstCreatedGame.name);
+		csvContent.put("LetzteInstallation",
+				resultLastCreatedGame==null ? "-" : resultLastCreatedGame.name);
+		csvContent.put("LetztesUpdate",
+				resultLastModifiedGame==null ? "-" : resultLastModifiedGame.name);
+
+		return csvContent;
 	}
 
 	@Override
