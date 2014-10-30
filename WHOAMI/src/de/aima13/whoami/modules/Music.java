@@ -2,6 +2,7 @@ package de.aima13.whoami.modules;
 
 import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.GlobalData;
+import de.aima13.whoami.Whoami;
 import org.farng.mp3.MP3File;
 import org.farng.mp3.TagException;
 import org.farng.mp3.id3.AbstractID3v2;
@@ -22,15 +23,15 @@ import java.util.*;
 
 public class Music implements Analyzable {
 
-	List<Path> musicDatabases = new ArrayList<>(); //List I get from FileSearcher
-	List<Path> localFiles = new ArrayList<>(); //List of MP3-files from musicDatabase
-	List<Path> browserFiles = new ArrayList<>(); //List of browser-entries from musicDatabase
-	List<Path> exeFiles = new ArrayList<>(); //List of browser-entries from musicDatabase
-	ArrayList<String> FileArtist = new ArrayList<>(); //List of Artists
-	ArrayList<String> FileGenre = new ArrayList<>(); //List of Genres
-	ArrayList<String> urls = new ArrayList<>(); //List of URLs
-	Map<String, Integer> mapMaxApp = new HashMap<>();//Map Artist - frequency of this artist
-	Map<String, Integer> mapMaxGen = new HashMap<>();//Map Genre - frequency of this genre
+	List<Path> musicDatabases = new ArrayList<>(); //Liste aller fürs Musikmodul wichtige Dateien
+	List<Path> localFiles = new ArrayList<>(); //Liste von MP3- und FLAC-Dateien
+	List<Path> browserFiles = new ArrayList<>(); //Liste der Browser-DB
+	List<Path> exeFiles = new ArrayList<>(); //Liste der Musikprogramme
+	ArrayList<String> FileArtist = new ArrayList<>();
+	ArrayList<String> FileGenre = new ArrayList<>();
+	ArrayList<String> urls = new ArrayList<>();
+	Map<String, Integer> mapMaxApp = new HashMap<>();//Map: Artist - Häufigkeit
+	Map<String, Integer> mapMaxGen = new HashMap<>();//Map Genre - Häufigkeit
 
 	public String html = ""; //Output der HTML
 	public String favArtist = "";
@@ -38,6 +39,7 @@ public class Music implements Analyzable {
 	public String onlService = ""; //Genutzte Onlinedienste (siehe: MY_SEARCH_DELIVERY_URLS)
 	public String cltProgram = ""; //Installierte Programme
 	String stmtGenre = ""; //Kommentar zum Genre nach Kategorie
+	private boolean cancelledByTimeLimit = false;
 
 	private static final String[] MY_SEARCH_DELIEVERY_URLS = {"youtube.com", "myvideo.de", "dailymotion.com",
 			"soundcloud.com", "deezer.com"};
@@ -94,6 +96,12 @@ public class Music implements Analyzable {
 		readId3Tag();
 		checkNativeClients();
 		readBrowser(MY_SEARCH_DELIEVERY_URLS);
+
+		if (Whoami.getTimeProgress() >= 99) {
+			//Ausstieg wegen Timeboxing
+			cancelledByTimeLimit = true;
+			return;
+		}
 	}
 
 
@@ -124,16 +132,16 @@ public class Music implements Analyzable {
 		filterMusic.add("**Firefox**places.sqlite");
 
 		//c) installed programs
-		filterMusic.add("**spotify.exe"); //AppData/Roaming... -> versteckter Ordner by default
+		filterMusic.add("**spotify.exe");
 		filterMusic.add("**iTunes.exe");
 		filterMusic.add("**SWYH.exe");
 		filterMusic.add("**simfy.exe");
+		filterMusic.add("**napster.exe");
+		filterMusic.add("**Amazon%20Music.exe"); //Leerzeichen im Namen
+		filterMusic.add("**Deezer.exe");
 
-		//jukebox, napster kostenpflichtig?
-		//Vorschlag: Amazon Prime instant
-
-		return filterMusic;
-	} //ANDERE DATEN
+			return filterMusic;
+	}
 
 	@Override
 	public void setFileInputs(List<Path> files) throws Exception {
@@ -161,6 +169,12 @@ public class Music implements Analyzable {
 				exeFiles.add(element); //Liste aller ausführbarer Musikprogramme
 			} else {
 				browserFiles.add(element);
+			}
+
+			if (Whoami.getTimeProgress() >= 99) {
+				//Ausstieg wegen Timeboxing
+				cancelledByTimeLimit = true;
+				break;
 			}
 		}
 	}
@@ -226,24 +240,24 @@ public class Music implements Analyzable {
 			buffer.append("<td colspan='2'><br /><b>Fazit:</b> Es können keine Informationen zu deinem " +
 					"Musikgeschmack " + "gefunden werden. ");
 			if (!(onlService.equals("")) || !(cltProgram.equals(""))) {
-				buffer.append("Aber Musik hörst du über " + onlService + cltProgram + "" +
+				buffer.append("Aber Musik hörst du über " + onlService + ", " + cltProgram + "" +
 						". Nur was bleibt eine offene Frage.</td></tr>");
 			}
 		} else {
 			buffer.append("<tr>" +
-					"<td colspan='2'><br /><b>Fazit:</b>Zwar konnten einige Informationen über " +
-					"dich nicht herausgefunden werden, <br />aber einiges wissen wir.<br />");
+					"<td colspan='2'><br /><b>Fazit:</b> Zwar konnten einige Informationen über " +
+					"dich nicht herausgefunden werden, <br />aber einiges wissen wir.");
 			if (!(onlService.equals(""))) {
-				buffer.append("<br />Du hörst über " + onlService + " online Musik.<br />");
+				buffer.append("<br />Du hörst über " + onlService + " online Musik.");
 			}
 			if (!(cltProgram.equals(""))) {
-				buffer.append("<br />Auf deinem PC benutzt du zum Musik hören " + cltProgram + ".<br />");
+				buffer.append("<br />Auf deinem PC benutzt du zum Musik hören " + cltProgram + ".");
 			}
 			if (!(favArtist.equals(""))) {
-				buffer.append("<br />Deine Lieblingsband ist" + favArtist + "<br />");
+				buffer.append("<br />Deine Lieblingsband ist " + favArtist + ".");
 			}
 			if (!(favGenre.equals(""))) {
-				buffer.append(stmtGenre);
+				buffer.append("<br />" + stmtGenre);
 			}
 
 			buffer.append("</td></tr>");
@@ -317,6 +331,12 @@ public class Music implements Analyzable {
 			}
 			count++;
 			mapMaxGen.put(each, count);
+
+			if (Whoami.getTimeProgress() >= 99) {
+				//Ausstieg wegen Timeboxing
+				cancelledByTimeLimit = true;
+				return;
+			}
 		}
 
 		//Finde Genre mit der höchsten Häufigkeit
@@ -499,6 +519,12 @@ public class Music implements Analyzable {
 			}
 			count++;
 			mapMaxApp.put(each, count);
+
+			if (Whoami.getTimeProgress() >= 99) {
+				//Ausstieg wegen Timeboxing
+				cancelledByTimeLimit = true;
+				return;
+			}
 		}
 
 		//Find artist with highest frequency
@@ -564,6 +590,11 @@ public class Music implements Analyzable {
 			} catch (Exception e) {
 			}
 
+			if (Whoami.getTimeProgress() >= 99) {
+				//Ausstieg wegen Timeboxing
+				cancelledByTimeLimit = true;
+				return;
+			}
 		}
 
 		scoreFavArtist(); //Call functions to find favArtist
@@ -596,6 +627,24 @@ public class Music implements Analyzable {
 				clients[count] = "simfy";
 				count++;
 			}
+			if (currentExe.toString().endsWith("Amazon Music.exe")) {
+				clients[count] = "Amazon Music";
+				count++;
+			}
+			if (currentExe.toString().endsWith("napster.exe")) {
+				clients[count] = "napster";
+				count++;
+			}
+			if (currentExe.toString().endsWith("Deezer.exe")) {
+				clients[count] = "deezer";
+				count++;
+			}
+
+			if (Whoami.getTimeProgress() >= 99) {
+				//Ausstieg wegen Timeboxing
+				cancelledByTimeLimit = true;
+				return;
+			}
 		}
 
 		if (count == 0) {
@@ -608,6 +657,15 @@ public class Music implements Analyzable {
 			cltProgram = clients[0] + ", " + clients[1] + ", " + clients[2];
 		} else if (count == 4) {
 			cltProgram = clients[0] + ", " + clients[1] + ", " + clients[2] + ", " + clients[3];
+		} else if (count == 5) {
+			cltProgram = clients[0] + ", " + clients[1] + ", " + clients[2] + ", " +
+					"" + clients[3] + ", " + clients[4];
+		} else if (count == 6) {
+			cltProgram = clients[0] + ", " + clients[1] + ", " + clients[2] + ", " +
+					"" + clients[3] + ", " + clients[4] + ", " + clients[5];
+		} else if (count == 7) {
+			cltProgram = clients[0] + ", " + clients[1] + ", " + clients[2] + ", " +
+					"" + clients[3] + ", " + clients[4] + ", " + clients[5] + ", " + clients[6];
 		}
 	}
 
@@ -695,6 +753,12 @@ public class Music implements Analyzable {
 							onlService += ", deezer.com";
 						}
 					}
+
+					if (Whoami.getTimeProgress() >= 99) {
+						//Ausstieg wegen Timeboxing
+						cancelledByTimeLimit = true;
+						return;
+					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -748,6 +812,12 @@ public class Music implements Analyzable {
 					if (foundDbs > 1) {
 						break;
 					}
+				}
+
+				if (Whoami.getTimeProgress() >= 99) {
+					//Ausstieg wegen Timeboxing
+					cancelledByTimeLimit = true;
+					return;
 				}
 			}
 		} catch (Exception e) {
