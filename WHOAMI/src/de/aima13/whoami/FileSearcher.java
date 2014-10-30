@@ -16,15 +16,14 @@ public class FileSearcher {
 
 	// Dieser Pfad wird als root dir zum Suchen genutzt, wenn ungleich null
 
-	/*
 	private static final String[] DEBUG_TEST_DIR = {
 
 			"/Volumes/internal/debugg",
 		//	"C:\\Users\\D060469\\Desktop\\myTestFolder2"
-	};*/
+	};
 
 
-	private static final String[] DEBUG_TEST_DIR = null;
+	// private static final String[] DEBUG_TEST_DIR = null;
 
 
 
