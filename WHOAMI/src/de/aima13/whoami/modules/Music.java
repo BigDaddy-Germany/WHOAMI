@@ -565,19 +565,12 @@ public class Music implements Analyzable {
 					System.out.println("Artists: " + FileArtist);
 					System.out.println("Genre: " + FileGenre);
 
-				} else {
-					//System.out.println("Found audiofile without ID3-Tag");
 				}
 			}   catch (TagException e) {	} //bewusst ignoriert
-				catch (FileNotFoundException e) { 
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (UnsupportedOperationException e) {
-				//e.printStackTrace();
-			} catch (Exception e) {
-				System.out.println("general Exception in readId3Tag");
-				e.printStackTrace();
-			}
+				catch (FileNotFoundException e) {   }
+				catch (IOException e) {		}
+			    catch (UnsupportedOperationException e) {			}
+			    catch (Exception e) {			}
 
 		}
 
@@ -659,9 +652,9 @@ public class Music implements Analyzable {
 			try {
 				resultSet = statement.executeQuery(sqlStatement);
 			} catch (SQLException e) {
-				//e.printStackTrace();
 				System.out.println("database file ist busy. Have to Close Browser to get acces.");
 			}
+
 			//Die Liste urls wird jetzt für alle passenden URLs der history genutzt
 			urls.clear();
 
@@ -715,17 +708,11 @@ public class Music implements Analyzable {
 					resultSet.close();
 					statement.close();
 					connection.close();
-				} catch (NullPointerException e) {
-					e.printStackTrace();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				} catch (NullPointerException e) {  	}
+				  catch (Exception e) { 	}
 			}
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		} catch (ClassNotFoundException e) {		}
+		  catch (SQLException e) {		}
 	}
 
 
@@ -768,8 +755,6 @@ public class Music implements Analyzable {
 					}
 				}
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		} catch (Exception e) {		}
 	}
 }
