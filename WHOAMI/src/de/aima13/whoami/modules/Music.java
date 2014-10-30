@@ -6,26 +6,26 @@ import de.aima13.whoami.Analyzable;
 
 import java.sql.*;
 import java.io.*;
-import java.io.File;
+//import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+//import java.net.URL;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.Hashtable;
-import java.util.concurrent.ConcurrentMap;
+//import java.util.Hashtable;
+//import java.util.concurrent.ConcurrentMap;
 
 import de.aima13.whoami.GlobalData;
-import de.aima13.whoami.support.DataSourceManager;
-import javafx.beans.property.MapProperty;
+//import de.aima13.whoami.support.DataSourceManager;
+//import javafx.beans.property.MapProperty;
 import org.farng.mp3.MP3File;
 import org.farng.mp3.TagException;
-import org.farng.mp3.id3.AbstractID3;
+//import org.farng.mp3.id3.AbstractID3;
 import org.farng.mp3.id3.AbstractID3v2;
 import org.farng.mp3.id3.ID3v1;
-import org.omg.CORBA.Environment;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
+//import org.omg.CORBA.Environment;
+//import org.xml.sax.ContentHandler;
+//import org.xml.sax.SAXException;
+//import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * favourite Music, created 16.10.14.
@@ -46,14 +46,12 @@ public class Music implements Analyzable {
 	Map<String, Integer> mapMaxApp = new HashMap<>();//Map Artist - frequency of this artist
 	Map<String, Integer> mapMaxGen = new HashMap<>();//Map Genre - frequency of this genre
 
-
 	public String html = ""; //Output der HTML
-	public String favArtist = ""; //Ergebnis von ScoreUser
-	public String favGenre = ""; //Ergebnis von ScoreGenre
-	public String onlService = ""; //Genutzte Onlinedienste (siehe MY_SEARCH_DELIVERY_URLS)
+	public String favArtist = "";
+	public String favGenre = "";
+	public String onlService = ""; //Genutzte Onlinedienste (siehe: MY_SEARCH_DELIVERY_URLS)
 	public String cltProgram = ""; //Installierte Programme
 	String stmtGenre = ""; //Kommentar zum Genre nach Kategorie
-	byte gId;
 
 	private static final String[] MY_SEARCH_DELIEVERY_URLS = {"youtube.com", "myvideo.de", "dailymotion.com",
 			"soundcloud.com", "deezer.com"};
@@ -348,7 +346,7 @@ public class Music implements Analyzable {
 		if (favGenre.startsWith("(")) {
 			String str;
 			str = favGenre.replaceAll("\\D+", "");
-			gId = Byte.parseByte(str);
+			byte gId = Byte.parseByte(str);
 			favGenre = arrayGenre[gId];
 		}
 
@@ -564,7 +562,7 @@ public class Music implements Analyzable {
 					FileArtist.add(tagv1.getArtist()); //Fill List of Type String with artist
 
 					//Have to map genreID to name of genre
-					gId = tagv1.getGenre(); //Get Genre ID
+					byte gId = tagv1.getGenre(); //Get Genre ID
 
 					try {
 						genre = arrayGenre[gId]; //look up String to ID
@@ -711,8 +709,6 @@ public class Music implements Analyzable {
 							onlService += ", deezer.com";
 					}
 				}
-
-				System.out.println("onlService:" + onlService);
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
@@ -738,24 +734,21 @@ public class Music implements Analyzable {
 		 * @retrun void
 		 */
 
-		//get Username -> Globaldata
+		//Benutzername wird an Globaldata übergeben
 		String username = System.getProperty("user.name");
-		GlobalData.getInstance().changeScore("username " + username, 0);
+		GlobalData.getInstance().changeScore("Name des Benutzers: " + username, 0);
 
-		//sqlite daten rausspeichern
+		//Richtige Datenbank hinzufügen
 		int foundDbs = 0;
-
 		try {
 			for (Path curr : browserFiles) {
 				if (curr != null) {
-					String path;
+					String path = "";
 					try {
-						path = curr.toString(); //getCanonicalPath();
-					} catch (Exception e) {
-						e.printStackTrace();
-						path = "";
-					}
+						path = curr.toString();
+					} catch (Exception e) {			}
 
+					//Unterscheidung zwischen Firefox und Chrome Datenbank
 					if (path.contains(".sqlite")) {
 						urls.add(path);
 						foundDbs++;
