@@ -86,9 +86,7 @@ public class ReportCreator {
 					htmlSource.getBytes(StandardCharsets.UTF_8.toString())
 			);
 			try {
-				System.out.println(htmlSource);
 				XMLWorkerHelper.getInstance().parseXHtml(writer, pdfFile, htmlSourceInputStream);
-				System.out.println("nach html worker");
 			} catch (RuntimeWorkerException e) {
 				System.err.println("Parsen des Berichtes wegen fehlerhaftem HTML abgebrochen.");
 				System.err.println("Bericht nur bis zu fehlerhafter Stelle erstellt.");
