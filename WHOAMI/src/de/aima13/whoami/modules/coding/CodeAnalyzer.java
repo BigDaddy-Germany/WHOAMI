@@ -132,6 +132,11 @@ public class CodeAnalyzer implements Analyzable {
 		return CSV_PREFIX;
 	}
 
+	
+	/**
+	 * Kalkulieren der CSV-Ausgabe. Jedes Feld soll wie volgt aussehen: SPRACHE-RESULT -> Anzahl
+	 * @return Die Map der CSV-Einträge
+	 */
 	@Override
 	public SortedMap<String, String> getCsvContent() {
 		SortedMap<String, String> csvContent = new TreeMap<>();
@@ -154,6 +159,13 @@ public class CodeAnalyzer implements Analyzable {
 		return csvContent;
 	}
 
+	/**
+	 * Iterieren über alle gefundenen Sprachen und die dazugehörigen Dateien. Bei jedem Eintrag
+	 * wird ein Syntax-Check durchgeführt und die Ergebnisse gespeichert. Es entsteht eine
+	 * Taelle, welche Auskunft darüber gibt, wie viele Dateien mit welchem Result geprüft wurden
+	 *
+	 * @author Marco Dörfler
+	 */
 	@Override
 	public void run() {
 		// ResultMap initialisieren
@@ -189,8 +201,7 @@ public class CodeAnalyzer implements Analyzable {
 	}
 
 	/**
-	 * Diese Methode iteriert über alle gefundenen Sprachen und checkt deren syntaktische
-	 * Korrektheit.
+	 * Diese Methode prüft die syntaktische Korrektheit einer Datei nach der übergebenen Sprache
 	 *
 	 * @param languageSetting Die Sprache, auf die geprüft werden soll
 	 * @param file Die Datei, die geprüft werden soll
