@@ -92,7 +92,10 @@ class GameCollector {
 			try {
 				if (Files.isDirectory(gameFolderPath)) {
 					gameName = gameFolderPath.getFileName().toString();
-					addGame(gameName, gameFolderPath);
+
+					if (!gameName.contains("SDK") && !gameName.toLowerCase().contains("openvr")) {
+						addGame(gameName, gameFolderPath);
+					}
 				}
 			} catch (Exception e) {
 			} //Zugriffsprobleme bewusst ignorieren
