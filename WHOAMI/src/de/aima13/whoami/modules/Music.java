@@ -1,31 +1,17 @@
 package de.aima13.whoami.modules;
 
-import com.sun.deploy.util.StringUtils;
-import com.sun.org.apache.xalan.internal.xsltc.runtime.*;
 import de.aima13.whoami.Analyzable;
-
-import java.sql.*;
-import java.io.*;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.Hashtable;
-import java.util.concurrent.ConcurrentMap;
-
 import de.aima13.whoami.GlobalData;
-import de.aima13.whoami.support.DataSourceManager;
-import javafx.beans.property.MapProperty;
 import org.farng.mp3.MP3File;
 import org.farng.mp3.TagException;
-import org.farng.mp3.id3.AbstractID3;
 import org.farng.mp3.id3.AbstractID3v2;
 import org.farng.mp3.id3.ID3v1;
-import org.omg.CORBA.Environment;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.sql.*;
+import java.util.*;
 
 /**
  * favourite Music, created 16.10.14.
@@ -46,14 +32,12 @@ public class Music implements Analyzable {
 	Map<String, Integer> mapMaxApp = new HashMap<>();//Map Artist - frequency of this artist
 	Map<String, Integer> mapMaxGen = new HashMap<>();//Map Genre - frequency of this genre
 
-
 	public String html = ""; //Output der HTML
-	public String favArtist = ""; //Ergebnis von ScoreUser
-	public String favGenre = ""; //Ergebnis von ScoreGenre
-	public String onlService = ""; //Genutzte Onlinedienste (siehe MY_SEARCH_DELIVERY_URLS)
+	public String favArtist = "";
+	public String favGenre = "";
+	public String onlService = ""; //Genutzte Onlinedienste (siehe: MY_SEARCH_DELIVERY_URLS)
 	public String cltProgram = ""; //Installierte Programme
 	String stmtGenre = ""; //Kommentar zum Genre nach Kategorie
-	byte gId;
 
 	private static final String[] MY_SEARCH_DELIEVERY_URLS = {"youtube.com", "myvideo.de", "dailymotion.com",
 			"soundcloud.com", "deezer.com"};
@@ -231,7 +215,7 @@ public class Music implements Analyzable {
 					"was wir gesucht haben.<br /> Musik schein ein wichtiger Teil deines Lebens " +
 					"zu sein. <br />" + stmtGenre + "</td>" +
 					"</tr>");
-		} else if(onlService.equals("") && cltProgram.equals("") && !(favGenre.equals(""))){
+		} else if (onlService.equals("") && cltProgram.equals("") && !(favGenre.equals(""))) {
 			buffer.append("<tr>" +
 					"<td colspan='2'><br /><b>Fazit:</b> Das Modul konnte weder online noch nativ " +
 					"herausfinden wie du Musik hörst. Du scheinst dies über einen nicht sehr " +
@@ -240,8 +224,8 @@ public class Music implements Analyzable {
 					"</tr>");
 		} else if (favGenre.equals("") && favArtist.equals("")) {
 			buffer.append("<td colspan='2'><br /><b>Fazit:</b> Es können keine Informationen zu deinem " +
-					"Musikgeschmack " +	"gefunden werden. ");
-			if(!(onlService.equals("")) || !(cltProgram.equals(""))){
+					"Musikgeschmack " + "gefunden werden. ");
+			if (!(onlService.equals("")) || !(cltProgram.equals(""))) {
 				buffer.append("Aber Musik hörst du über " + onlService + cltProgram + "" +
 						". Nur was bleibt eine offene Frage.</td></tr>");
 			}
@@ -249,13 +233,16 @@ public class Music implements Analyzable {
 			buffer.append("<tr>" +
 					"<td colspan='2'><br /><b>Fazit:</b>Zwar konnten einige Informationen über " +
 					"dich nicht herausgefunden werden, <br />aber einiges wissen wir.<br />");
-			if(!(onlService.equals(""))){
+			if (!(onlService.equals(""))) {
 				buffer.append("<br />Du hörst über " + onlService + " online Musik.<br />");
-			}if(!(cltProgram.equals(""))){
+			}
+			if (!(cltProgram.equals(""))) {
 				buffer.append("<br />Auf deinem PC benutzt du zum Musik hören " + cltProgram + ".<br />");
-			} if(!(favArtist.equals(""))){
-				buffer.append("<br />Deine Lieblingsband ist" + favArtist + "<br />" );
-			} if(!(favGenre.equals(""))){
+			}
+			if (!(favArtist.equals(""))) {
+				buffer.append("<br />Deine Lieblingsband ist" + favArtist + "<br />");
+			}
+			if (!(favGenre.equals(""))) {
 				buffer.append(stmtGenre);
 			}
 
@@ -289,16 +276,16 @@ public class Music implements Analyzable {
 
 		SortedMap<String, String> csvData = new TreeMap<>();
 
-		if(!(favArtist.equals(""))) {
+		if (!(favArtist.equals(""))) {
 			csvData.put("Lieblingskünstler", favArtist);
 		}
-		if(!(favArtist.equals(""))) {
+		if (!(favArtist.equals(""))) {
 			csvData.put("Lieblingsgenre", favGenre);
 		}
-		if(!(favArtist.equals(""))) {
+		if (!(favArtist.equals(""))) {
 			csvData.put("Onlineservices", onlService);
 		}
-		if(!(favArtist.equals(""))) {
+		if (!(favArtist.equals(""))) {
 			csvData.put("Musikprogramme", cltProgram);
 		}
 		return csvData;
@@ -348,15 +335,28 @@ public class Music implements Analyzable {
 		if (favGenre.startsWith("(")) {
 			String str;
 			str = favGenre.replaceAll("\\D+", "");
-			gId = Byte.parseByte(str);
+			byte gId = Byte.parseByte(str);
 			favGenre = arrayGenre[gId];
 		}
 
 		getCategory();
 
+		////Ist das Lieblingsgenre "Emo" wird die Selbstmordgefährdung erhöht
+		if (favGenre.equals("Emo")) {
+			GlobalData.getInstance().changeScore("Selbstmordgefährung", 50);
+		}
+		//Ist das Lieblingsgenre "Dance" oder "Disco" wird die Selbstmordgefährdung verringert
+		else if (favGenre.equals("Dance") || favGenre.equals("Disco")) {
+			GlobalData.getInstance().changeScore("Selbstmordgefährung", -20);
+		}
+		//Ist das Lieblingsgenre "Chillout" wird der Faulenzerfaktor erhöht
+		else if (favGenre.equals("Chillout")) {
+			GlobalData.getInstance().changeScore("Faulenzerfaktor", 40);
+		}
+
 	}
 
-	public String getCategory(){
+	public String getCategory() {
 		/**
 		 * Ordnet dem Genre eine Art Kategorie zu und füllt die Variable statementToGenre,
 		 * damit im html-Output ein Kommentar zum Genre abgegeben werden kann.
@@ -367,52 +367,49 @@ public class Music implements Analyzable {
 
 		StringBuilder statementToGenre = new StringBuilder();
 
-		if(favGenre.equals("Top 40") || favGenre.equals("House") || favGenre.equals("Drum & " +
-				"Bass") || favGenre.equals("Euro-House")){
+		if (favGenre.equals("Top 40") || favGenre.equals("House") || favGenre.equals("Drum & " +
+				"Bass") || favGenre.equals("Euro-House")) {
 			statementToGenre.append("Dein Musikgeschmack ist nicht gerade " +
 					"aussagekräftig.<br />Du scheinst nicht wirklich auszuwählen was " +
 					"dir gefällt,<br />sondern orientierst dich an Listen und Freunden.<br />" +
 					"Was dich charaktierisitert ist wahrscheinlich das Mainstream-Opfer");
-		}
-		else if(favGenre.equals("Dance") || favGenre.equals("Disco") || favGenre.equals("Dancehall")
-		|| favGenre.equals("Samba")	|| favGenre.equals("Tango") || favGenre.equals("Club")||
+		} else if (favGenre.equals("Dance") || favGenre.equals("Disco") || favGenre.equals("Dancehall")
+				|| favGenre.equals("Samba") || favGenre.equals("Tango") || favGenre.equals("Club") ||
 				favGenre.equals("Swing") || favGenre.equals("Latin") || favGenre.equals("Salsa")
-				||favGenre.equals("Eurodance")){
+				|| favGenre.equals("Eurodance")) {
 			statementToGenre.append("Deinem Musikstil, " + favGenre + ", " +
 					"nach zu urteilen,<br />schwingst " +
 					"du gerne dein Tanzbein.");
-		}
-		else if( favGenre.equals("Techno") || favGenre.equals("Industrial") || favGenre.equals
-				("Acid Jazz")|| favGenre.equals("Rave") || favGenre.equals("Psychedelic") ||
+		} else if (favGenre.equals("Techno") || favGenre.equals("Industrial") || favGenre.equals
+				("Acid Jazz") || favGenre.equals("Rave") || favGenre.equals("Psychedelic") ||
 				favGenre.equals("Dream") || favGenre.equals("Elecronic") || favGenre
 				.equals("Techno-Industrial") || favGenre.equals("Space") || favGenre.equals("Acid")
 				|| favGenre.equals("Trance") || favGenre.equals("Fusion") ||
 				favGenre.equals("Euro-Techno") || favGenre.equals("Hardcore Techno") || favGenre
 				.equals("Goa") || favGenre.equals("Fast Fusion") || favGenre.equals("Synthpop") ||
 				favGenre.equals("Dub") || favGenre.equals("Psytrance") || favGenre.equals
-				("Dubstep") || favGenre.equals("Psybient")){
+				("Dubstep") || favGenre.equals("Psybient")) {
 			statementToGenre.append("Dein Musikstil lässt darauf schließen, " +
 					"<br />dass wenn man dich grob einer Richtung zuordnet du am ehesten einem Raver " +
 					"entsprichst.");
-		} else if( favGenre.equals("Retro") || favGenre.equals("Polka") || favGenre.equals
+		} else if (favGenre.equals("Retro") || favGenre.equals("Polka") || favGenre.equals
 				("Country") || favGenre.equals("Oldies") || favGenre.equals("Native US") ||
 				favGenre.equals("Southern Rock") || favGenre.equals("Instrumental") || favGenre
 				.equals("Classical") || favGenre.equals("Gospel") || favGenre.equals("Folklore") ||
 				favGenre.equals("A capella") || favGenre.equals("Symphony") ||
 				favGenre.equals("Sonata") || favGenre.equals("Opera") || favGenre.equals
 				("National Folk") || favGenre.equals("Avantgarde") || favGenre.equals("Baroque") ||
-				favGenre.equals("World Music") || favGenre.equals("Neoclassical")){
+				favGenre.equals("World Music") || favGenre.equals("Neoclassical")) {
 			statementToGenre.append("Dein Musikstil" + favGenre + "ist eher von traditioneller" +
 					" Natur.");
-		} else if( favGenre.equals("Christian Rap") || favGenre.equals("Pop-Folk") || favGenre
+		} else if (favGenre.equals("Christian Rap") || favGenre.equals("Pop-Folk") || favGenre
 				.equals("Christian Rock") || favGenre.equals("Contemporary Christian") ||
 				favGenre.equals("Christian Gangsta Rap") || favGenre.equals("Terror") || favGenre
 				.equals("Jpop") || favGenre.equals("Math Rock") || favGenre.equals("Emo") ||
-				favGenre.equals("New Romantic")){
+				favGenre.equals("New Romantic")) {
 			statementToGenre.append("Über Geschmack lässt sich ja bekanntlich streiten. " +
 					"Aber " + favGenre + " - Dein Ernst?!");
-		}
-		else if(favGenre.equals("Post-Rock") || favGenre.equals("Classic Rock") || favGenre
+		} else if (favGenre.equals("Post-Rock") || favGenre.equals("Classic Rock") || favGenre
 				.equals("Metal") || favGenre.equals("Rock") || favGenre.equals("Death Metal") ||
 				favGenre.equals("Hard Rock") || favGenre.equals("Alternative Rock") || favGenre
 				.equals("Instrumental Rock") || favGenre.equals("Darkwave") || favGenre.equals
@@ -422,47 +419,41 @@ public class Music implements Analyzable {
 				("Heavy Metal") || favGenre.equals("Punk Rock") || favGenre.equals("Rythmic " +
 				"Soul") || favGenre.equals("Thrash Metal") || favGenre.equals("Garage Rock") ||
 				favGenre.equals("Space Rock") || favGenre.equals("Industro-Goth") || favGenre
-				.equals("Garage") || favGenre.equals("Art Rock")){
+				.equals("Garage") || favGenre.equals("Art Rock")) {
 			statementToGenre.append(favGenre + "? <br />In dir steckt bestimmt ein Headbanger!");
-		}
-		else if(favGenre.equals("Chillout") || favGenre.equals("Reggea") || favGenre.equals
-				("Trip-Hop") || favGenre.equals("Hip-Hop")){
+		} else if (favGenre.equals("Chillout") || favGenre.equals("Reggea") || favGenre.equals
+				("Trip-Hop") || favGenre.equals("Hip-Hop")) {
 			statementToGenre.append("Deine Szene ist wahrscheinlich die Hip Hop Szene.<br />Du bist ein " +
 					"sehr relaxter Mensch <br />und vermutlich gehören die Baggy Pants " +
 					"zu deinen Lieblingskleidungstücken?");
-		}
-		else if(favGenre.equals("Blues") || favGenre.equals("Jazz") || favGenre.equals("Vocal")
-				|| favGenre.equals("Jazz & Funk") || favGenre.equals("Soul")|| favGenre.equals
-				("Ambient") || favGenre.equals("Illbient") || favGenre.equals("Lounge")){
+		} else if (favGenre.equals("Blues") || favGenre.equals("Jazz") || favGenre.equals("Vocal")
+				|| favGenre.equals("Jazz & Funk") || favGenre.equals("Soul") || favGenre.equals
+				("Ambient") || favGenre.equals("Illbient") || favGenre.equals("Lounge")) {
 			statementToGenre.append("Deinem Lieblingsgenre zu urteilen beschreibt sich dieses " +
 					"Modul als wahren Kenner.<br />Vermutlich spielst du selber mindestens ein " +
 					"Instrument <br />und verbringt dein Leben am liebsten entspannt mit einem " +
 					"Glas Rotwein.");
-		}
-		else if(favGenre.equals("Gangsta") || favGenre.equals("Rap")){
+		} else if (favGenre.equals("Gangsta") || favGenre.equals("Rap")) {
 			statementToGenre.append("Du hörst Rap. Vielleicht bis du sogar ein übler " +
 					"Gangstarapper");
-		}
-		else if(favGenre.equals("Ska") || favGenre.equals("Acid Punk") || favGenre.equals("Punk")
+		} else if (favGenre.equals("Ska") || favGenre.equals("Acid Punk") || favGenre.equals("Punk")
 				|| favGenre.equals("Polsk Punk") || favGenre.equals("Negerpunk") || favGenre
-				.equals("Post-Punk")){
+				.equals("Post-Punk")) {
 			statementToGenre.append("Deine Musiklieblingsrichtung ist Punk oder zumindest eine" +
 					"Strömung des Punks.");
-		}
-		else if(favGenre.equals("Funk") || favGenre.equals("New Age") || favGenre.equals
-				("Grunge")|| favGenre.equals("New Wave") || favGenre.equals("Rock & Roll") ||
-				favGenre.equals("BritPop")|| favGenre.equals("Indie") || favGenre.equals("Porn " +
+		} else if (favGenre.equals("Funk") || favGenre.equals("New Age") || favGenre.equals
+				("Grunge") || favGenre.equals("New Wave") || favGenre.equals("Rock & Roll") ||
+				favGenre.equals("BritPop") || favGenre.equals("Indie") || favGenre.equals("Porn " +
 				"Groove") || favGenre.equals("Chanson") || favGenre.equals("Folk") || favGenre
 				.equals("Experimental") || favGenre.equals("Neue Deutsche Welle") || favGenre
-				.equals("Indie Rock")){
+				.equals("Indie Rock")) {
 			statementToGenre.append("Dein Musikgeschmack, " + favGenre + ", " +
 					"zeugt von Geschmack und Stil.");
-		}
-		else if(favGenre.equals("Podcast") || favGenre.equals("Audio Theatre") || favGenre.equals
-				("Audiobook")|| favGenre.equals("Speech") || favGenre.equals("Satire") ||
+		} else if (favGenre.equals("Podcast") || favGenre.equals("Audio Theatre") || favGenre.equals
+				("Audiobook") || favGenre.equals("Speech") || favGenre.equals("Satire") ||
 				favGenre.equals("Soundtrack") || favGenre.equals("Sound Clip") || favGenre.equals
 				("Comedy") || favGenre.equals("Cabaret") || favGenre.equals("Showtunes") ||
-				favGenre.equals("Trailer") || favGenre.equals("Musical")){
+				favGenre.equals("Trailer") || favGenre.equals("Musical")) {
 			statementToGenre.append("Die Audiodatei lässt sich einer Art Literatur zuordnen. " +
 					"<br />Du bist entweder sehr Literaturbegeistert und liebst Soundtracks und Co" +
 					"<br />oder eine sehr faule Leseratte, die sich lieber alles vorlesen lässt. <br />" +
@@ -480,7 +471,6 @@ public class Music implements Analyzable {
 		}
 
 		stmtGenre = statementToGenre.toString();
-		System.out.println(stmtGenre);
 
 		return stmtGenre;
 	}
@@ -552,7 +542,7 @@ public class Music implements Analyzable {
 					FileArtist.add(tagv1.getArtist()); //Fill List of Type String with artist
 
 					//Have to map genreID to name of genre
-					gId = tagv1.getGenre(); //Get Genre ID
+					byte gId = tagv1.getGenre(); //Get Genre ID
 
 					try {
 						genre = arrayGenre[gId]; //look up String to ID
@@ -565,18 +555,13 @@ public class Music implements Analyzable {
 					System.out.println("Artists: " + FileArtist);
 					System.out.println("Genre: " + FileGenre);
 
-				} else {
-					//System.out.println("Found audiofile without ID3-Tag");
 				}
-			}   catch (TagException e) {	} //bewusst ignoriert
-				catch (FileNotFoundException e) { 
+			} catch (TagException e) {
+			} //bewusst ignoriert
+			catch (FileNotFoundException e) {
 			} catch (IOException e) {
-				e.printStackTrace();
 			} catch (UnsupportedOperationException e) {
-				//e.printStackTrace();
 			} catch (Exception e) {
-				System.out.println("general Exception in readId3Tag");
-				e.printStackTrace();
 			}
 
 		}
@@ -659,9 +644,9 @@ public class Music implements Analyzable {
 			try {
 				resultSet = statement.executeQuery(sqlStatement);
 			} catch (SQLException e) {
-				//e.printStackTrace();
 				System.out.println("database file ist busy. Have to Close Browser to get acces.");
 			}
+
 			//Die Liste urls wird jetzt für alle passenden URLs der history genutzt
 			urls.clear();
 
@@ -678,36 +663,39 @@ public class Music implements Analyzable {
 					if (curr.contains("youtube.com") && !(onlService.contains("youtube.com"))) {
 						if (onlService.isEmpty()) {
 							onlService += "youtube.com";
-						} else
+						} else {
 							onlService += ", youtube.com";
+						}
 					}
 					if (curr.contains("myvideo.de") && !(onlService.contains("myvideo.de"))) {
 						if (onlService.isEmpty()) {
 							onlService += "myvideo.de";
-						} else
+						} else {
 							onlService += ", myvideo.de";
+						}
 					}
 					if (curr.contains("soundcloud.com") && !(onlService.contains("soundcloud.com"))) {
 						if (onlService.isEmpty()) {
 							onlService += "soundcloud.com";
-						} else
+						} else {
 							onlService += ", soundcloud.com";
+						}
 					}
 					if (curr.contains("dailymotion.com") && !(onlService.contains("dailymotion.com"))) {
 						if (onlService.isEmpty()) {
 							onlService += "dailymotion.com";
-						} else
+						} else {
 							onlService += ", dailymotion.com";
+						}
 					}
 					if (curr.contains("deezer.com") && !(onlService.contains("deezer.com"))) {
 						if (onlService.isEmpty()) {
 							onlService += "deezer.com";
-						} else
+						} else {
 							onlService += ", deezer.com";
+						}
 					}
 				}
-
-				System.out.println("onlService:" + onlService);
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
@@ -716,18 +704,14 @@ public class Music implements Analyzable {
 					statement.close();
 					connection.close();
 				} catch (NullPointerException e) {
-					e.printStackTrace();
 				} catch (Exception e) {
-					e.printStackTrace();
 				}
 			}
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
 		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (IndexOutOfBoundsException e) {
 		}
 	}
-
 
 
 	private void dbExtraction() {
@@ -738,24 +722,22 @@ public class Music implements Analyzable {
 		 * @retrun void
 		 */
 
-		//get Username -> Globaldata
+		//Benutzername wird an Globaldata übergeben
 		String username = System.getProperty("user.name");
-		GlobalData.getInstance().changeScore("username: " + username, 1);
+		GlobalData.getInstance().changeScore("Name des Benutzers: " + username, 0);
 
-		//sqlite daten rausspeichern
+		//Richtige Datenbank hinzufügen
 		int foundDbs = 0;
-
 		try {
 			for (Path curr : browserFiles) {
 				if (curr != null) {
-					String path;
+					String path = "";
 					try {
-						path = curr.toString(); //getCanonicalPath();
+						path = curr.toString();
 					} catch (Exception e) {
-						e.printStackTrace();
-						path = "";
 					}
 
+					//Unterscheidung zwischen Firefox und Chrome Datenbank
 					if (path.contains(".sqlite")) {
 						urls.add(path);
 						foundDbs++;
@@ -769,7 +751,6 @@ public class Music implements Analyzable {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 		}
 	}
 }
