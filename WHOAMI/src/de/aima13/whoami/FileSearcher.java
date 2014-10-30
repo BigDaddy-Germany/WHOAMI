@@ -95,7 +95,6 @@ public class FileSearcher {
 
 			// TimeBoxing
 			if (Whoami.getTimeProgress() > Whoami.PERCENT_FOR_FILE_SEARCHER) {
-				System.out.println("TERMINATE!!");
 				return FileVisitResult.TERMINATE;
 			} else {
 				return FileVisitResult.CONTINUE;
