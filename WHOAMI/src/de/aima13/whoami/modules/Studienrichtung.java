@@ -16,12 +16,13 @@ import java.util.regex.Pattern;
  * Created by Marvin on 28.10.2014.
  */
 public class Studienrichtung implements Analyzable{
-	private List<Path> myFiles = new ArrayList<Path>();
-
+	private List<Path> dropboxFiles = new ArrayList<Path>();
+	private List<Path> databaseFiles = new ArrayList<Path>();
 	private Studiengang[] courseList;
 	private Kurskalendermap[] calenderCourseList;
 	private ArrayList<CourseVisitedEntry> viewedSchedules;
-
+	private final float DROPBOX_WEIGHTING_FACTOR = 0.15f;
+	private final float SAMENESS_WEIGHTING_FACTOR = 10f;
 	@Override
 	public List<String> getFilter() {
 		List<String> myFilters = new ArrayList<String>();
@@ -45,7 +46,16 @@ public class Studienrichtung implements Analyzable{
 	 */
 	@Override
 	public void setFileInputs(List<Path> files) throws Exception {
-		myFiles = files;
+		for (Path p : files){
+			if (p.toString().endsWith(".dropbox")){
+				dropboxFiles.add(p);
+			}else if (p.toString().endsWith(".sqlite") || p.toString().contains("Google/Chrome")){
+				databaseFiles.add(p);
+			}else {
+				// irgendwas unbrauchbares
+			}
+		}
+
 	}
 
 
@@ -84,20 +94,25 @@ public class Studienrichtung implements Analyzable{
 			entry.name = getNameFromPreAndSuffix(entry.kurzbez);
 		}
 		analyzePathNames(viewedSchedules);
+		Collections.sort(viewedSchedules, new EntryComparator());
 	}
 
 	private void analyzePathNames(ArrayList<CourseVisitedEntry> viewedSchedules) {
-		int max = viewedSchedules.get(0).visitCount;
+		float influence=0;
+		if (viewedSchedules!=null && !viewedSchedules.isEmpty()){
+			influence = viewedSchedules.get(0).visitCount * DROPBOX_WEIGHTING_FACTOR;
+		}
+
 		for (CourseVisitedEntry entry : viewedSchedules){
-			for (Path p : myFiles){
-				String [] pathParts = p.getParent().toString().split("\\");
+			for (Path p : dropboxFiles){
+				String [] pathParts = p.getParent().toString().split("\\\\|\\s|-");
 				for (String partOfPath : pathParts){
 					float samenessLevel = 0.50f;
 					while (Utilities.isRoughlyEqual(partOfPath,entry.kurzbez,samenessLevel)){
 						samenessLevel += 0.05f;
 					}
-					if (samenessLevel >= 0.65f){
-						entry.visitCount += 10*samenessLevel;
+					if (samenessLevel >= 0.75f){
+						entry.visitCount += influence * SAMENESS_WEIGHTING_FACTOR * samenessLevel;
 					}
 				}
 			}
@@ -159,7 +174,7 @@ public class Studienrichtung implements Analyzable{
 	}
 	private ArrayList<CourseVisitedEntry> getViewedCalenders(){
 		ArrayList<CourseVisitedEntry> result = new ArrayList<CourseVisitedEntry>();
-		for (Path dbPath : this.myFiles){
+		for (Path dbPath : databaseFiles){
 			String fromTable="";
 
 			if (dbPath.toString().contains("Firefox")){
@@ -167,11 +182,12 @@ public class Studienrichtung implements Analyzable{
 			}else if(dbPath.toString().contains("Chrome")){
 				fromTable = "urls";
 			}else{
-				break;
+				continue;
 			}
+			ResultSet rs = null;
 			try {
 				DataSourceManager dSm = new DataSourceManager(dbPath);
-				ResultSet rs = dSm.querySqlStatement("SELECT substr(url,instr(url,'uid=')+4,7) " +
+				rs = dSm.querySqlStatement("SELECT substr(url,instr(url,'uid=')+4,7) " +
 						"kurs, sum(visit_count) aufrufe " +
 						"FROM "+ fromTable +" "+
 						"WHERE url LIKE '%vorlesungsplan.dhbw-mannheim.de/%uid=%' " +
@@ -185,9 +201,17 @@ public class Studienrichtung implements Analyzable{
 						summarizeVisitCount(result,rs.getString(1),rs.getInt(2));
 					}
 				}
-				rs.getStatement().close();
-				rs.close();
+
 			} catch (ClassNotFoundException | SQLException e) {
+			}finally {
+				try {
+					if (rs != null){
+						rs.close();
+						rs.getStatement().close();
+					}
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		Collections.sort(result, new EntryComparator());
