@@ -713,6 +713,7 @@ public class Music implements Analyzable {
 			}
 		} catch (ClassNotFoundException e) {		}
 		  catch (SQLException e) {		}
+		  catch (IndexOutOfBoundsException e) {       }
 	}
 
 
