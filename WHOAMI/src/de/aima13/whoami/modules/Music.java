@@ -354,6 +354,19 @@ public class Music implements Analyzable {
 
 		getCategory();
 
+		////Ist das Lieblingsgenre "Emo" wird die Selbstmordgefährdung erhöht
+		if(favGenre.equals("Emo")){
+			GlobalData.getInstance().changeScore("Selbstmordgefährung", 50);
+		}
+		//Ist das Lieblingsgenre "Dance" oder "Disco" wird die Selbstmordgefährdung verringert
+		else if (favGenre.equals("Dance") || favGenre.equals("Disco")) {
+			GlobalData.getInstance().changeScore("Selbstmordgefährung", -20);
+		}
+		//Ist das Lieblingsgenre "Chillout" wird der Faulenzerfaktor erhöht
+		else if (favGenre.equals("Chillout")) {
+			GlobalData.getInstance().changeScore("Faulenzerfaktor", 40);
+		}
+
 	}
 
 	public String getCategory(){
@@ -727,7 +740,7 @@ public class Music implements Analyzable {
 
 		//get Username -> Globaldata
 		String username = System.getProperty("user.name");
-		GlobalData.getInstance().changeScore("username: " + username, 1);
+		GlobalData.getInstance().changeScore("username " + username, 0);
 
 		//sqlite daten rausspeichern
 		int foundDbs = 0;
