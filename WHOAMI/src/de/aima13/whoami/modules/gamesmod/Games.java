@@ -89,23 +89,39 @@ public class Games implements Analyzable {
 
 
 		//Anzahl Spiele mit Kommentar dazu und GamingScore
-		int score = 0;
+		int score;
 		int scoreLevel = -1;
 		final int scoreMaxLevel = gamesComments.gameThresholds.size() - 1;
 
+		/**
+		 * Berechnung des Gaming-Scores:
+		 * Durch obere Grenzen definierte Level von 0 bis X werden in einer stückweise linearen
+		 * Funktion auf den Bereich 0-100 abgebildet (über 100 falls max. Level überschritten)
+		 *
+		 * Beispiel: Fünf Level in JSON-Ressource konfiguriert
+		 * LVL0 bis    0 Spiele: Score 0
+		 * LVL1 bis   10 Spiele: Score 1 - 25
+		 * LVL2 bis   50 Spiele: Score     25 - 50
+		 * LVL3 bis  150 Spiele: Score          50 - 75
+		 * LVL4 bis 1000 Spiele: Score               75 - 100
+		 *     über 1000 Spiele: Score                    100 - infinity
+		 */
 		GameThreshold threshold;
 		do { //Passendes Spiele-Level ermitteln
 			threshold = gamesComments.gameThresholds.get(++scoreLevel);
 		} while ((gameList.size() > threshold.limit)
 				&& (scoreLevel < scoreMaxLevel));
 
-		float band = 100 / (scoreMaxLevel + 1);
-		score = (int) (band * scoreLevel);
+		//auf 0-100 münzen
 		if (scoreLevel > 0) {
+			float band = 100 / scoreMaxLevel;
+			score = (int) (band * (scoreLevel - 1));
 			int upper = threshold.limit;
 			int lower = gamesComments.gameThresholds.get(scoreLevel - 1).limit;
 			int bonus = (int) (band * (gameList.size() - lower) / (upper - lower));
 			score += bonus;
+		} else {
+			score = 0;
 		}
 		GlobalData.getInstance().changeScore("GamingScore", -50 + score); //-50 to adjust to 0-100
 
@@ -140,7 +156,7 @@ public class Games implements Analyzable {
 		if (gameList.size() >= 5) {
 			//erst ab 5, damit abzüglich der eventuellen Duplikate mind. 3 übrig bleiben
 			html.append("<table>");
-			html.append("<tr><th colspan=\"2\">Weitere gefundene Spiele:</th></tr>");
+			html.append("<tr><th colspan=\"2\">Auswahl weiterer gefundener Spiele:</th></tr>");
 			html.append("<tr><th>Spiel</th><th>Installiert</th></tr>");
 			int listed = 0;
 			for (GameEntry entry : gameList) {
@@ -149,7 +165,7 @@ public class Games implements Analyzable {
 						&& entry != resultLastModifiedGame) {
 					html.append("<tr>"
 							+ "<td>" + entry.name + "</td>"
-							+ "<td>" + new SimpleDateFormat("dd. mm. yyyy").format(
+							+ "<td>" + new SimpleDateFormat("dd. MM. yyyy").format(
 							entry.created) + "</td>"
 							+ "</tr>");
 					if (++listed >= 10) {
@@ -210,11 +226,11 @@ public class Games implements Analyzable {
 		//Dem Ergebnis dienliche Abschlussoperationen auch bei Timeboxing-Abbruch durchführen
 		if (gameList.size() > 0) {
 			//Zuletzt & zuerst installierte sowie modifizierte Spiele ermitteln
+			gameList.sortByLatestModified();
+			resultLastModifiedGame = gameList.get(0);
 			gameList.sortByLatestCreated();
 			resultFirstCreatedGame = gameList.get(gameList.size() - 1);
 			resultLastCreatedGame = gameList.get(0);
-			gameList.sortByLatestModified();
-			resultLastModifiedGame = gameList.get(0);
 
 			//Duplikate löschen, damit nicht mehrere Aussagen zum selben Spiel getroffen werden
 			if (resultLastCreatedGame == resultFirstCreatedGame) {
