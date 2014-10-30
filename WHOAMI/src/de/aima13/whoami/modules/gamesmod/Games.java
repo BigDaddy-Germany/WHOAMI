@@ -6,6 +6,7 @@ import de.aima13.whoami.Whoami;
 import de.aima13.whoami.support.Utilities;
 
 import java.nio.file.Path;
+import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedMap;
@@ -121,11 +122,42 @@ public class Games implements Analyzable {
 
 		//Datumsangaben der Executables kommentieren
 		if (gameList.size() > 0) {
-			html.append("Spielst du eigentlich noch " + resultFirstCreatedGame.name + "? " +
-					"" + gamesComments.firstCreated + " Wie läuft es denn so mit " +
-					"" + resultLastModifiedGame.name + "? " + gamesComments.lastModified + " Als letztes " +
-					"wurde anscheinend " + resultLastCreatedGame.name + " installiert. " +
-					"" + gamesComments.lastCreated);
+			if (resultFirstCreatedGame != null) {
+				html.append("Spielst du eigentlich noch " + resultFirstCreatedGame.name + "? "
+						+ gamesComments.firstCreated + " ");
+			}
+			if (resultLastModifiedGame != null) {
+				html.append("Wie läuft es denn so mit " + resultLastModifiedGame.name + "? "
+						+ gamesComments.lastModified + " ");
+			}
+			if (resultLastCreatedGame != null) {
+				html.append("Als letztes wurde anscheinend " + resultLastCreatedGame.name
+						+ " installiert. " + gamesComments.lastCreated + " ");
+			}
+		}
+
+		//Liste weiterer Spiele
+		if (gameList.size() >= 5) {
+			//erst ab 5, damit abzüglich der eventuellen Duplikate mind. 3 übrig bleiben
+			html.append("<table>");
+			html.append("<tr><th colspan=\"2\">Weitere gefundene Spiele:</th></tr>");
+			html.append("<tr><th>Spiel</th><th>Installiert</th></tr>");
+			int listed = 0;
+			for (GameEntry entry : gameList) {
+				if (entry != resultFirstCreatedGame
+						&& entry != resultLastCreatedGame
+						&& entry != resultLastModifiedGame) {
+					html.append("<tr>"
+							+ "<td>" + entry.name + "</td>"
+							+ "<td>" + new SimpleDateFormat("dd. mm. yyyy").format(
+							entry.created) + "</td>"
+							+ "</tr>");
+					if (++listed >= 10) {
+						break; //maximal 10 weitere Spiele anzeigen
+					}
+				}
+			}
+			html.append("</table>");
 		}
 		return html.toString();
 	}
@@ -144,13 +176,13 @@ public class Games implements Analyzable {
 	public SortedMap<String, String> getCsvContent() {
 		TreeMap<String, String> csvContent = new TreeMap();
 
-		csvContent.put("Anzahl",Integer.toString(gameList.size()));
+		csvContent.put("Anzahl", Integer.toString(gameList.size()));
 		csvContent.put("ÄltesteInstallation",
-				resultFirstCreatedGame==null ? "-" : resultFirstCreatedGame.name);
+				resultFirstCreatedGame == null ? "-" : resultFirstCreatedGame.name);
 		csvContent.put("LetzteInstallation",
-				resultLastCreatedGame==null ? "-" : resultLastCreatedGame.name);
+				resultLastCreatedGame == null ? "-" : resultLastCreatedGame.name);
 		csvContent.put("LetztesUpdate",
-				resultLastModifiedGame==null ? "-" : resultLastModifiedGame.name);
+				resultLastModifiedGame == null ? "-" : resultLastModifiedGame.name);
 
 		return csvContent;
 	}
@@ -177,11 +209,20 @@ public class Games implements Analyzable {
 
 		//Dem Ergebnis dienliche Abschlussoperationen auch bei Timeboxing-Abbruch durchführen
 		if (gameList.size() > 0) {
+			//Zuletzt & zuerst installierte sowie modifizierte Spiele ermitteln
 			gameList.sortByLatestCreated();
 			resultFirstCreatedGame = gameList.get(gameList.size() - 1);
 			resultLastCreatedGame = gameList.get(0);
 			gameList.sortByLatestModified();
 			resultLastModifiedGame = gameList.get(0);
+
+			//Duplikate löschen, damit nicht mehrere Aussagen zum selben Spiel getroffen werden
+			if (resultLastCreatedGame == resultFirstCreatedGame) {
+				resultFirstCreatedGame = null;
+			}
+			if (resultLastModifiedGame == resultLastCreatedGame) {
+				resultLastCreatedGame = null;
+			}
 		}
 	}
 
