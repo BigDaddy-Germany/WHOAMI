@@ -226,7 +226,7 @@ public class Music implements Analyzable {
 				&& !(cltProgram.equals(""))) {
 			buffer.append("<tr>" +
 					"<td colspan='2'><br /><b>Fazit:</b> Dein Computer enthält Informationen zu allem " +
-					"was wir gesucht haben.<br /> Musik schein ein wichtiger Teil deines Lebens " +
+					"was wir gesucht haben.<br /> Musik scheint ein wichtiger Teil deines Lebens " +
 					"zu sein. <br />" + stmtGenre + "</td>" +
 					"</tr>");
 		} else if (onlService.equals("") && cltProgram.equals("") && !(favGenre.equals(""))) {
