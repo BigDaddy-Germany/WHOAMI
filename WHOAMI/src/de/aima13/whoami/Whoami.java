@@ -23,12 +23,6 @@ public class Whoami {
 	 * @author Marco Dörfler
 	 */
 	public static void main(String[] args) {
-
-		CodeAnalyzer codeAnalyzer = new CodeAnalyzer();
-		codeAnalyzer.run();
-
-		System.exit(0);
-
 		startTime = System.currentTimeMillis();
 
 		List<Analyzable> moduleList = new ArrayList<>();                // Liste der Module
