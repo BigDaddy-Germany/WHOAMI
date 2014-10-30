@@ -480,7 +480,6 @@ public class Music implements Analyzable {
 		}
 
 		stmtGenre = statementToGenre.toString();
-		System.out.println(stmtGenre);
 
 		return stmtGenre;
 	}
