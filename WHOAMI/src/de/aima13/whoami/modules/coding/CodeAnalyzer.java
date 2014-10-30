@@ -134,7 +134,24 @@ public class CodeAnalyzer implements Analyzable {
 
 	@Override
 	public SortedMap<String, String> getCsvContent() {
-		return null;
+		SortedMap<String, String> csvContent = new TreeMap<>();
+
+		// Sprachen durchgehen und CSV-Einträge ausgeben (nur für erfolgreiche Ergebnise)
+		for (Map.Entry<LanguageSetting, Map<CHECK_RESULT, Integer>> syntaxCheckResult : this
+				.syntaxCheckResults.entrySet()) {
+			// Ergebnisse durchgehen
+			for (Map.Entry<CHECK_RESULT, Integer> checkResultEntry : syntaxCheckResult.getValue()
+					.entrySet()) {
+				// Wenn das Ergebnis nicht "Parsen nicht möglich" ist, Eintrag einfügen
+				if (checkResultEntry.getKey() != CHECK_RESULT.CANT_PARSE) {
+					// Prefix ist die Sprache
+					csvContent.put(syntaxCheckResult.getKey().LANGUAGE_NAME + "-" +
+							checkResultEntry.getKey().toString(), checkResultEntry.getValue().toString());
+				}
+			}
+		}
+
+		return csvContent;
 	}
 
 	@Override
