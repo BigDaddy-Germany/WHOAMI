@@ -18,7 +18,7 @@ public class FileSearcher {
 
 	private static final String[] DEBUG_TEST_DIR = {
 
-			"/Volumes/internal/debugg",
+			"C:\\Users\\D060469\\Dropbox\\Uni\\Semester 1\\Programmieren in C\\Projekte\\2013-11-06 - 101-106 examples",
 		//	"C:\\Users\\D060469\\Desktop\\myTestFolder2"
 	};
 
@@ -95,7 +95,6 @@ public class FileSearcher {
 
 			// TimeBoxing
 			if (Whoami.getTimeProgress() > Whoami.PERCENT_FOR_FILE_SEARCHER) {
-				System.out.println("TERMINATE!!");
 				return FileVisitResult.TERMINATE;
 			} else {
 				return FileVisitResult.CONTINUE;

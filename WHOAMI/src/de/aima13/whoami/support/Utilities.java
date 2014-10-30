@@ -1,8 +1,11 @@
 package de.aima13.whoami.support;
 
 import org.apache.commons.lang3.StringUtils;
+import org.w3c.tidy.Configuration;
+import org.w3c.tidy.Tidy;
 
-import java.io.InputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -241,5 +244,41 @@ public class Utilities {
 		}
 
 		return optimizedText.toString();
+	}
+
+
+	/**
+	 * Diese Methode nutzt den TidyParser, um HTML zu korrektem XHTML zu wandeln
+	 * @param html Der HTML code
+	 * @return Der generierte XHTML Code
+	 *
+	 * @author Marco Dörfler
+	 */
+	public static String convertHtmlToXhtml(String html) {
+		// Fehlerausgaben unterdrücken
+		PrintStream errStream = System.err;
+		System.setErr(new PrintStream(new OutputStream() {
+			@Override
+			public void write(int b) throws IOException {
+				// Nichts geschieht....
+			}
+		}));
+
+		Tidy tidy = new Tidy();
+		tidy.setXHTML(true);
+		tidy.setCharEncoding(Configuration.UTF8);
+		ByteArrayInputStream inputStream = new ByteArrayInputStream(html.getBytes
+				(StandardCharsets.UTF_8));
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		tidy.parseDOM(inputStream, outputStream);
+
+		// Fehlerausgaben wieder zulassen
+		System.setErr(errStream);
+
+		try {
+			return outputStream.toString(StandardCharsets.UTF_8.toString());
+		} catch (UnsupportedEncodingException e) {
+			return html;
+		}
 	}
 }
