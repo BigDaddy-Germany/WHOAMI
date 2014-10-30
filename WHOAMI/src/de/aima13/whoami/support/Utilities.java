@@ -267,13 +267,18 @@ public class Utilities {
 		Tidy tidy = new Tidy();
 		tidy.setXHTML(true);
 		tidy.setCharEncoding(Configuration.UTF8);
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(html.getBytes());
+		ByteArrayInputStream inputStream = new ByteArrayInputStream(html.getBytes
+				(StandardCharsets.UTF_8));
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		tidy.parseDOM(inputStream, outputStream);
 
 		// Fehlerausgaben wieder zulassen
 		System.setErr(errStream);
 
-		return outputStream.toString();
+		try {
+			return outputStream.toString(StandardCharsets.UTF_8.toString());
+		} catch (UnsupportedEncodingException e) {
+			return html;
+		}
 	}
 }
