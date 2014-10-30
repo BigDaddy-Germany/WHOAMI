@@ -16,15 +16,10 @@ public class FileSearcher {
 
 	// Dieser Pfad wird als root dir zum Suchen genutzt, wenn ungleich null
 
-	private static final String[] DEBUG_TEST_DIR = {
-
-			"C:\\Users\\D060469\\Dropbox\\Uni\\Semester 1\\Programmieren in C\\Projekte\\2013-11-06 - 101-106 examples",
-		//	"C:\\Users\\D060469\\Desktop\\myTestFolder2"
-	};
-
-
-	// private static final String[] DEBUG_TEST_DIR = null;
-
+	private static final String[] DEBUG_TEST_DIR =
+	//  {"C:\\debug"}
+		null
+	;
 
 
 	/**
