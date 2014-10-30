@@ -74,50 +74,55 @@ public class Studienrichtung implements Analyzable {
 	@Override
 	public String getHtml() {
 		StringBuilder html = new StringBuilder();
-		String courseToken = null;
-		String courseName = null;
-		String lastCommentOnClass = null;
-		String graduation = null;
+		String courseToken = "";
+		String courseName = "";
+		String lastCommentOnClass = "";
+		String graduation = "";
 
 		if (courseResult.size() > 0) {
 			courseToken = courseResult.get(0).kurzbez;
 			courseName = courseResult.get(0).name;
 			lastCommentOnClass = courseResult.get(0).kommentar;
-		}
+			try {
+				int graduationYear = 2000 + Integer.parseInt(courseToken.replaceAll("[A-Z]*",
+						"").substring(0, 2)) + 3;
+				graduation = String.valueOf(graduationYear);
+			} catch (NumberFormatException e) {
 
-		try {
-			int graduationYear = 2000 + Integer.parseInt(courseToken.replaceAll("[A-Z]*",
-					"").substring(0, 2)) + 3;
-			graduation = String.valueOf(graduationYear);
-		} catch (NumberFormatException e) {
-
-		}
-
-		html.append("Du studierst also auch an der DHBW Mannheim. Gefällt dir die Rahmsoße genau " +
-				"so gut wir uns? Immerhin siegt durch Autoload endlich die Faulheit!");
-		if (courseToken.startsWith("T")) {
-			html.append("Immerhin bist du auch an der Fakultät Technik!");
-			if (courseToken.startsWith("TMT") || courseToken.startsWith("TWIW")) {
-				html.append("Aber wir haben mit Mitleid, dass ihr in Eppelheim sitzt");
 			}
-		} else if (courseToken.startsWith("W")) {
-			html.append("Wir als Techniker sind froh über jede Studentin, " +
-					"die bei uns in Neuostheim ist!");
-		}
-		html.append("Um so besser, dass nächste Jahr hoffentlich alle in Neuostheim vereint sind");
-		html.append("<br \\> Nichts desto trotz, du studierst also <b>" + courseName + "</b>");
-		if (graduation == null) {
-			graduation = "irgendwann";
-		}
-		html.append(" simmt's? Wir hoffen, dass du dir " + graduation + " auch dein " +
-				"Bachelorzeugnis abholen darfst.<br \\><br \\> ");
+
+			html.append("Du studierst also auch an der DHBW Mannheim. Gefällt dir die Rahmsoße genau " +
+					"so gut wir uns? Immerhin siegt durch Autoload endlich die Faulheit! ");
+
+			if (courseToken.startsWith("T")) {
+				html.append("Immerhin bist du auch an der Fakultät Technik! ");
+				if (courseToken.startsWith("TMT") || courseToken.startsWith("TWIW")) {
+					html.append("Aber wir haben Mitleid, dass ihr in Eppelheim sitzt");
+				}
+			} else if (courseToken.startsWith("W")) {
+				html.append("Wir als Techniker sind froh über jede Studentin, " +
+						"die bei uns in Neuostheim ist!");
+			}
+			html.append(" Um so besser, dass nächste Jahr hoffentlich alle in Neuostheim vereint " +
+					"sind");
+			html.append("<br \\> Nichts desto trotz, du studierst also <b>" + courseName + "</b>");
+			if (graduation == null) {
+				graduation = "irgendwann";
+			}
+			html.append(" simmt's? Wir hoffen, dass du dir " + graduation + " auch dein " +
+					"Bachelorzeugnis abholen darfst.<br \\><br \\> ");
 
 
-		html.append("Am Ende möchten wir noch etwas los werden:<br \\>");
-		if (lastCommentOnClass != null) {
-			html.append(lastCommentOnClass);
-		} else {
-			html.append("Viel Erfolg weiterhin im Studium!");
+			html.append("Am Ende möchten wir noch etwas los werden:<br \\>");
+			if (lastCommentOnClass != null) {
+				html.append(lastCommentOnClass);
+			} else {
+				html.append("Viel Erfolg weiterhin im Studium!");
+			}
+		}else {
+			html.append("Das ist wohl ein Laptop oder Rechner, den du nicht hauptsächlich für das" +
+					" Studium an der DHBW Mannheim nutzt. Also können wir an dieser leider keine " +
+					"fundierte Aussage treffen");
 		}
 		return html.toString();
 	}
