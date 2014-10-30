@@ -70,6 +70,11 @@
             <artifactId>xmlworker</artifactId>
             <version>5.4.1</version>
         </dependency>
+        <dependency>
+            <groupId>jtidy</groupId>
+            <artifactId>jtidy</artifactId>
+            <version>4aug2000r7-dev</version>
+        </dependency>
     </dependencies>
 
     <build>
