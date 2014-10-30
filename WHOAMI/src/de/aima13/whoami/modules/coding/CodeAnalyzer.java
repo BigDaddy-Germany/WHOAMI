@@ -29,6 +29,7 @@ public class CodeAnalyzer implements Analyzable {
 
 	private Map<LanguageSetting, List<Path>> languageFilesMap;
 	private List<String> moduleFilter;
+	private Map<LanguageSetting, Map<CHECK_RESULT, Integer>> syntaxCheckResults;
 
 	private static enum CHECK_RESULT {
 		CANT_PARSE, CORRECT, SYNTAX_ERROR
@@ -136,7 +137,31 @@ public class CodeAnalyzer implements Analyzable {
 
 	@Override
 	public void run() {
-		System.out.println(this.checkSyntax(new CSetting(), Paths.get("C:\\ANTLR\\101-hello.c")));
+		// ResultMap initialisieren
+		this.syntaxCheckResults = new HashMap<>();
+
+		// Alle Programmiersprachen durchgehen
+		for (Map.Entry<LanguageSetting, List<Path>> languageFilesEntry : this
+				.languageFilesMap.entrySet()) {
+			// ResultSet für diese Sprache initialisieren
+			Map<CHECK_RESULT, Integer> checkResults = new HashMap<>();
+			// Für jedes existente Result den Wert 0 initialisieren
+			for (CHECK_RESULT result : CHECK_RESULT.values()) {
+				checkResults.put(result, 0);
+			}
+
+			// Alle Dateien der Sprache parsen
+			for (Path file : languageFilesEntry.getValue()) {
+				CHECK_RESULT checkResult = this.checkSyntax(languageFilesEntry.getKey(), file);
+				// Entsprechende Summe der Results um eins erhöhen
+				checkResults.put(checkResult, checkResults.get(checkResult) + 1);
+			}
+
+			// Ergebnisse für diese Sprache speichern
+			this.syntaxCheckResults.put(languageFilesEntry.getKey(), checkResults);
+		}
+
+		int i = 0;
 	}
 
 	/**
