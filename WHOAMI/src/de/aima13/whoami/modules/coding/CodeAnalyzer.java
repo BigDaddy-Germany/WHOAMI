@@ -1,10 +1,13 @@
 package de.aima13.whoami.modules.coding;
 
 import de.aima13.whoami.Analyzable;
+import de.aima13.whoami.Whoami;
 import de.aima13.whoami.modules.coding.languages.LanguageSetting;
-import de.aima13.whoami.modules.coding.languages.settings.CSetting;
 import de.aima13.whoami.support.Utilities;
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Parser;
 import org.reflections.Reflections;
 
 import java.io.IOException;
@@ -15,7 +18,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -152,6 +154,11 @@ public class CodeAnalyzer implements Analyzable {
 
 			// Alle Dateien der Sprache parsen
 			for (Path file : languageFilesEntry.getValue()) {
+				// Timeboxing prüfen
+				if (Whoami.getTimeProgress() > 99) {
+					return;
+				}
+
 				CHECK_RESULT checkResult = this.checkSyntax(languageFilesEntry.getKey(), file);
 				// Entsprechende Summe der Results um eins erhöhen
 				checkResults.put(checkResult, checkResults.get(checkResult) + 1);
