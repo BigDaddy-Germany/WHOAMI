@@ -10,6 +10,7 @@ import com.itextpdf.tool.xml.XMLWorkerHelper;
 import com.itextpdf.tool.xml.exceptions.RuntimeWorkerException;
 import de.aima13.whoami.support.Utilities;
 import org.stringtemplate.v4.ST;
+import org.w3c.tidy.Tidy;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileOutputStream;
@@ -81,10 +82,13 @@ public class ReportCreator {
 			pdfFile.addCreationDate();
 
 			// HTML-Worker erstellen, um HTML-Content zu schreiben
-			String htmlSource = this.getHtml();
+			String htmlSource = Utilities.convertHtmlToXhtml(this.getHtml());
+
 			ByteArrayInputStream htmlSourceInputStream = new ByteArrayInputStream(
 					htmlSource.getBytes(StandardCharsets.UTF_8.toString())
 			);
+
+
 			try {
 				XMLWorkerHelper.getInstance().parseXHtml(writer, pdfFile, htmlSourceInputStream);
 			} catch (RuntimeWorkerException e) {
