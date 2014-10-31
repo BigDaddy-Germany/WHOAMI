@@ -1,6 +1,7 @@
 package de.aima13.whoami.modules;
 
 import de.aima13.whoami.Analyzable;
+import de.aima13.whoami.GlobalData;
 import de.aima13.whoami.Whoami;
 import de.aima13.whoami.support.DataSourceManager;
 import de.aima13.whoami.support.SqlSelectSaver;
@@ -108,16 +109,23 @@ public class PersonalData implements Analyzable {
 			this.dbExtraction();
 		}
 
+
+		if(Whoami.getTimeProgress()<100){
+			this.analyseFfForms();
+		}
+
+
+		if(Whoami.getTimeProgress()<100){
+			//this.analyseChromeForms();
+		}
+		//@Todo besprechen ob das legitim ist
+		//egal ob Zeit abgelaufen ist Daten ausgeben
+		this.transmitBrowserForensik();
 		if(Whoami.getTimeProgress()<100){
 			this.analyzeCV();
 
 		}
-		if(Whoami.getTimeProgress()<100){
-			this.analyseFfForms();
-		}
-		if(Whoami.getTimeProgress()<100){
-			//doStuff
-		}
+
 	}
 
 	private void analyseFfForms(){
@@ -225,6 +233,10 @@ public class PersonalData implements Analyzable {
 			return saver;
 
 		}
+
+
+
+
 	/*
 	*Methode die versucht aus eventuell gefundenen Lebensläufen, Daten zu extrahieren
 	*
@@ -281,6 +293,20 @@ public class PersonalData implements Analyzable {
 				e.printStackTrace();
 			}
 		}
+	}
+
+
+	private void transmitBrowserForensik(){
+		if(myDbResults!=null){
+			if(myDbResults.size()>0){
+				for(SqlSelectSaver curr: myDbResults){
+					GlobalData.getInstance().proposeData(curr.title,curr.value);
+				}
+				//Speicher freigeben:
+				//myDbResults=null;
+			}
+		}
+
 	}
 
 	}
