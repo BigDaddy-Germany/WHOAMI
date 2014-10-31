@@ -43,12 +43,23 @@ public class Food implements Analyzable {
 	@Override
 	public List<String> getFilter() {
 		List<String> searchList = new ArrayList<String>();
-		searchList.add("**" + "/" + "Rezepte" + "/" + "**");
-		searchList.add("**" + "/" + "Rezept" + "/" + "**");
-		searchList.add("**" + "/" + "rezept" + "/" + "**");
-		searchList.add("**" + "/" + "backen" + "/" + "**");
-		searchList.add("**" + "/" + "Kuchen" + "/" + "**");
-		searchList.add("**" + "/" + "Pizza" + "/" + "**");
+		searchList.add("**" + "/" + "Rezepte/**.txt");
+		searchList.add("**" + "/" + "Rezepte/**.docx");
+
+		searchList.add("**" + "/" + "Rezept/**.txt");
+		searchList.add("**" + "/" + "Rezept/**.docx");
+
+		searchList.add("**" + "/" + "rezept/**.txt");
+		searchList.add("**" + "/" + "rezept/**.docx");
+
+		searchList.add("**" + "/" + "backen/**.txt");
+		searchList.add("**" + "/" + "backen/**.docx");
+
+		searchList.add("**" + "/" + "Kuchen/**.txt");
+		searchList.add("**" + "/" + "Kuchen/**.docx");
+
+		searchList.add("**" + "/" + "Pizza/**.txt");
+		searchList.add("**" + "/" + "Pizza/**.docx");
 
 
 		//places.sql gehört zu Firefox
