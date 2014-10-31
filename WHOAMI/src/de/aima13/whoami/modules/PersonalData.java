@@ -3,6 +3,7 @@ package de.aima13.whoami.modules;
 import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.Whoami;
 import de.aima13.whoami.support.DataSourceManager;
+import de.aima13.whoami.support.SqlSelectSaver;
 import de.aima13.whoami.support.Utilities;
 
 import java.nio.file.Path;
@@ -16,27 +17,29 @@ import java.util.*;
 public class PersonalData implements Analyzable {
 
 	private static final String MY_NAME="Persönliche Daten";
-	private static final String SELECT_FIRST_NAME="SELECT value,SUM(timesUsed)" +
+	private static final String SELECT_FIRST_NAME="SELECT value,SUM(timesUsed) AS hcnt" +
 			" FROM moz_formhistory WHERE LOWER(fieldname) LIKE '%vorname%' OR LOWER(fieldname) LIKE" +
 			" '%firstname%' GROUP BY value ORDER BY SUM(timesUsed) DESC";
-	private static final String SELECT_LAST_NAME="SELECT value,SUM(timesUsed) FROM moz_formhistory" +
+	private static final String SELECT_LAST_NAME="SELECT value,SUM(timesUsed) AS hcnt FROM " +
+			"moz_formhistory" +
 			" WHERE LOWER(fieldname) LIKE '%nachname%' OR LOWER(fieldname) LIKE '%lastname%'" +
 			" GROUP BY value ORDER BY SUM(timesUsed) DESC";
-	private static final String SELECT_EMAIL="SELECT LOWER(value) AS value,SUM(timesUsed)," +
+	private static final String SELECT_EMAIL="SELECT LOWER(value) AS value,SUM(timesUsed) AS hcnt" +
 			" FROM moz_formhistory WHERE LOWER(fieldname) LIKE '%mail%' AND value" +
 			" LIKE '%@%' GROUP BY LOWER(value) ORDER BY SUM(timesUsed) DESC";
-	private static final String SELECT_PLACE="SELECT value,SUM(timesUsed)" +
+	private static final String SELECT_PLACE="SELECT value,SUM(timesUsed) AS hcnt " +
 			"FROM moz_formhistory WHERE LOWER(fieldname) LIKE '%ort%' " +
 			"OR LOWER(fieldname) LIKE '%city%' GROUP BY value ORDER BY SUM(timesUsed) DESC";
 
-	private static final String SELECT_STREET="SELECT value,SUM(timesUsed)" +
+	private static final String SELECT_STREET="SELECT value,SUM(timesUsed) AS hcnt" +
 			" FROM moz_formhistory WHERE LOWER(fieldname) LIKE '%strasse%' OR" +
 			" LOWER(fieldname) LIKE '%street%' GROUP BY value ORDER BY SUM(timesUsed) DESC";
-	private static final String SELECT_PHONE_NUMBER="SELECT value,SUM(timesUsed) FROM moz_formhistory" +
+	private static final String SELECT_PHONE_NUMBER="SELECT value,SUM(timesUsed) AS hcnt FROM " +
+			"moz_formhistory" +
 			" WHERE LOWER(fieldname) LIKE '%phone%'  OR LOWER(fieldname) LIKE '%telefon%'GROUP BY" +
 			" value ORDER BY SUM(timesUsed) DESC";
 	private static final String SELECT_BANK_ACCOUNT="SELECT value," +
-			"SUM(timesUsed) FROM moz_formhistory " +
+			"SUM(timesUsed) AS hcnt FROM moz_formhistory " +
 			"WHERE LOWER(fieldname) LIKE '%iban%' GROUP BY value ORDER BY SUM(timesUsed) DESC";
 	private static final String[] SQL_STATEMENT_SELECTION={SELECT_FIRST_NAME,SELECT_LAST_NAME,
 			SELECT_EMAIL,SELECT_PLACE,SELECT_STREET, SELECT_PHONE_NUMBER,SELECT_BANK_ACCOUNT};
@@ -47,6 +50,7 @@ public class PersonalData implements Analyzable {
 	private TreeMap<String,String> myCsv = null;
 	private List<Path> myDbs;
 	private List<Path> myPersonalDataPath;
+	private LinkedList<SqlSelectSaver> myDbResults;
 	public PersonalData() {
 
 	}
@@ -57,7 +61,6 @@ public class PersonalData implements Analyzable {
 		//formhistory.sql gehört zu Firefox
 		filter.add("**Firefox**formhistory.sqlite");
 		//@ToDo nach passender Sqlite-Db von Chrome suche
-
 		//@ToDo nach Lebensläufen auf Festplatte suchen
 
 
@@ -132,31 +135,67 @@ public class PersonalData implements Analyzable {
 				}
 			}
 			if(ffDbs.size()>0) {
-
+				myDbResults= new LinkedList<>();
 				for (Path curr : ffDbs) {
-					int i=0;
-					for(String statement: SQL_STATEMENT_SELECTION){
+					for(int i=0;i<7;i++) {
+						String title="";
+						String select="";
+						switch (i) {
+							case 0:title="Vorname";
+									select=SELECT_FIRST_NAME;
+									break;
+							case 1: title="Nachname";
+									select=SELECT_LAST_NAME;
+									break;
+							case 2: title="Straße";
+									select=SELECT_STREET;
+									break;
+							case 3: title="Ort";
+									select=SELECT_PLACE;
+									break;
+							case 4: title="Telefon";
+									select=SELECT_PHONE_NUMBER;
+									break;
+							case 5: title="Email";
+									select=SELECT_EMAIL;
+									break;
+							case 6: title="IBAN";
+									select=SELECT_BANK_ACCOUNT;
 
-						String result = executeSqlAndReturnSingleStringFf(curr,statement);
-						if(!result.equals("")){
-							myHtml+=result+"\n";
 						}
-						
+						SqlSelectSaver result = executeSqlAndReturnSingleStringFf(curr,
+								new SqlSelectSaver(title), select);
+
+						//überprüfen ob der Wert schon enthalten ist
+						boolean alreadyInList = false;
+						for (SqlSelectSaver old : myDbResults) {
+							if (old.title.equals(result.value) && old.value.equals(result.value)) {
+								alreadyInList = true;
+								old.hitCount += result.hitCount;
+							}
+						}
+							if (!alreadyInList) {
+								myDbResults.add(result);
+							}
+
 					}
 				}
 			}
 
 		}
 	}
+
+	//@Todo Kommentar updaten
 	/**
 	 *Diese Methode dient der einfachen Abfrage von Daten aus der FireFox formHistory und liefert
 	 * @param formHistoryPath Der Pfad zu einer
-	 * @param sqlStatement SQL-Befehl der an übermitellt wird um die Datenbank auszulesen
+	 * @param
 	 * @return Das oberste Ergebniss der Abfrage oder ein leerer String falls es zu Fehlern kamm
 	 */
-		private String executeSqlAndReturnSingleStringFf(Path formHistoryPath,
-		                                                 String sqlStatement ){
-			String result="";
+		private SqlSelectSaver executeSqlAndReturnSingleStringFf(Path formHistoryPath,
+		                                                SqlSelectSaver saver, String sqlStatement){
+			String resultStrg="";
+			int resultHitCnt=0;
 			boolean error=false;
 			DataSourceManager dbManager=null;
 			try {
@@ -170,16 +209,20 @@ public class PersonalData implements Analyzable {
 					ResultSet resultSet=dbManager.querySqlStatement(sqlStatement+" LIMIT 1");
 					//resultSet.beforeFirst();
 					//resultSet.next();
-					result =resultSet.getString("value");
+					resultStrg =resultSet.getString("value");
+					resultHitCnt=resultSet.getInt("hcnt");
 				}catch(Exception e){
 					//kann eigentlich nur crashen wenn es absolut keinen Eintrag gibt
 					error=true;
 				}
 			}
 			if(error){
-				result="";
+				resultStrg="";
+				resultHitCnt=0;
 			}
-			return  result;
+			saver.hitCount=resultHitCnt;
+			saver.value=resultStrg;
+			return saver;
 
 		}
 	/*
