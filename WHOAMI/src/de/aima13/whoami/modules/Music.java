@@ -195,7 +195,6 @@ public class Music implements Analyzable {
 		StringBuilder buffer = new StringBuilder();
 		buffer.append("<table>");
 
-
 		if (!(favArtist.equals(""))) {
 			buffer.append("<tr><td>Lieblingskünstler:</td>" +
 					"<td>" + favArtist + "</td></tr>");
@@ -219,34 +218,31 @@ public class Music implements Analyzable {
 					"</tr>");
 		}
 
+		buffer.append("</table>");
+
 		// Abschlussfazit des Musikmoduls
 		if (musicDatabases.isEmpty()) {
-			buffer.append("<tr><td><br />Es wurden keine Informationen gefunden um den scheinbar " +
-					"sehr geheimen Musikgeschmack des Users zu analysieren.</td></tr>");
+			buffer.append("Es wurden keine Informationen gefunden um den scheinbar " +
+					"sehr geheimen Musikgeschmack des Users zu analysieren.");
 		} else if (!(onlService.equals("")) && !(favArtist.equals("")) && !(favGenre.equals(""))
 				&& !(cltProgram.equals(""))) {
-			buffer.append("<tr>" +
-					"<td colspan='2'><br /><b>Fazit:</b> Dein Computer enthält Informationen zu allem " +
+			buffer.append("<br /><b>Fazit:</b> Dein Computer enthält Informationen zu allem " +
 					"was wir gesucht haben.<br /> Musik scheint ein wichtiger Teil deines Lebens " +
-					"zu sein. <br />" + stmtGenre + "</td>" +
-					"</tr>");
+					"zu sein. <br />" + stmtGenre);
 		} else if (onlService.equals("") && cltProgram.equals("") && !(favGenre.equals(""))) {
-			buffer.append("<tr>" +
-					"<td colspan='2'><br /><b>Fazit:</b> Das Modul konnte weder online noch nativ " +
+			buffer.append("<br /><b>Fazit:</b> Das Modul konnte weder online noch nativ " +
 					"herausfinden wie du Musik hörst. Du scheinst dies über einen nicht sehr " +
 					"verbreiteten Weg zu machen. Nichts desto trotz konnten wir deinen Geschmack " +
-					"analysieren:<br /> " + stmtGenre + "</td>" +
-					"</tr>");
+					"analysieren:<br /> " + stmtGenre);
 		} else if (favGenre.equals("") && favArtist.equals("")) {
-			buffer.append("<td colspan='2'><br /><b>Fazit:</b> Es können keine Informationen zu deinem " +
-					"Musikgeschmack " + "gefunden werden. ");
+			buffer.append("<br /><b>Fazit:</b> Es konnten keine Informationen zu deinem " +
+					"Musikgeschmack gefunden werden.");
 			if (!(onlService.equals("")) || !(cltProgram.equals(""))) {
 				buffer.append("Aber Musik hörst du über " + onlService + ", " + cltProgram + "" +
-						". Nur was bleibt eine offene Frage.</td></tr>");
+						". Nur was bleibt eine offene Frage.");
 			}
 		} else {
-			buffer.append("<tr>" +
-					"<td colspan='2'><br /><b>Fazit:</b> Zwar konnten einige Informationen über " +
+			buffer.append("<br /><b>Fazit:</b> Zwar konnten einige Informationen über " +
 					"dich nicht herausgefunden werden, <br />aber einiges wissen wir.");
 			if (!(onlService.equals(""))) {
 				buffer.append("<br />Du hörst über " + onlService + " online Musik.");
@@ -261,11 +257,8 @@ public class Music implements Analyzable {
 				buffer.append("<br />" + stmtGenre);
 			}
 
-			buffer.append("</td></tr>");
-
 		}
 
-		buffer.append("</table>");
 		html = buffer.toString();
 
 		return html;
@@ -806,7 +799,7 @@ public class Music implements Analyzable {
 
 		//Benutzername wird an Globaldata übergeben
 		String username = System.getProperty("user.name");
-		GlobalData.getInstance().proposeData("Benutzername: ", username);
+		GlobalData.getInstance().proposeData("Benutzername", username);
 
 		//Richtige Datenbank hinzufügen
 		int foundDbs = 0;
