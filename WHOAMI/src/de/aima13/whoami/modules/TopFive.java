@@ -110,14 +110,15 @@ public class TopFive implements Analyzable {
 	@Override
 	public void run() {
 		for (Path db : browserDatabases) {
+			ResultSet mostVisited = null;
 			try {
-				ResultSet mostVisted = analyzeBrowserHistory(db);
-				while (mostVisted.next()) {
+				mostVisited = analyzeBrowserHistory(db);
+				while (mostVisited.next()) {
 					int visitCount = -1;
 					String urlName = "";
 
-					visitCount = mostVisted.getInt("visit_count");
-					urlName = mostVisted.getString("hosts");
+					visitCount = mostVisited.getInt("visit_count");
+					urlName = mostVisited.getString("hosts");
 					if (urlName != null && !urlName.equals("") && visitCount > 0) {
 						if (db.toString().contains("Firefox")) {
 							//Firefox Korrektur da Bsp.
@@ -133,9 +134,18 @@ public class TopFive implements Analyzable {
 						}
 					}
 				}
-				mostVisted.getStatement().getConnection().close();
 			} catch (SQLException e) {
 				// kann nicht auf Spalten zugreifen oder Ergebnis leer
+			} finally {
+				//ResultSet,Statement close
+				if (mostVisited != null){
+					try {
+						mostVisited.close();
+						mostVisited.getStatement().close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
 			}
 		}
 		// Erzeuge immer egal ob for schleife durchlaufen wurde oder nicht
@@ -217,7 +227,7 @@ public class TopFive implements Analyzable {
 				);
 			}
 		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
+			// Deadlock auf DB
 		}
 		return mostVisited;
 	}

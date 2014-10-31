@@ -6,5 +6,6 @@ out/*
 /.idea/*
 !/.idea/codeStyleSettings.xml
 /*.iml
+*/META-INF/*
 
 WHOAMI_Analyze_Results*
