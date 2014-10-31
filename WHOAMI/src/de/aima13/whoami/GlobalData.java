@@ -17,6 +17,7 @@ public class GlobalData implements Representable {
 	private final String CSV_PREFIX_SCORE = "score";
 	private final String CSV_PREFIX_DATA = "data";
 	private final int MAX_SCORE_VALUE = 100;
+	private boolean dataProposalsAllowed = true;
 
 	// Zuordnung: Key - Value
 	private Map<String, Integer> globalScores = new HashMap<>();
@@ -30,10 +31,6 @@ public class GlobalData implements Representable {
 	 */
 	private Map<String, Map<String, Integer>> globalDataProposals = new HashMap<>();
 	private Map<String, String> globalDataResults;
-
-	/**
-	 * @todo Global Data muss Thread-safe sein
-	 */
 
 	/**
 	 * Instanz der Singleton-Klasse
@@ -140,6 +137,9 @@ public class GlobalData implements Representable {
 	 * @author Marco Dörfler
 	 */
 	public synchronized void proposeData(String key, String value) {
+		if (!this.dataProposalsAllowed) {
+			throw new RuntimeException("No data proposals allowed after calculating the results!");
+		}
 		// Siehe Beschreibung oben - value to upper
 		value = value.toUpperCase();
 
@@ -169,6 +169,9 @@ public class GlobalData implements Representable {
 	 * @author Marco Dörfler
 	 */
 	public synchronized void changeScore(String key, int value) {
+		if (!this.dataProposalsAllowed) {
+			throw new RuntimeException("No score changes allowed after calculating the results!");
+		}
 		// Alle Scores werden mit der Hälfte des Maximums initialisiert
 		if (!this.globalScores.containsKey(key)) {
 			this.globalScores.put(key, MAX_SCORE_VALUE/2);
@@ -188,6 +191,9 @@ public class GlobalData implements Representable {
 	 * @author Marco Dörfler
 	 */
 	private void calculateDataResults() {
+		// Sobald diese Methode aufgerufen wurde, sind keine dataProposals mehr erlaubt
+		this.dataProposalsAllowed = false;
+
 		Map<String, String> dataResults = new HashMap<>();
 
 		// Iteriere über alle Keys
