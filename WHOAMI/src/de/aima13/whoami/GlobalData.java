@@ -92,9 +92,6 @@ public class GlobalData implements Representable {
 			template.add("hasScores", false);
 		}
 
-		System.out.println(template.render());
-		System.exit(0);
-
 		// Template rendern und zurückgeben
 		return template.render();
 	}
