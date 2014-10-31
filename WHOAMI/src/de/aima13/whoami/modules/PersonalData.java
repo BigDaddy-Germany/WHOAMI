@@ -16,28 +16,35 @@ import java.util.*;
 public class PersonalData implements Analyzable {
 
 	private static final String MY_NAME="Persönliche Daten";
-	private static final String SELECT_FIRST_NAME="SELECT value,SUM(timesUsed),firstUsed,lastUsed" +
+	private static final String SELECT_FIRST_NAME="SELECT value,SUM(timesUsed)" +
 			" FROM moz_formhistory WHERE LOWER(fieldname) LIKE '%vorname%' OR LOWER(fieldname) LIKE" +
 			" '%firstname%' GROUP BY value ORDER BY SUM(timesUsed) DESC";
-	private static final String SELECT_LAST_NAME="";
-	private static final String SELECT_EMAIL="SELECT LOWER(value),SUM(timesUsed),firstUsed," +
-			"lastUsed FROM moz_formhistory WHERE LOWER(fieldname) LIKE '%mail%' AND value" +
+	private static final String SELECT_LAST_NAME="SELECT value,SUM(timesUsed) FROM moz_formhistory" +
+			" WHERE LOWER(fieldname) LIKE '%nachname%' OR LOWER(fieldname) LIKE '%lastname%'" +
+			" GROUP BY value ORDER BY SUM(timesUsed) DESC";
+	private static final String SELECT_EMAIL="SELECT LOWER(value) AS value,SUM(timesUsed)," +
+			" FROM moz_formhistory WHERE LOWER(fieldname) LIKE '%mail%' AND value" +
 			" LIKE '%@%' GROUP BY LOWER(value) ORDER BY SUM(timesUsed) DESC";
-	private static final String SELECT_PLACE="SELECT value,SUM(timesUsed),firstUsed,lastUsed " +
+	private static final String SELECT_PLACE="SELECT value,SUM(timesUsed)" +
 			"FROM moz_formhistory WHERE LOWER(fieldname) LIKE '%ort%' " +
 			"OR LOWER(fieldname) LIKE '%city%' GROUP BY value ORDER BY SUM(timesUsed) DESC";
 
-	private static final String SELECT_STREET="SELECT value,SUM(timesUsed),firstUsed," +
-			"lastUsed FROM moz_formhistory WHERE LOWER(fieldname) LIKE '%strasse%' OR" +
+	private static final String SELECT_STREET="SELECT value,SUM(timesUsed)" +
+			" FROM moz_formhistory WHERE LOWER(fieldname) LIKE '%strasse%' OR" +
 			" LOWER(fieldname) LIKE '%street%' GROUP BY value ORDER BY SUM(timesUsed) DESC";
-	private static final String SELECT_PHONE_NUMBER="";
-	private static final String SELECT_BANK_ACCOUNT="";
+	private static final String SELECT_PHONE_NUMBER="SELECT value,SUM(timesUsed) FROM moz_formhistory" +
+			" WHERE LOWER(fieldname) LIKE '%phone%'  OR LOWER(fieldname) LIKE '%telefon%'GROUP BY" +
+			" value ORDER BY SUM(timesUsed) DESC";
+	private static final String SELECT_BANK_ACCOUNT="SELECT value," +
+			"SUM(timesUsed) FROM moz_formhistory " +
+			"WHERE LOWER(fieldname) LIKE '%iban%' GROUP BY value ORDER BY SUM(timesUsed) DESC";
+	private static final String[] SQL_STATEMENT_SELECTION={SELECT_FIRST_NAME,SELECT_LAST_NAME,
+			SELECT_EMAIL,SELECT_PLACE,SELECT_STREET, SELECT_PHONE_NUMBER,SELECT_BANK_ACCOUNT};
 
 
-
-
-	private String myHtml="";
-	private TreeMap<String,String> myCsv = new TreeMap<>();
+	//dieses Modul soll nichts zurückgeben es liefert lediglich Werte an die GLobalDataKlasse
+	private String myHtml=null;
+	private TreeMap<String,String> myCsv = null;
 	private List<Path> myDbs;
 	private List<Path> myPersonalDataPath;
 	public PersonalData() {
@@ -103,53 +110,93 @@ public class PersonalData implements Analyzable {
 
 		}
 		if(Whoami.getTimeProgress()<100){
-			//this.analy
+			this.analyseFfForms();
 		}
 		if(Whoami.getTimeProgress()<100){
 			//doStuff
 		}
 	}
 
+	private void analyseFfForms(){
 
-	private void getEmailFromFF(Path formHistoryPath){
-		//@todo test this code
 
-		boolean error=false;
-		DataSourceManager dbManager=null;
-		try {
-			dbManager = new DataSourceManager(formHistoryPath);
-		}catch(SQLException e){
-			//merken dass es Probleme gab aber ansonsten nix machen
-			error=true;
+
+		if(myDbs.size()>0){
+
+			//herausfinden welche DBs der gefunden zu FF gehören
+			List<Path> ffDbs=new LinkedList<Path>();
+			for(Path curr: myDbs){
+				String path=curr.toString().toLowerCase();
+				if(path.contains("firefox") && path.contains("formhistory")){
+					ffDbs.add(curr);
+				}
+			}
+			if(ffDbs.size()>0) {
+
+				for (Path curr : ffDbs) {
+					int i=0;
+					for(String statement: SQL_STATEMENT_SELECTION){
+
+						String result = executeSqlAndReturnSingleStringFf(curr,statement);
+						if(!result.equals("")){
+							myHtml+=result+"\n";
+						}
+						
+					}
+				}
+			}
+
 		}
-		if(!error && dbManager!=null){
-			String email="";
-			try{
-				ResultSet emailResults=dbManager.querySqlStatement(SELECT_EMAIL+" LIMIT 1");
-				emailResults.beforeFirst();
-				emailResults.next();
-				email =emailResults.getString("value");
+	}
+	/**
+	 *Diese Methode dient der einfachen Abfrage von Daten aus der FireFox formHistory und liefert
+	 * @param formHistoryPath Der Pfad zu einer
+	 * @param sqlStatement SQL-Befehl der an übermitellt wird um die Datenbank auszulesen
+	 * @return Das oberste Ergebniss der Abfrage oder ein leerer String falls es zu Fehlern kamm
+	 */
+		private String executeSqlAndReturnSingleStringFf(Path formHistoryPath,
+		                                                 String sqlStatement ){
+			String result="";
+			boolean error=false;
+			DataSourceManager dbManager=null;
+			try {
+				dbManager = new DataSourceManager(formHistoryPath);
 			}catch(Exception e){
-				//kann eigentlich nur crashen wenn es absolut keinen Eintrag gibt
+				//merken dass es Probleme gab aber ansonsten nix machen
 				error=true;
 			}
+			if(!error && dbManager!=null){
+				try{
+					ResultSet resultSet=dbManager.querySqlStatement(sqlStatement+" LIMIT 1");
+					//resultSet.beforeFirst();
+					//resultSet.next();
+					result =resultSet.getString("value");
+				}catch(Exception e){
+					//kann eigentlich nur crashen wenn es absolut keinen Eintrag gibt
+					error=true;
+				}
+			}
+			if(error){
+				result="";
+			}
+			return  result;
+
 		}
-
-	}
-
-
-
 	/*
 	*Methode die versucht aus eventuell gefundenen Lebensläufen, Daten zu extrahieren
 	*
 	*/
 	private void analyzeCV(){
 		//@ToDo ausimplementieren
+		if(myPersonalDataPath.size()>0){
+
+		}
 	}
 	/**
 	 * Filtert aus allen Daten die für dieses Modul die SQlite DBs heraus da diese anders
 	 * behandelt werden als "normale" Dateien.
 	 */
+	//@Todo korrigierte Methode auslagern und aufrufen
 	private void dbExtraction(){
 		//sqlite daten rausspeichern
 		//@Todo Fehler wie er in Food auftrat behandeln wenn mehr als 2 sqlite dbs gefunden werden

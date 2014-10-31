@@ -43,19 +43,19 @@ public class Food implements Analyzable {
 	@Override
 	public List<String> getFilter() {
 		List<String> searchList = new ArrayList<String>();
-		searchList.add("**" + File.separator + "Rezepte" + File.separator + "**");
-		searchList.add("**" + File.separator + "Rezept" + File.separator + "**");
-		searchList.add("**" + File.separator + "rezept" + File.separator + "**");
-		searchList.add("**" + File.separator + "backen" + File.separator + "**");
-		searchList.add("**" + File.separator + "Kuchen" + File.separator + "**");
-		searchList.add("**" + File.separator + "Pizza" + File.separator + "**");
+		searchList.add("**" + "/" + "Rezepte" + "/" + "**");
+		searchList.add("**" + "/" + "Rezept" + "/" + "**");
+		searchList.add("**" + "/" + "rezept" + "/" + "**");
+		searchList.add("**" + "/" + "backen" + "/" + "**");
+		searchList.add("**" + "/" + "Kuchen" + "/" + "**");
+		searchList.add("**" + "/" + "Pizza" + "/" + "**");
 
 
 		//places.sql gehört zu Firefox
 		searchList.add("**Firefox**places.sqlite");
 
 		//* hier weil History Datein gibt es zu viele und Chrome kann mehrere Benutzer verwalten
-		searchList.add("**Google"+File.separator+"Chrome**History");
+		searchList.add("**Google"+"/"+"Chrome**History");
 
 
 		return searchList;
