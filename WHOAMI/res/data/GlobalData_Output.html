@@ -1,13 +1,19 @@
 <!-- Template für GlobalData Output -->
-<b>Hallo $firstName$</b><br />
+<b>
+    $if(firstName)$
+        Hallo $firstName$,
+    $else$
+        Hallo,
+    $endif$
+</b><br />
 Dann wollen wir mal sehen was uns dein Rechnenknecht über dich verrät!
-Fangen wir mal mit einer kleinen Übersicht an wie wäre es mit deiner Anschrift?
-Wo du wohnst interessiert bestimmt viele!
 $if(location)$
+    Fangen wir mal mit einer kleinen Übersicht an wie wäre es mit deiner Anschrift?
+    Wo du wohnst interessiert bestimmt viele!
     Ich tippe auf $location$. Wie lebt es sich denn so in $location$? Schön dort?
 $else$
-    Sag mal, hast du überhaupt ein Zuhause? Wenn ja, dann hast du es leider sehr gut vor uns
-    versteckt...
+    Eigentlich wollten wir dich ja damit überraschen, dass wir deinen Wohnort herausgefunden
+    haben, aber leider hast du den sehr gut vor uns versteckt.
 $endif$
 $if(street)$
     Ein kleiner Hinweis noch: Uns ist zu Ohren gekommen, dass Nachts schreckliche Dinge in der
@@ -22,30 +28,37 @@ $if(iban)$
     Achso, das Geld für die Waschmaschine ziehen wir dann von folgendem Konto ein $iban$, das Sepa
     Mandata stand ja in der Eula.
 $endif$
-Na ja wir weichen vom Thema ab. Mal schauen was wir noch so interessantes haben.
-<table border="1">
-    <tr>
-        <th>Name</th>
-        <th>Wert</th>
-    </tr>
-    $informationen:{info|
-    <tr>
-        <td>$info.name$</td>
-        <td>$info.value$</td>
-    </tr>
-    }$
-</table>
-
-Zusätzlich haben wir folgende Scores für dich berechnet:
-<table border="1">
-    <tr>
-        <th>Score</th>
-        <th>Wertung</th>
-    </tr>
-    $score:{s|
-    <tr>
-        <td>$s.name$</td>
-        <td> $s.value$</td>
-    </tr>
-    }$
-</table>
+$if(hasInformation)$
+    Na ja wir weichen vom Thema ab. Mal schauen was wir noch so interessantes haben.
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Wert</th>
+        </tr>
+        $information:{info|
+        <tr>
+            <td>$info.name$</td>
+            <td>$info.value$</td>
+        </tr>
+        }$
+    </table>
+$endif$
+$if(hasScores)$
+    $if(hasInformation)$
+        Zusätzlich haben wir folgende Scores für dich berechnet:
+    $else$
+        Wir haben vor den Bericht noch ein paar Scores für dich:
+    $endif$
+    <table border="1">
+        <tr>
+            <th>Score</th>
+            <th>Wertung</th>
+        </tr>
+        $scores:{s|
+        <tr>
+            <td>$s.name$</td>
+            <td> $s.value$</td>
+        </tr>
+        }$
+    </table>
+$endif$

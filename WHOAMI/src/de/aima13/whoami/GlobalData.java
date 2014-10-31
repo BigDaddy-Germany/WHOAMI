@@ -1,6 +1,8 @@
 package de.aima13.whoami;
 
+import de.aima13.whoami.support.Utilities;
 import org.apache.commons.lang3.text.WordUtils;
+import org.stringtemplate.v4.ST;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +18,7 @@ public class GlobalData implements Representable {
 	private final String CSV_PREFIX = "global";
 	private final String CSV_PREFIX_SCORE = "score";
 	private final String CSV_PREFIX_DATA = "data";
+	private final String TEMPLATE_LOCATION = "/data/GlobalData_Output.html";
 	private final int MAX_SCORE_VALUE = 100;
 	private boolean dataProposalsAllowed = true;
 
@@ -46,20 +49,54 @@ public class GlobalData implements Representable {
 			this.calculateDataResults();
 		}
 
-		String html = "<b>Es wurden folgende Daten gefunden:</b><br />";
-		html += "<table border=\"1\"><tr><th>Name</th><th>Wert</th></tr>";
 
-		for (Map.Entry<String, Integer> score : this.globalScores.entrySet()) {
-			html += "<tr><td>Score " + score.getKey() + "</td><td>" + score.getValue().toString()
-					+ "</td></tr>";
+		// Template laden
+		ST template = new ST(Utilities.getResourceAsString(TEMPLATE_LOCATION), '$', '$');
+
+		// Liste der benötigten Headdaten
+		String[] headData = new String[] {
+				"firstName", "location", "street", "zipCode", "iban"
+		};
+
+		// Eventuell benötigte Headdaten hinzufügen
+		for (String dataKey : headData) {
+			if (this.globalDataResults.containsKey(dataKey)) {
+				template.add(dataKey, this.globalDataResults.get(dataKey));
+			} else {
+				template.add(dataKey, false);
+			}
 		}
-		for (Map.Entry<String, String> data : this.globalDataResults.entrySet()) {
-			html += "<tr><td>" + data.getKey() + "</td><td>" + data.getValue() + "</td></tr>";
+
+		// Globale Informationen hinzufügen, wenn vorhanden
+		if (!this.globalDataResults.isEmpty()) {
+			template.add("hasInformation", true);
+
+			// Daten vorhanden? -> füllen
+			for (Map.Entry<String, String> dataResult : this.globalDataResults.entrySet()) {
+				template.addAggr("information.{name, value}", dataResult.getKey(),
+						dataResult.getValue());
+			}
+		} else {
+			template.add("hasInformation", false);
 		}
 
-		html += "</table>";
+		// Scores hinzufügen, wenn vorhanden
+		if (!this.globalScores.isEmpty()) {
+			template.add("hasScores", true);
 
-		return html;
+			// Scores vorhanden? -> füllen
+			for (Map.Entry<String, Integer> score : this.globalScores.entrySet()) {
+				template.addAggr("scores.{name, value}", score.getKey(), score.getValue());
+			}
+		} else {
+			template.add("hasScores", false);
+		}
+
+		System.out.println(template.render());
+		System.exit(0);
+
+		// Template rendern und zurückgeben
+		return template.render();
 	}
 
 	@Override
