@@ -132,13 +132,13 @@ public class Music implements Analyzable {
 		filterMusic.add("**Google/Chrome**History");
 		filterMusic.add("**Firefox**places.sqlite");
 
-		//c) installed programs
+		//c) installierte Programme
 		filterMusic.add("**spotify.exe");
 		filterMusic.add("**iTunes.exe");
 		filterMusic.add("**SWYH.exe");
 		filterMusic.add("**simfy.exe");
 		filterMusic.add("**napster.exe");
-		filterMusic.add("**Amazon%20Music.exe"); //Leerzeichen im Namen
+		filterMusic.add("**Amazon*Music.exe");
 		filterMusic.add("**Deezer.exe");
 
 			return filterMusic;
@@ -323,8 +323,19 @@ public class Music implements Analyzable {
 
 		FileGenre.removeAll(Arrays.asList("", null)); //Lösche leere Einträge
 
+
 		//Ordne einem Genre seine Häufigkeit zu
 		for (String each : FileGenre) {
+
+			//Einige ID3-Tags sind fehlerhaft und das Byte wird in der Form "(XX)"als String
+			// gespeichert. Hier wird nochmal geguckt ob das Genre zugeordnet werden kann.
+			if (each.startsWith("(")) {
+				String str;
+				str = each.replaceAll("\\D+", "");
+				byte gId = Byte.parseByte(str);
+				each = arrayGenre[gId];
+			}
+
 			count = 0;
 			if (mapMaxGen.containsKey(each)) {
 				count = mapMaxGen.get(each);
@@ -346,20 +357,11 @@ public class Music implements Analyzable {
 		Iterator it = mapMaxGen.entrySet().iterator();
 		while (it.hasNext()) {
 			Map.Entry pairs = (Map.Entry) it.next();
-			if ((int) (pairs.getValue()) > max) {
+			if ((int) (pairs.getValue()) > max || !(pairs.equals("Other"))) {
 				favGenre = (String) pairs.getKey();
 				max = (int) (pairs.getValue());
 			}
 			it.remove();
-		}
-
-		//Einige ID3-Tags sind fehlerhaft und das Byte wird in der Form "(XX)"als String
-		// gespeichert. Hier wird nochmal geguckt ob das Genre zugeordnet werden kann.
-		if (favGenre.startsWith("(")) {
-			String str;
-			str = favGenre.replaceAll("\\D+", "");
-			byte gId = Byte.parseByte(str);
-			favGenre = arrayGenre[gId];
 		}
 
 		getCategory();
@@ -436,14 +438,14 @@ public class Music implements Analyzable {
 				.equals("Metal") || favGenre.equals("Rock") || favGenre.equals("Death Metal") ||
 				favGenre.equals("Hard Rock") || favGenre.equals("Alternative Rock") || favGenre
 				.equals("Instrumental Rock") || favGenre.equals("Darkwave") || favGenre.equals
-				("Gothic") || favGenre.equals("Alternative") || favGenre.equals("Folk Rock") ||
+				("Gothic") || favGenre.equals("Folk Rock") ||
 				favGenre.equals("Symphonic Rock") || favGenre.equals("Gothic Rock") || favGenre
 				.equals("Progressive Rock") || favGenre.equals("Black Metal") || favGenre.equals
 				("Heavy Metal") || favGenre.equals("Punk Rock") || favGenre.equals("Rythmic " +
 				"Soul") || favGenre.equals("Thrash Metal") || favGenre.equals("Garage Rock") ||
 				favGenre.equals("Space Rock") || favGenre.equals("Industro-Goth") || favGenre
 				.equals("Garage") || favGenre.equals("Art Rock")) {
-			statementToGenre.append(favGenre + "? <br />In dir steckt bestimmt ein Headbanger!");
+			statementToGenre.append(favGenre + "? In dir steckt bestimmt ein Headbanger!");
 		} else if (favGenre.equals("Chillout") || favGenre.equals("Reggea") || favGenre.equals
 				("Trip-Hop") || favGenre.equals("Hip-Hop")) {
 			statementToGenre.append("Deine Szene ist wahrscheinlich die Hip Hop Szene.<br />Du bist ein " +
@@ -469,9 +471,9 @@ public class Music implements Analyzable {
 				favGenre.equals("BritPop") || favGenre.equals("Indie") || favGenre.equals("Porn " +
 				"Groove") || favGenre.equals("Chanson") || favGenre.equals("Folk") || favGenre
 				.equals("Experimental") || favGenre.equals("Neue Deutsche Welle") || favGenre
-				.equals("Indie Rock")) {
+				.equals("Indie Rock") || favGenre.equals("Alternative")) {
 			statementToGenre.append("Dein Musikgeschmack, " + favGenre + ", " +
-					"zeugt von Geschmack und Stil.");
+					"zeugt auf jeden Fall von Geschmack und Stil.");
 		} else if (favGenre.equals("Podcast") || favGenre.equals("Audio Theatre") || favGenre.equals
 				("Audiobook") || favGenre.equals("Speech") || favGenre.equals("Satire") ||
 				favGenre.equals("Soundtrack") || favGenre.equals("Sound Clip") || favGenre.equals
@@ -482,14 +484,14 @@ public class Music implements Analyzable {
 					"<br />oder eine sehr faule Leseratte, die sich lieber alles vorlesen lässt. <br />" +
 					"Wie auch immer du bist, " +
 					"wahrscheinlich ein ziemlich belesener Mensch. ");
-		} else if (favGenre.equals("Other")) {
-			statementToGenre.append("Wer auch immer sich die ID3v1-Genres ausgedacht hat, " +
-					"<br />diese Richtung als 'Other' zu " +
-					"betiteln ist mehr als unaussagekräftig.<br />Du hast wahrscheinlich einen guten " +
-					"Musikgeschmack, wenn man sich anschaut <br />was da so unter diese Bezeichnung " +
-					"fällt :-)");
+		} else if (favGenre.equals("Other") || favGenre.equals("Andere")) {
+			statementToGenre.append("Du hast anscheinend mehr MP3-Files in deiner " +
+					"Spielebibliothek <br/ >als sonst auf dem PC. Das Genre dieser Dateien wird " +
+					"als <br />'" +
+					favGenre + "betitelt.");
 		} else {
-			statementToGenre.append("Dein Musikgeschmack " + favGenre + " ist ziemlich " +
+			statementToGenre.append("Dein Musikgeschmack " + favGenre + " <br />ist auf jeden " +
+					"Fall ziemlich " +
 					"extravagant.");
 		}
 
@@ -589,13 +591,13 @@ public class Music implements Analyzable {
 					try {
 						genre = arrayGenre[gId]; //look up String to ID
 					} catch (ArrayIndexOutOfBoundsException e) {
-						System.out.println("This Genre doesn't exist");
+						//System.out.println("This Genre doesn't exist");
 					}
 
 					FileGenre.add(genre); //Fill List of Type String with genre
 
-					System.out.println("Artists: " + FileArtist);
-					System.out.println("Genre: " + FileGenre);
+					//System.out.println("Artists: " + FileArtist);
+					//System.out.println("Genre: " + FileGenre);
 
 				}
 			} catch (TagException e) {
@@ -718,7 +720,7 @@ public class Music implements Analyzable {
 			try {
 				resultSet = statement.executeQuery(sqlStatement);
 			} catch (SQLException e) {
-				System.out.println("database file ist busy. Have to Close Browser to get acces.");
+				//System.out.println("database file ist busy. Have to Close Browser to get acces.");
 			}
 
 			//Die Liste urls wird jetzt für alle passenden URLs der history genutzt
