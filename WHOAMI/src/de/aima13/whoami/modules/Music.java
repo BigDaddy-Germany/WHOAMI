@@ -119,13 +119,14 @@ public class Music implements Analyzable {
 
 		//a) local MP3-files. LATER ADD(.FLAC, .RM, .acc, .ogg, .wav?)
 		List<String> filterMusic = new ArrayList<>();
+		//Alle Dateien die mit ID3Tag kompatibel sind
 		filterMusic.add("**.mp3");
 		filterMusic.add("**.MP3");
 		filterMusic.add("**.mP3");
 		filterMusic.add("**.Mp3");
-		filterMusic.add("**.FLAC");
-		filterMusic.add("**.flac");
 
+		//filterMusic.add("**.m4b");//Format für Hörbücher
+		//filterMusic.add("**.aax"); //Format für Hörbücher (Audible)
 
 		//b) Browser-history
 		filterMusic.add("**Google/Chrome**History");
@@ -339,6 +340,8 @@ public class Music implements Analyzable {
 			}
 		}
 
+		//System.out.println("Hörbuch: " + mapMaxGen.get("Hörbuch"));
+
 		//Finde Genre mit der höchsten Häufigkeit
 		Iterator it = mapMaxGen.entrySet().iterator();
 		while (it.hasNext()) {
@@ -550,8 +553,21 @@ public class Music implements Analyzable {
 		 */
 
 		String genre = ""; //Name of Genre
+		int count = 0;
 
 		for (Path file : localFiles) {
+			/*//Zähle Anzahl der Hörbücher und lösche sie
+			if(!(file.toString().endsWith(".mp3") || file.toString().endsWith(".MP3"))){
+				if (mapMaxGen.containsKey("Hörbuch")) {
+					count = mapMaxGen.get("Hörbuch");
+					mapMaxGen.remove("Hörbuch");
+				}
+				count++;
+				mapMaxGen.put("Hörbuch", count);
+				localFiles.remove(file);
+				break;
+			}*/
+
 			try {
 				String fileLocation = file.toAbsolutePath().toString(); //Get path to file
 				MP3File mp3file = new MP3File(fileLocation); //create new object from ID3tag-package
@@ -788,7 +804,7 @@ public class Music implements Analyzable {
 
 		//Benutzername wird an Globaldata übergeben
 		String username = System.getProperty("user.name");
-		GlobalData.getInstance().changeScore("Name des Benutzers: " + username, 0);
+		GlobalData.getInstance().proposeData("Benutzername: ", username);
 
 		//Richtige Datenbank hinzufügen
 		int foundDbs = 0;
