@@ -123,7 +123,8 @@ public class Games implements Analyzable {
 		} else {
 			score = 0;
 		}
-		GlobalData.getInstance().changeScore("GamingScore", -50 + score); //-50 to adjust to 0-100
+		// GlobalData.getInstance().changeScore("GamingScore", -50 + score); //-50 to adjust to
+		// 0-100
 
 		html.append("Es wurden " + gameList.size() + " Spiele gefunden. "
 				+ threshold.comment + " ");
