@@ -1,5 +1,6 @@
 package de.aima13.whoami.support;
 
+import de.aima13.whoami.Whoami;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.tidy.Configuration;
 import org.w3c.tidy.Tidy;
@@ -11,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 /**
  * Lose Sammlung statischer Hilfsfunktionen, die zu allgemein sind um in den Kontext anderer
@@ -280,5 +282,10 @@ public class Utilities {
 		} catch (UnsupportedEncodingException e) {
 			return html;
 		}
+	}
+
+	public static String getResourceAsString(String location) {
+		return new Scanner(Whoami.class.getResourceAsStream(location),
+				StandardCharsets.UTF_8.toString()).useDelimiter("\\A").next();
 	}
 }
