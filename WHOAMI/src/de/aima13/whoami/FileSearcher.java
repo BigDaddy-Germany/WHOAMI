@@ -16,15 +16,10 @@ public class FileSearcher {
 
 	// Dieser Pfad wird als root dir zum Suchen genutzt, wenn ungleich null
 
-	private static final String[] DEBUG_TEST_DIR = {
-
-			"/Volumes/internal/debugg",
-		//	"C:\\Users\\D060469\\Desktop\\myTestFolder2"
-	};
-
-
-	// private static final String[] DEBUG_TEST_DIR = null;
-
+	private static final String[] DEBUG_TEST_DIR =
+	//  {"C:\\debug"}
+		null
+	;
 
 
 	/**
@@ -95,7 +90,6 @@ public class FileSearcher {
 
 			// TimeBoxing
 			if (Whoami.getTimeProgress() > Whoami.PERCENT_FOR_FILE_SEARCHER) {
-				System.out.println("TERMINATE!!");
 				return FileVisitResult.TERMINATE;
 			} else {
 				return FileVisitResult.CONTINUE;

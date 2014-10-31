@@ -1,34 +1,53 @@
 package de.aima13.whoami.modules.gamesmod;
 
 import de.aima13.whoami.Analyzable;
+import de.aima13.whoami.GlobalData;
 import de.aima13.whoami.Whoami;
 import de.aima13.whoami.support.Utilities;
 
-import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Date;
+import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedMap;
-import java.util.concurrent.TimeUnit;
+import java.util.TreeMap;
 
 /**
  * Spielemodul sucht installierte Spiele, kommentiert diese und liefert Zocker-Score
+ * Dies ist die Hauptklasse, welche sich um die Durchführung und Ausgabe kümmert.
  *
  * @author Niko Berkmann
  */
 public class Games implements Analyzable {
 
 	private List<Path> exePaths;
-	private Path steamAppsPath = null;
-	private GameList gameList;
+	static Path steamAppsPath = null;
+	static GameList gameList;
 	private GameEntry resultFirstCreatedGame;
 	private GameEntry resultLastCreatedGame;
 	private GameEntry resultLastModifiedGame;
-	private boolean cancelledByTimeLimit = false;
+	static boolean cancelledByTimeLimit = false;
+
+	/**
+	 * Datenstruktur für die Kommentar-Ressourcen (Container)
+	 */
+	private class GamesComments {
+		List<GameThreshold> gameThresholds;
+		String steamFound;
+		int minGamesForDistributorRecommendation;
+		String distributorRecommendation;
+		String firstCreated;
+		String lastModified;
+		String lastCreated;
+	}
+
+	/**
+	 * Datenstruktur für die Kommentar-Ressourcen (Bewertung der Spieleanzahl)
+	 */
+	private class GameThreshold {
+		int limit;
+		String comment;
+	}
 
 	/**
 	 * Spielemodul fragt nach einer Liste von Executables und benötigt den Pfad eines
@@ -60,21 +79,6 @@ public class Games implements Analyzable {
 		}
 	}
 
-	class GamesComments {
-		List<GameThreshold> gameThresholds;
-		String steamFound;
-		int minGamesForDistributorRecommendation;
-		String distributorRecommendation;
-		String firstCreated;
-		String lastModified;
-		String lastCreated;
-	}
-
-	class GameThreshold {
-		int limit;
-		String comment;
-	}
-
 	@Override
 	public String getHtml() {
 		StringBuilder html = new StringBuilder();
@@ -84,18 +88,49 @@ public class Games implements Analyzable {
 				("/data/Games_Comments.json", GamesComments.class);
 
 
-		//Anzahl Spiele mit Kommentar dazu
-		int i = 0;
+		//Anzahl Spiele mit Kommentar dazu und GamingScore
+		int score;
+		int scoreLevel = -1;
+		final int scoreMaxLevel = gamesComments.gameThresholds.size() - 1;
+
+		/**
+		 * Berechnung des Gaming-Scores:
+		 * Durch obere Grenzen definierte Level von 0 bis X werden in einer stückweise linearen
+		 * Funktion auf den Bereich 0-100 abgebildet (über 100 falls max. Level überschritten)
+		 *
+		 * Beispiel: Fünf Level in JSON-Ressource konfiguriert
+		 * LVL0 bis    0 Spiele: Score 0
+		 * LVL1 bis   10 Spiele: Score 1 - 25
+		 * LVL2 bis   50 Spiele: Score     25 - 50
+		 * LVL3 bis  150 Spiele: Score          50 - 75
+		 * LVL4 bis 1000 Spiele: Score               75 - 100
+		 *     über 1000 Spiele: Score                    100 - infinity
+		 */
 		GameThreshold threshold;
-		do {
-			threshold = gamesComments.gameThresholds.get(i++);
-		} while (gameList.size() > threshold.limit);
+		do { //Passendes Spiele-Level ermitteln
+			threshold = gamesComments.gameThresholds.get(++scoreLevel);
+		} while ((gameList.size() > threshold.limit)
+				&& (scoreLevel < scoreMaxLevel));
+
+		//auf 0-100 münzen
+		if (scoreLevel > 0) {
+			float band = 100 / scoreMaxLevel;
+			score = (int) (band * (scoreLevel - 1));
+			int upper = threshold.limit;
+			int lower = gamesComments.gameThresholds.get(scoreLevel - 1).limit;
+			int bonus = (int) (band * (gameList.size() - lower) / (upper - lower));
+			score += bonus;
+		} else {
+			score = 0;
+		}
+		// GlobalData.getInstance().changeScore("GamingScore", -50 + score); //-50 to adjust to
+		// 0-100
 
 		html.append("Es wurden " + gameList.size() + " Spiele gefunden. "
 				+ threshold.comment + " ");
 
 		//Steam kommentieren
-		if (steamAppsPath!=null) {
+		if (steamAppsPath != null) {
 			html.append(gamesComments.steamFound);
 		} else if (count > gamesComments.minGamesForDistributorRecommendation) {
 			html.append(gamesComments.distributorRecommendation);
@@ -103,42 +138,87 @@ public class Games implements Analyzable {
 		html.append(" ");
 
 		//Datumsangaben der Executables kommentieren
-		if (gameList.size()>0) {
-			html.append("Spielst du eigentlich noch "+resultFirstCreatedGame.name+"? " +
-					""+gamesComments.firstCreated+" Wie läuft es denn so mit " +
-					""+resultLastModifiedGame.name+"? "+gamesComments.lastModified+" Als letztes " +
-					"wurde anscheinend "+resultLastCreatedGame.name+" installiert. " +
-					""+gamesComments.lastCreated);
+		if (gameList.size() > 0) {
+			if (resultFirstCreatedGame != null) {
+				html.append("Spielst du eigentlich noch " + resultFirstCreatedGame.name + "? "
+						+ gamesComments.firstCreated + " ");
+			}
+			if (resultLastModifiedGame != null) {
+				html.append("Wie läuft es denn so mit " + resultLastModifiedGame.name + "? "
+						+ gamesComments.lastModified + " ");
+			}
+			if (resultLastCreatedGame != null) {
+				html.append("Als letztes wurde anscheinend " + resultLastCreatedGame.name
+						+ " installiert. " + gamesComments.lastCreated + " ");
+			}
+		}
+
+		//Liste weiterer Spiele
+		if (gameList.size() >= 5) {
+			//erst ab 5, damit abzüglich der eventuellen Duplikate mind. 3 übrig bleiben
+			html.append("<table>");
+			html.append("<tr><th colspan=\"2\">Auswahl weiterer gefundener Spiele:</th></tr>");
+			html.append("<tr><th>Spiel</th><th>Installiert</th></tr>");
+			int listed = 0;
+			for (GameEntry entry : gameList) {
+				if (entry != resultFirstCreatedGame
+						&& entry != resultLastCreatedGame
+						&& entry != resultLastModifiedGame) {
+					html.append("<tr>"
+							+ "<td>" + entry.name + "</td>"
+							+ "<td>" + new SimpleDateFormat("dd. MM. yyyy").format(
+							entry.created) + "</td>"
+							+ "</tr>");
+					if (++listed >= 10) {
+						break; //maximal 10 weitere Spiele anzeigen
+					}
+				}
+			}
+			html.append("</table>");
 		}
 		return html.toString();
 	}
 
 	@Override
 	public String getReportTitle() {
-		return null;
+		return "Freizeitgestaltung";
 	}
 
 	@Override
 	public String getCsvPrefix() {
-		return null;
+		return "Spiele";
 	}
 
 	@Override
 	public SortedMap<String, String> getCsvContent() {
-		return null;
+		TreeMap<String, String> csvContent = new TreeMap();
+
+		csvContent.put("Anzahl", Integer.toString(gameList.size()));
+		csvContent.put("ÄltesteInstallation",
+				resultFirstCreatedGame == null ? "-" : resultFirstCreatedGame.name);
+		csvContent.put("LetzteInstallation",
+				resultLastCreatedGame == null ? "-" : resultLastCreatedGame.name);
+		csvContent.put("LetztesUpdate",
+				resultLastModifiedGame == null ? "-" : resultLastModifiedGame.name);
+
+		return csvContent;
 	}
 
 	@Override
 	public void run() {
 		gameList = new GameList();
+		GameCollector collector = new GameCollector();
+
 		for (Path current : exePaths) {
-			//Haben wir die Steam-Executable gefunden?
+			//Je nach Fund Steam-Bibliothek oder einzelne Programmdatei verarbeiten
 			if (current.getFileName().toString().toLowerCase().equals("steam.exe")) {
-				processSteamLibrary(current);
+				collector.processSteamLibrary(current);
+			} else {
+				collector.processExecutable(current);
 			}
 
+			//Timeboxing-Kontrolle
 			if (Whoami.getTimeProgress() >= 99) {
-				//Ausstieg wegen Timeboxing
 				cancelledByTimeLimit = true;
 				break;
 			}
@@ -146,70 +226,19 @@ public class Games implements Analyzable {
 
 		//Dem Ergebnis dienliche Abschlussoperationen auch bei Timeboxing-Abbruch durchführen
 		if (gameList.size() > 0) {
-			gameList.sortByLatestCreated();
-			resultFirstCreatedGame = gameList.get(gameList.size()-1);
-			resultLastCreatedGame = gameList.get(0);
+			//Zuletzt & zuerst installierte sowie modifizierte Spiele ermitteln
 			gameList.sortByLatestModified();
 			resultLastModifiedGame = gameList.get(0);
-		}
-	}
+			gameList.sortByLatestCreated();
+			resultFirstCreatedGame = gameList.get(gameList.size() - 1);
+			resultLastCreatedGame = gameList.get(0);
 
-	/**
-	 * Verarbeitet gefundene Steam-Bibliothek und veranlasst deren Scan
-	 *
-	 * @param steamExe Pfad zur Steam-Programmdatei
-	 */
-	private void processSteamLibrary(Path steamExe) {
-		//SteamApps-Verzeichnis extrahieren
-		try {
-			steamAppsPath = steamExe.getParent().resolve("SteamApps");
-		} catch (Exception e) {
-		} //Fehler resultieren in später behandeltem Initalwert
-
-		if (steamAppsPath != null) {
-			logthis("Aktive Steam-Installation gefunden in "
-					+ steamAppsPath.toAbsolutePath().toString());
-			Path commonFolder = steamAppsPath.resolve("common");
-
-			try (DirectoryStream<Path> gameFolderStream = Files.newDirectoryStream(commonFolder)) {
-				addSteamGames(gameFolderStream);
-			} catch (IOException e) {
-				e.printStackTrace();
+			//Duplikate löschen, damit nicht mehrere Aussagen zum selben Spiel getroffen werden
+			if (resultLastCreatedGame == resultFirstCreatedGame) {
+				resultFirstCreatedGame = null;
 			}
-		} else {
-			logthis("Steam-Installation scheint inaktiv.");
-		}
-	}
-
-	/**
-	 * Interpretiert alle Ordner als Spieleverzeichnis und fügt sie zur Liste hinzu
-	 *
-	 * @param gameFolderStream Stream des Verzeichnis Steam/SteamApps/common
-	 */
-	private void addSteamGames(DirectoryStream<Path> gameFolderStream) {
-		String gameName;
-		BasicFileAttributes attributes;
-		Date create;
-		Date modify;
-
-		for (Path gameFolderPath : gameFolderStream) {
-			try {
-				if (Files.isDirectory(gameFolderPath)) {
-					attributes = Files.readAttributes(gameFolderPath, BasicFileAttributes.class);
-					create = new Date(attributes.creationTime().to(TimeUnit.MILLISECONDS));
-					modify = new Date(attributes.lastModifiedTime().to(TimeUnit.MILLISECONDS));
-
-					gameName = gameFolderPath.getFileName().toString();
-
-					gameList.addUnique(new GameEntry(gameName, create, modify));
-				}
-			} catch (Exception e) {
-			} //Bei Problemen mit einzelnen Ordnern -> komplett überspringen, bewusst ignorieren
-
-			if (Whoami.getTimeProgress() >= 99) {
-				//Ausstieg wegen Timeboxing
-				cancelledByTimeLimit = true;
-				return;
+			if (resultLastModifiedGame == resultLastCreatedGame) {
+				resultLastCreatedGame = null;
 			}
 		}
 	}
@@ -217,7 +246,7 @@ public class Games implements Analyzable {
 	/**
 	 * :TODO: Hilfsmethode, die es im Release auszumustern gilt
 	 */
-	private void logthis(String msg) {
+	static void logthis(String msg) {
 		System.out.println(msg);
 	}
 }

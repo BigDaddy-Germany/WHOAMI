@@ -3,18 +3,14 @@ package de.aima13.whoami;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.PageSize;
-import com.itextpdf.text.html.simpleparser.HTMLWorker;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.tool.xml.XMLWorker;
 import com.itextpdf.tool.xml.XMLWorkerHelper;
 import com.itextpdf.tool.xml.exceptions.RuntimeWorkerException;
 import de.aima13.whoami.support.Utilities;
 import org.stringtemplate.v4.ST;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -78,17 +74,18 @@ public class ReportCreator {
 			// Metadaten hinzufügen
 			pdfFile.addAuthor(PDF_AUTHOR);
 			pdfFile.addTitle(PDF_TITLE);
-			pdfFile.addCreationDate();
 
 			// HTML-Worker erstellen, um HTML-Content zu schreiben
-			String htmlSource = this.getHtml();
+			String htmlSource = Utilities.convertHtmlToXhtml(this.getHtml());
+
 			ByteArrayInputStream htmlSourceInputStream = new ByteArrayInputStream(
-					htmlSource.getBytes(StandardCharsets.UTF_8.toString())
+					htmlSource.getBytes(StandardCharsets.UTF_8)
 			);
+
+
 			try {
-				System.out.println(htmlSource);
-				XMLWorkerHelper.getInstance().parseXHtml(writer, pdfFile, htmlSourceInputStream);
-				System.out.println("nach html worker");
+				XMLWorkerHelper.getInstance().parseXHtml(writer, pdfFile, htmlSourceInputStream,
+						StandardCharsets.UTF_8);
 			} catch (RuntimeWorkerException e) {
 				System.err.println("Parsen des Berichtes wegen fehlerhaftem HTML abgebrochen.");
 				System.err.println("Bericht nur bis zu fehlerhafter Stelle erstellt.");
