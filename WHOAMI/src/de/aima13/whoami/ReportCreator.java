@@ -136,11 +136,7 @@ public class ReportCreator {
 	 */
 	private String createHtml() {
 		// Template laden
-		ST template = new ST(
-				new Scanner(this.getClass().getResourceAsStream(TEMPLATE_LOCATION),
-						StandardCharsets.UTF_8.toString()).useDelimiter("\\A").next()
-				, '$', '$'
-		);
+		ST template = new ST(Utilities.getResourceAsString(TEMPLATE_LOCATION), '$', '$');
 
 		// Daten der Representables einfügen
 		for (Representable representable : representableList) {
