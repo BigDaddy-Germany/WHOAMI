@@ -1,6 +1,7 @@
 package de.aima13.whoami.modules;
 
 import de.aima13.whoami.Analyzable;
+import de.aima13.whoami.GlobalData;
 import de.aima13.whoami.Whoami;
 import de.aima13.whoami.support.DataSourceManager;
 import de.aima13.whoami.support.Utilities;
@@ -171,6 +172,9 @@ public class Studienrichtung implements Analyzable {
 		}
 		analyzePathNames(courseResult);
 		Collections.sort(courseResult, new EntryComparator());
+		if (!courseResult.isEmpty()){
+			GlobalData.getInstance().proposeData("Kurskürzel",courseResult.get(0).kurzbez);
+		}
 	}
 
 	/**
