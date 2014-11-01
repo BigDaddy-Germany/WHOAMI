@@ -2,6 +2,7 @@ package de.aima13.whoami.modules;
 
 import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.support.DataSourceManager;
+import de.aima13.whoami.support.Utilities;
 
 import java.nio.file.Path;
 import java.sql.ResultSet;
@@ -16,7 +17,7 @@ import java.util.*;
  */
 public class TopFive implements Analyzable {
 	private List<Path> browserDatabases = new ArrayList<Path>();
-	private SortedMap<String, Integer> results = new TreeMap<String, Integer>();
+	private TreeMap<String, Integer> results = new TreeMap<String, Integer>();
 	private SortedMap<String, String> csvOutput = new TreeMap<String, String>();
 	private String htmlOutput = "";
 	private boolean outputPrepared = false;
@@ -69,31 +70,7 @@ public class TopFive implements Analyzable {
 		return "Web";
 	}
 
-	/**
-	 * Methode iteriert über die Ergebnisse in der TreeMap. Und liefert den maximalen Wert der
-	 * TreeMap.
-	 *
-	 * @return Ergebnis ist der Eintrag der die meisten Klicks im Browser bekommen hat.
-	 *
-	 * @throws NoSuchElementException Sollte kein Element gefunden werden gibt auch kein Entry
-	 *                                der am höchsten ist.
-	 */
-	private Map.Entry<String, Integer> getHighestEntry() throws NoSuchElementException {
-		int maxValue = -1;
-		Map.Entry<String, Integer> highestEntry = null;
-		for (Map.Entry<String, Integer> entry : results.entrySet()) {
-			if (entry.getValue() > maxValue) {
-				highestEntry = entry;
-				maxValue = highestEntry.getValue();
-			}
-		}
-		if (null == highestEntry) {
-			throw new NoSuchElementException("Highest Value was not found");
-		} else {
-			return highestEntry;
-		}
 
-	}
 
 	@Override
 	public SortedMap<String, String> getCsvContent() {
@@ -164,7 +141,7 @@ public class TopFive implements Analyzable {
 				"</tr>");
 		for (int i = 0; i < 5; i++) {
 			try {
-				Map.Entry<String, Integer> highestEntry = getHighestEntry();
+				Map.Entry<String, Integer> highestEntry = Utilities.getHighestEntry(results);
 				String key = highestEntry.getKey();
 				String value = highestEntry.getValue().toString();
 				//Formatiere genau eine Zeile
