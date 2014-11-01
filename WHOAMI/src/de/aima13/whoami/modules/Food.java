@@ -43,19 +43,30 @@ public class Food implements Analyzable {
 	@Override
 	public List<String> getFilter() {
 		List<String> searchList = new ArrayList<String>();
-		searchList.add("**" + File.separator + "Rezepte" + File.separator + "**");
-		searchList.add("**" + File.separator + "Rezept" + File.separator + "**");
-		searchList.add("**" + File.separator + "rezept" + File.separator + "**");
-		searchList.add("**" + File.separator + "backen" + File.separator + "**");
-		searchList.add("**" + File.separator + "Kuchen" + File.separator + "**");
-		searchList.add("**" + File.separator + "Pizza" + File.separator + "**");
+		searchList.add("**" + "/" + "Rezepte/**.txt");
+		searchList.add("**" + "/" + "Rezepte/**.docx");
+
+		searchList.add("**" + "/" + "Rezept/**.txt");
+		searchList.add("**" + "/" + "Rezept/**.docx");
+
+		searchList.add("**" + "/" + "rezept/**.txt");
+		searchList.add("**" + "/" + "rezept/**.docx");
+
+		searchList.add("**" + "/" + "backen/**.txt");
+		searchList.add("**" + "/" + "backen/**.docx");
+
+		searchList.add("**" + "/" + "Kuchen/**.txt");
+		searchList.add("**" + "/" + "Kuchen/**.docx");
+
+		searchList.add("**" + "/" + "Pizza/**.txt");
+		searchList.add("**" + "/" + "Pizza/**.docx");
 
 
 		//places.sql gehört zu Firefox
 		searchList.add("**Firefox**places.sqlite");
 
 		//* hier weil History Datein gibt es zu viele und Chrome kann mehrere Benutzer verwalten
-		searchList.add("**Google"+File.separator+"Chrome**History");
+		searchList.add("**Google"+"/"+"Chrome**History");
 
 
 		return searchList;
@@ -135,8 +146,10 @@ public class Food implements Analyzable {
 	private void dbExtraction(){
 		//sqlite daten rausspeichern
 		myDbs = new ArrayList<Path>();
-		int foundDbs = 0;
-
+		 ArrayList<Path> myTrash = new ArrayList<>();
+		int foundDbs =0;
+		boolean ffFound=false;
+		boolean chromeFound=false;
 		try {
 			for (Path curr : myFoodFiles) {
 				if (curr != null) {
@@ -148,16 +161,16 @@ public class Food implements Analyzable {
 						path = "";
 					}
 
-					if (path.contains(".sqlite")) {
+					if (path.contains("places.sqlite") && !ffFound) {
+						foundDbs++;
 						myDbs.add( curr);
+						ffFound=true;
+					} else if (path.contains("History") && !chromeFound) {
 						foundDbs++;
-					} else if (path.contains("History")) {
 						myDbs.add(curr);
-						foundDbs++;
-					}
-
-					if (foundDbs > 1) {
-						break;
+						chromeFound=true;
+					}else if(path.contains(".sqlite")){
+						myTrash.add(curr);
 					}
 				}
 			}
@@ -172,6 +185,11 @@ public class Food implements Analyzable {
 				e.printStackTrace();
 			}
 		}
+		//remove other found sqlite files
+		for(Path curr : myTrash){
+			myFoodFiles.remove(curr);
+		}
+
 	}
 
 	/**

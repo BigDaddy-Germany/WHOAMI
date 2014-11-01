@@ -1,5 +1,7 @@
 package de.aima13.whoami;
 
+import de.aima13.whoami.support.DataSourceManager;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,5 +38,6 @@ public class SlaveDriver {
 				e.printStackTrace();
 			}
 		}
+		DataSourceManager.closeRemainingOpenConnections();
 	}
 }
