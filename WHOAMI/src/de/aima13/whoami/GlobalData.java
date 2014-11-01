@@ -1,6 +1,8 @@
 package de.aima13.whoami;
 
+import de.aima13.whoami.support.Utilities;
 import org.apache.commons.lang3.text.WordUtils;
+import org.stringtemplate.v4.ST;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +18,9 @@ public class GlobalData implements Representable {
 	private final String CSV_PREFIX = "global";
 	private final String CSV_PREFIX_SCORE = "score";
 	private final String CSV_PREFIX_DATA = "data";
+	private final String TEMPLATE_LOCATION = "/data/GlobalData_Output.html";
 	private final int MAX_SCORE_VALUE = 100;
+	private boolean dataProposalsAllowed = true;
 
 	// Zuordnung: Key - Value
 	private Map<String, Integer> globalScores = new HashMap<>();
@@ -32,10 +36,6 @@ public class GlobalData implements Representable {
 	private Map<String, String> globalDataResults;
 
 	/**
-	 * @todo Global Data muss Thread-safe sein
-	 */
-
-	/**
 	 * Instanz der Singleton-Klasse
 	 *
 	 * @author Marco Dörfler
@@ -49,20 +49,51 @@ public class GlobalData implements Representable {
 			this.calculateDataResults();
 		}
 
-		String html = "<b>Es wurden folgende Daten gefunden:</b><br />";
-		html += "<table border=\"1\"><tr><th>Name</th><th>Wert</th></tr>";
 
-		for (Map.Entry<String, Integer> score : this.globalScores.entrySet()) {
-			html += "<tr><td>Score " + score.getKey() + "</td><td>" + score.getValue().toString()
-					+ "</td></tr>";
+		// Template laden
+		ST template = new ST(Utilities.getResourceAsString(TEMPLATE_LOCATION), '$', '$');
+
+		// Liste der benötigten Headdaten
+		String[] headData = new String[] {
+				"firstName", "location", "street", "zipCode", "iban"
+		};
+
+		// Eventuell benötigte Headdaten hinzufügen
+		for (String dataKey : headData) {
+			if (this.globalDataResults.containsKey(dataKey)) {
+				template.add(dataKey, this.globalDataResults.get(dataKey));
+			} else {
+				template.add(dataKey, false);
+			}
 		}
-		for (Map.Entry<String, String> data : this.globalDataResults.entrySet()) {
-			html += "<tr><td>" + data.getKey() + "</td><td>" + data.getValue() + "</td></tr>";
+
+		// Globale Informationen hinzufügen, wenn vorhanden
+		if (!this.globalDataResults.isEmpty()) {
+			template.add("hasInformation", true);
+
+			// Daten vorhanden? -> füllen
+			for (Map.Entry<String, String> dataResult : this.globalDataResults.entrySet()) {
+				template.addAggr("information.{name, value}", dataResult.getKey(),
+						dataResult.getValue());
+			}
+		} else {
+			template.add("hasInformation", false);
 		}
 
-		html += "</table>";
+		// Scores hinzufügen, wenn vorhanden
+		if (!this.globalScores.isEmpty()) {
+			template.add("hasScores", true);
 
-		return html;
+			// Scores vorhanden? -> füllen
+			for (Map.Entry<String, Integer> score : this.globalScores.entrySet()) {
+				template.addAggr("scores.{name, value}", score.getKey(), score.getValue());
+			}
+		} else {
+			template.add("hasScores", false);
+		}
+
+		// Template rendern und zurückgeben
+		return template.render();
 	}
 
 	@Override
@@ -140,6 +171,9 @@ public class GlobalData implements Representable {
 	 * @author Marco Dörfler
 	 */
 	public synchronized void proposeData(String key, String value) {
+		if (!this.dataProposalsAllowed) {
+			throw new RuntimeException("No data proposals allowed after calculating the results!");
+		}
 		// Siehe Beschreibung oben - value to upper
 		value = value.toUpperCase();
 
@@ -169,6 +203,9 @@ public class GlobalData implements Representable {
 	 * @author Marco Dörfler
 	 */
 	public synchronized void changeScore(String key, int value) {
+		if (!this.dataProposalsAllowed) {
+			throw new RuntimeException("No score changes allowed after calculating the results!");
+		}
 		// Alle Scores werden mit der Hälfte des Maximums initialisiert
 		if (!this.globalScores.containsKey(key)) {
 			this.globalScores.put(key, MAX_SCORE_VALUE/2);
@@ -188,6 +225,9 @@ public class GlobalData implements Representable {
 	 * @author Marco Dörfler
 	 */
 	private void calculateDataResults() {
+		// Sobald diese Methode aufgerufen wurde, sind keine dataProposals mehr erlaubt
+		this.dataProposalsAllowed = false;
+
 		Map<String, String> dataResults = new HashMap<>();
 
 		// Iteriere über alle Keys
