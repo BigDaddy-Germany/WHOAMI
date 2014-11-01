@@ -3,12 +3,10 @@ package de.aima13.whoami.modules;
 import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.support.DataSourceManager;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-import java.nio.file.Path;
 
 /**
  * Created by Marvin on 16.10.14.
@@ -21,10 +19,8 @@ public class TopFive implements Analyzable {
 	private SortedMap<String, Integer> results = new TreeMap<String, Integer>();
 	private SortedMap<String, String> csvOutput = new TreeMap<String, String>();
 	private String htmlOutput = "";
+	private boolean outputPrepared = false;
 
-
-	public TopFive() {
-	}
 
 	/**
 	 * Methode spezifiziert die sqlite Datenbank die für uns von Interesse sind.
@@ -57,17 +53,20 @@ public class TopFive implements Analyzable {
 	 */
 	@Override
 	public String getHtml() {
+		if (!outputPrepared) {
+			prepareOutput();
+		}
 		return htmlOutput;
 	}
 
 	@Override
 	public String getReportTitle() {
-		return null;
+		return "Deine Internetaktivitäten";
 	}
 
 	@Override
 	public String getCsvPrefix() {
-		return null;
+		return "Web";
 	}
 
 	/**
@@ -90,8 +89,7 @@ public class TopFive implements Analyzable {
 		}
 		if (null == highestEntry) {
 			throw new NoSuchElementException("Highest Value was not found");
-		}
-		else {
+		} else {
 			return highestEntry;
 		}
 
@@ -99,6 +97,9 @@ public class TopFive implements Analyzable {
 
 	@Override
 	public SortedMap<String, String> getCsvContent() {
+		if (!outputPrepared) {
+			prepareOutput();
+		}
 		return csvOutput;
 	}
 
@@ -128,8 +129,7 @@ public class TopFive implements Analyzable {
 
 						if (results.containsKey(urlName) && visitCount > 0) {
 							results.put(urlName, visitCount + results.get(urlName));
-						}
-						else {
+						} else {
 							results.put(urlName, visitCount);
 						}
 					}
@@ -138,7 +138,7 @@ public class TopFive implements Analyzable {
 				// kann nicht auf Spalten zugreifen oder Ergebnis leer
 			} finally {
 				//ResultSet,Statement close
-				if (mostVisited != null){
+				if (mostVisited != null) {
 					try {
 						mostVisited.close();
 						mostVisited.getStatement().close();
@@ -148,8 +148,6 @@ public class TopFive implements Analyzable {
 				}
 			}
 		}
-		// Erzeuge immer egal ob for schleife durchlaufen wurde oder nicht
-		prepareOutput();
 	}
 
 	/**
@@ -185,11 +183,11 @@ public class TopFive implements Analyzable {
 		}
 		if (resultExists) {
 			htmlOutput = stringBuffer.append("</table>").toString();
-		}
-		else {
+		} else {
 			htmlOutput = "<b>Leider lieferte das Modul der TOP5 Webseiten keinerlei Ergebnisse! " +
 					"Du scheinst deine Spuren gut zu verwischen!</b>";
 		}
+		outputPrepared = true;
 	}
 
 	/**
@@ -213,8 +211,7 @@ public class TopFive implements Analyzable {
 						"GROUP BY rev_host " +
 						"ORDER BY visit_count DESC " +
 						"LIMIT 5;");
-			}
-			else if (sqliteDb.toString().contains("Chrome")) {
+			} else if (sqliteDb.toString().contains("Chrome")) {
 				mostVisited = dbManager.querySqlStatement(
 						"SELECT SUM(visit_count) visit_count ,substr(B.url, 0 ,instr(B.url," +
 								"'/')) hosts FROM (SELECT visit_count," +
