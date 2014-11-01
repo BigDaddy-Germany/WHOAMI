@@ -83,6 +83,10 @@ public class FileSearcher {
 
 						// Zuweisung durchführen
 						this.resultMap.get(matcherEntry.getKey()).add(file);
+						if (Math.random() < 0.001){
+							GuiManager.updateProgress(file.getFileName()+ " scheint wohl von " +
+									"Interesse zu sein...");
+						}
 					}
 				}
 
@@ -124,7 +128,9 @@ public class FileSearcher {
 	 */
 	public static void startSearch(List<Analyzable> analyzables) {
 		// Sammelt alle Ergebnisse über alle gestarteten FileWalks
+		GuiManager.updateProgress("File Patterns werden geladen...");
 		FileFinder fileFinder = new FileFinder(getMatchers(analyzables));
+
 		// Starten des Finders ausgelagert, da dies mit Debug-Option komplexer ist
 		startFinder(fileFinder);
 
@@ -132,6 +138,7 @@ public class FileSearcher {
 		Map<Analyzable, List<Path>> results = fileFinder.getResults();
 
 		// Durch Module iterieren und Ergebnisse zurweisen
+		GuiManager.updateProgress("Datenpakete werden geschnürt...");
 		for (Map.Entry<Analyzable, List<Path>> resultEntry : results.entrySet()) {
 			try {
 				resultEntry.getKey().setFileInputs(new ArrayList<> (resultEntry.getValue()));
@@ -197,6 +204,7 @@ public class FileSearcher {
 			// Alle verfügbaren Laufwerke iterieren und Suche starten
 			File[] roots = File.listRoots();
 			for (File root : roots) {
+				GuiManager.updateProgress("Fange an zu suchen auf...  "+root.toString());
 				if (Whoami.getTimeProgress() > Whoami.PERCENT_FOR_FILE_SEARCHER) {
 					break;
 				}
@@ -209,6 +217,7 @@ public class FileSearcher {
 			}
 		} else {
 			// Nur in den angegebenen Ordnern suchen
+			GuiManager.updateProgress("Durchsuche die DebugOption Ordner");
 			for (String testDir : DEBUG_TEST_DIR) {
 				if (Whoami.getTimeProgress() > Whoami.PERCENT_FOR_FILE_SEARCHER) {
 					break;
