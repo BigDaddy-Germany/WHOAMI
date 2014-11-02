@@ -266,11 +266,19 @@ public class Music implements Analyzable {
 
 	@Override
 	public String getReportTitle() {
+		/**
+		 * @param
+		 * @return static final String TITLE
+		 */
 		return TITLE;
 	}
 
 	@Override
 	public String getCsvPrefix() {
+		/**
+		 * @param
+		 * @return static final String TITLE
+		 */
 		return TITLE;
 	}
 
@@ -307,8 +315,8 @@ public class Music implements Analyzable {
 	public void scoreFavGenre() {
 		/**
 		 * Sucht aus der Liste aller Genres das Lieblingsgenre heraus
-		 * @return String favGenre
-		 * @param ArrayList<String> fileArtist
+		 * @return void
+		 * @param
 		 */
 
 		int max = 0; // Häufigkeit des am meisten existierenden Genre
@@ -380,7 +388,7 @@ public class Music implements Analyzable {
 		 * damit im html-Output ein Kommentar zum Genre abgegeben werden kann.
 		 *
 		 * @return void
-		 * @param byte genreByte
+		 * @param String stmtGenre
 		 */
 
 		StringBuilder statementToGenre = new StringBuilder();
@@ -498,7 +506,7 @@ public class Music implements Analyzable {
 		/**
 		 * Sucht aus einer Liste aller Artisten des Lieblingsartisten heraus
 		 *
-		 * @param ArrayList<String> FileArtist
+		 * @param
 		 * @return void
 		 */
 
@@ -545,6 +553,7 @@ public class Music implements Analyzable {
 		 * @param ArrayList<File> localFiles
 		 * @return void
 		 * @remark benutzt Bibliothek "jid3lib-0.5.4.jar"
+		 * @exception org.farng.mp3.TagException, FileNotFoundException, UnsupportedOperationException
 		 */
 
 		String genre = ""; //Name of Genre
@@ -618,6 +627,12 @@ public class Music implements Analyzable {
 	/////////////////////////////////////////
 
 	public void checkNativeClients() {
+		/**
+		 * Überprüft welche Musikprogramme gefunden wurden
+		 *
+		 * @return void
+		 * @param
+		 */
 		String clients[] = new String[4];
 		int count = 0;
 
@@ -689,8 +704,10 @@ public class Music implements Analyzable {
 		/**
 		 * Durchsucht den Browser-Verlauf auf bekannte Musikportale
 		 *
-		 * @param browserFiles
+		 * @param String searchUrl[] Bekommt den final static String[] MY_SEARCH_DELIEVERY_URLS
 		 * @return void
+		 * @exception java.sql.SQLException, ClassNotFoundException, IndexOutOfBoundException,
+		 * NullPointerException, Exception
 		 */
 
 		dbExtraction();
@@ -792,9 +809,9 @@ public class Music implements Analyzable {
 	private void dbExtraction() {
 		/**
 		 *
-		 *
 		 * @param
 		 * @retrun void
+		 * @exception Exception
 		 */
 
 		//Benutzername wird an Globaldata übergeben

@@ -2,13 +2,12 @@ package de.aima13.whoami.modules;
 
 import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.support.DataSourceManager;
+import de.aima13.whoami.support.Utilities;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-import java.nio.file.Path;
 
 /**
  * Created by Marvin on 16.10.14.
@@ -18,13 +17,11 @@ import java.nio.file.Path;
  */
 public class TopFive implements Analyzable {
 	private List<Path> browserDatabases = new ArrayList<Path>();
-	private SortedMap<String, Integer> results = new TreeMap<String, Integer>();
+	private TreeMap<String, Integer> results = new TreeMap<String, Integer>();
 	private SortedMap<String, String> csvOutput = new TreeMap<String, String>();
 	private String htmlOutput = "";
+	private boolean outputPrepared = false;
 
-
-	public TopFive() {
-	}
 
 	/**
 	 * Methode spezifiziert die sqlite Datenbank die für uns von Interesse sind.
@@ -57,48 +54,29 @@ public class TopFive implements Analyzable {
 	 */
 	@Override
 	public String getHtml() {
+		if (!outputPrepared) {
+			prepareOutput();
+		}
 		return htmlOutput;
 	}
 
 	@Override
 	public String getReportTitle() {
-		return null;
+		return "Deine Internetaktivitäten";
 	}
 
 	@Override
 	public String getCsvPrefix() {
-		return null;
+		return "Web";
 	}
 
-	/**
-	 * Methode iteriert über die Ergebnisse in der TreeMap. Und liefert den maximalen Wert der
-	 * TreeMap.
-	 *
-	 * @return Ergebnis ist der Eintrag der die meisten Klicks im Browser bekommen hat.
-	 *
-	 * @throws NoSuchElementException Sollte kein Element gefunden werden gibt auch kein Entry
-	 *                                der am höchsten ist.
-	 */
-	private Map.Entry<String, Integer> getHighestEntry() throws NoSuchElementException {
-		int maxValue = -1;
-		Map.Entry<String, Integer> highestEntry = null;
-		for (Map.Entry<String, Integer> entry : results.entrySet()) {
-			if (entry.getValue() > maxValue) {
-				highestEntry = entry;
-				maxValue = highestEntry.getValue();
-			}
-		}
-		if (null == highestEntry) {
-			throw new NoSuchElementException("Highest Value was not found");
-		}
-		else {
-			return highestEntry;
-		}
 
-	}
 
 	@Override
 	public SortedMap<String, String> getCsvContent() {
+		if (!outputPrepared) {
+			prepareOutput();
+		}
 		return csvOutput;
 	}
 
@@ -128,8 +106,7 @@ public class TopFive implements Analyzable {
 
 						if (results.containsKey(urlName) && visitCount > 0) {
 							results.put(urlName, visitCount + results.get(urlName));
-						}
-						else {
+						} else {
 							results.put(urlName, visitCount);
 						}
 					}
@@ -138,7 +115,7 @@ public class TopFive implements Analyzable {
 				// kann nicht auf Spalten zugreifen oder Ergebnis leer
 			} finally {
 				//ResultSet,Statement close
-				if (mostVisited != null){
+				if (mostVisited != null) {
 					try {
 						mostVisited.close();
 						mostVisited.getStatement().close();
@@ -148,8 +125,6 @@ public class TopFive implements Analyzable {
 				}
 			}
 		}
-		// Erzeuge immer egal ob for schleife durchlaufen wurde oder nicht
-		prepareOutput();
 	}
 
 	/**
@@ -166,7 +141,7 @@ public class TopFive implements Analyzable {
 				"</tr>");
 		for (int i = 0; i < 5; i++) {
 			try {
-				Map.Entry<String, Integer> highestEntry = getHighestEntry();
+				Map.Entry<String, Integer> highestEntry = Utilities.getHighestEntry(results);
 				String key = highestEntry.getKey();
 				String value = highestEntry.getValue().toString();
 				//Formatiere genau eine Zeile
@@ -185,11 +160,11 @@ public class TopFive implements Analyzable {
 		}
 		if (resultExists) {
 			htmlOutput = stringBuffer.append("</table>").toString();
-		}
-		else {
+		} else {
 			htmlOutput = "<b>Leider lieferte das Modul der TOP5 Webseiten keinerlei Ergebnisse! " +
 					"Du scheinst deine Spuren gut zu verwischen!</b>";
 		}
+		outputPrepared = true;
 	}
 
 	/**
@@ -213,8 +188,7 @@ public class TopFive implements Analyzable {
 						"GROUP BY rev_host " +
 						"ORDER BY visit_count DESC " +
 						"LIMIT 5;");
-			}
-			else if (sqliteDb.toString().contains("Chrome")) {
+			} else if (sqliteDb.toString().contains("Chrome")) {
 				mostVisited = dbManager.querySqlStatement(
 						"SELECT SUM(visit_count) visit_count ,substr(B.url, 0 ,instr(B.url," +
 								"'/')) hosts FROM (SELECT visit_count," +
