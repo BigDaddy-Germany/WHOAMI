@@ -3,6 +3,7 @@ package de.aima13.whoami.modules;
 import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.GlobalData;
 import de.aima13.whoami.Whoami;
+import de.aima13.whoami.support.DataSourceManager;
 import org.farng.mp3.MP3File;
 import org.farng.mp3.TagException;
 import org.farng.mp3.id3.AbstractID3v2;
@@ -30,6 +31,7 @@ public class Music implements Analyzable {
 	ArrayList<String> FileArtist = new ArrayList<>();
 	ArrayList<String> FileGenre = new ArrayList<>();
 	ArrayList<String> urls = new ArrayList<>();
+	ResultSet mostVisited = null;
 	Map<String, Integer> mapMaxApp = new HashMap<>();//Map: Artist - Häufigkeit
 	Map<String, Integer> mapMaxGen = new HashMap<>();//Map Genre - Häufigkeit
 
@@ -95,13 +97,13 @@ public class Music implements Analyzable {
 		getFilter();
 		readId3Tag();
 		checkNativeClients();
-		readBrowser(MY_SEARCH_DELIEVERY_URLS);
+		readBrowser();
 
-		if (Whoami.getTimeProgress() >= 99) {
+		/*if (Whoami.getTimeProgress() >= 99) {
 			//Ausstieg wegen Timeboxing
 			cancelledByTimeLimit = true;
 			return;
-		}
+		}*/
 	}
 
 
@@ -160,15 +162,23 @@ public class Music implements Analyzable {
 					"Informationen zu Musik gefunden werden.");
 		}
 
+		//Benutzername wird an Globaldata übergeben
+		String username = System.getProperty("user.name");
+		GlobalData.getInstance().proposeData("Benutzername", username);
+
+
 		//Spalte die Liste in drei Unterlisten:
 		for (Path element : musicDatabases) {
+			String path = element.toString();
+
 			if (element.toString().contains(".mp3") || element.toString().contains(".flac") ||
 					element.toString().contains(".FLAC") || element.toString().contains(".MP3")) {
 				localFiles.add(element); // Liste der lokalen Audiodateien von denen der ID3Tag
 				// ausgelesen wird
 			} else if (element.toString().contains(".exe")) {
 				exeFiles.add(element); //Liste aller ausführbarer Musikprogramme
-			} else {
+			} else if(path.contains(".sqlite") || (path.endsWith("\\History") && path.contains
+					(username))){
 				browserFiles.add(element);
 			}
 
@@ -178,6 +188,8 @@ public class Music implements Analyzable {
 				break;
 			}
 		}
+
+		musicDatabases.clear();
 	}
 
 	///////////////////////////////////////////////////////
@@ -221,7 +233,7 @@ public class Music implements Analyzable {
 		buffer.append("</table>");
 
 		// Abschlussfazit des Musikmoduls
-		if (musicDatabases.isEmpty()) {
+		if (localFiles.isEmpty() && browserFiles.isEmpty() && exeFiles.isEmpty()) {
 			buffer.append("Es wurden keine Informationen gefunden um den scheinbar " +
 					"sehr geheimen Musikgeschmack des Users zu analysieren.");
 		} else if (!(onlService.equals("")) && !(favArtist.equals("")) && !(favGenre.equals(""))
@@ -323,7 +335,6 @@ public class Music implements Analyzable {
 		int count; // Häufigkeit des aktuellen Genre
 
 		FileGenre.removeAll(Arrays.asList("", null)); //Lösche leere Einträge
-
 
 		//Ordne einem Genre seine Häufigkeit zu
 		for (String each : FileGenre) {
@@ -700,7 +711,7 @@ public class Music implements Analyzable {
 	/////////////////////////////////////////
 
 
-	public void readBrowser(String searchUrl[]) {
+	public void readBrowser() {
 		/**
 		 * Durchsucht den Browser-Verlauf auf bekannte Musikportale
 		 *
@@ -710,12 +721,87 @@ public class Music implements Analyzable {
 		 * NullPointerException, Exception
 		 */
 
-		dbExtraction();
-		Connection connection = null;
-		ResultSet resultSet = null;
-		Statement statement = null;
+		for (Path db : browserFiles) {
+			try {
+				mostVisited = dbExtraction(db, MY_SEARCH_DELIEVERY_URLS);
+				while (mostVisited.next()) {
+					String urlName = "";
 
-		try {
+					urlName = mostVisited.getString("hosts");
+					if (urlName != null && !urlName.equals("")) {
+						if (db.toString().contains("Firefox")) {
+							//Firefox Korrektur da Bsp.
+							// ed.miehnnam-wbhd.nalpsgnuselrov. -> vorlesungsplan.dhbw-mannheim.de
+							urlName = new StringBuffer(urlName).reverse().substring(1);
+						}
+						if (!(urls.contains(urlName))) {
+							urls.add(urlName);
+						}
+					}
+				}
+			} catch (SQLException e) {
+				// kann nicht auf Spalten zugreifen oder Ergebnis leer
+			} finally {
+				//ResultSet,Statement close
+				if (mostVisited != null) {
+					try {
+						mostVisited.close();
+						mostVisited.getStatement().close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+
+			// Füge den String onlServices als Aufzählung zusammen
+			for (int i = 1; i < urls.size(); i++) {
+				String curr = urls.get(i);
+				if (curr.contains("youtube.com") && !(onlService.contains("youtube.com"))) {
+					if (onlService.isEmpty()) {
+						onlService += "youtube.com";
+					} else {
+						onlService += ", youtube.com";
+					}
+				}
+				if (curr.contains("myvideo.de") && !(onlService.contains("myvideo.de"))) {
+					if (onlService.isEmpty()) {
+						onlService += "myvideo.de";
+					} else {
+						onlService += ", myvideo.de";
+					}
+				}
+				if (curr.contains("soundcloud.com") && !(onlService.contains("soundcloud.com"))) {
+					if (onlService.isEmpty()) {
+						onlService += "soundcloud.com";
+					} else {
+						onlService += ", soundcloud.com";
+					}
+				}
+				if (curr.contains("dailymotion.com") && !(onlService.contains("dailymotion.com"))) {
+					if (onlService.isEmpty()) {
+						onlService += "dailymotion.com";
+					} else {
+						onlService += ", dailymotion.com";
+					}
+				}
+				if (curr.contains("deezer.com") && !(onlService.contains("deezer.com"))) {
+					if (onlService.isEmpty()) {
+						onlService += "deezer.com";
+					} else {
+						onlService += ", deezer.com";
+					}
+				}
+
+			}
+
+
+			//dbExtraction();
+			//Connection connection = null;
+			//ResultSet resultSet = null;
+			//Statement statement = null;
+
+		/*try {
 			//Zusammenfügen des SQL-Statements aus der WhiteListe der Onlineseiten
 			String sqlStatement = "SELECT * FROM urls WHERE url LIKE '%" + searchUrl[0] + "%'";
 			for (int i = 1; i < searchUrl.length; i++) {
@@ -802,53 +888,42 @@ public class Music implements Analyzable {
 		} catch (ClassNotFoundException e) {
 		} catch (SQLException e) {
 		} catch (IndexOutOfBoundsException e) {
-		}
+		}*/
+
 	}
 
+	private ResultSet dbExtraction(Path sqliteDb, String searchUrl[]) {
 
-	private void dbExtraction() {
-		/**
-		 *
-		 * @param
-		 * @retrun void
-		 * @exception Exception
-		 */
-
-		//Benutzername wird an Globaldata übergeben
-		String username = System.getProperty("user.name");
-		GlobalData.getInstance().proposeData("Benutzername", username);
-
-		//Richtige Datenbank hinzufügen
-		int foundDbs = 0;
+		DataSourceManager dbManager = null;
 		try {
-			for (Path curr : browserFiles) {
-				if (curr != null) {
-					String path = "";
-					try {
-						path = curr.toString();
-					} catch (Exception e) {
-					}
-
-					//Unterscheidung zwischen Firefox und Chrome Datenbank
-					if (path.contains(".sqlite")) {
-						urls.add(path);
-						foundDbs++;
-					} else if (path.endsWith("\\History") && path.contains(username)) {
-						urls.add(path);
-						foundDbs++;
-					}
-					if (foundDbs > 1) {
-						break;
-					}
+			dbManager = new DataSourceManager(sqliteDb);
+			if (sqliteDb.toString().contains("Firefox")) {
+				String sqlStatement = "SELECT SUM(moz_places.visit_count) " +
+						"visit_count, " +
+						"moz_places.rev_host hosts " +
+						"FROM moz_places " +
+						"WHERE moz_places.rev_host hosts LIKE '%" + searchUrl[0] + "%'";
+				for (int i = 1; i < searchUrl.length; i++) {
+					sqlStatement += "OR moz_places.rev_host hosts LIKE '%" + searchUrl[i] + "%' ";
 				}
 
-				if (Whoami.getTimeProgress() >= 99) {
-					//Ausstieg wegen Timeboxing
-					cancelledByTimeLimit = true;
-					return;
+				mostVisited = dbManager.querySqlStatement(sqlStatement);
+
+			} else if (sqliteDb.toString().contains("Chrome")) {
+				String sqlStatement = "SELECT * " +
+						"FROM urls " +
+						"WHERE urls LIKE '%" + searchUrl[0] + "%'";
+						;
+				for (int i = 1; i < searchUrl.length; i++) {
+					sqlStatement += "OR urls LIKE '%" + searchUrl[i] + "%' ";
 				}
+				mostVisited = dbManager.querySqlStatement(sqlStatement);
 			}
-		} catch (Exception e) {
+		} catch (ClassNotFoundException | SQLException e) {
+			// Deadlock auf DB
 		}
+
+		System.out.println("most visited: " + mostVisited);
+		return mostVisited;
 	}
 }
