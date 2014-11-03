@@ -29,6 +29,15 @@ public class SyntaxAnalyzer implements Analyzable {
 	private final String CSV_PREFIX = "syntaxcheck";
 	private final String REPORT_TITLE = "Syntaxcheck";
 
+	/**
+	 * Es soll nur eine Stichprobe von Dateien pro Sprache geparst werden, um zu vermeiden,
+	 * dass die Laufzeit durch ANTLR zu hoch wird
+	 * Durch späteren Zufall soll eine Auswahl getroffen werden,
+	 * welche später eine repräsentative Sicht auf die Qualität des Codings zu bieten
+	 */
+	private final int MAX_FILES_PER_LANGUAGE = 250;
+	private final String[] FORBIDDEN_CONTAINS = {"jdk", "jre", "adt", "tex"};
+
 	private Map<LanguageSetting, List<Path>> languageFilesMap;
 	private List<String> moduleFilter;
 	private Map<LanguageSetting, Map<CHECK_RESULT, Integer>> syntaxCheckResults;
@@ -107,6 +116,19 @@ public class SyntaxAnalyzer implements Analyzable {
 
 		// Iteriere über Dateien
 		for (Path file : files) {
+			// Auf verbotene Substrings prüfen
+			boolean containsForbidden = false;
+			for (String substr : this.FORBIDDEN_CONTAINS) {
+				if (file.toAbsolutePath().toString().toLowerCase().contains(substr)) {
+					containsForbidden = true;
+					break;
+				}
+			}
+			if (containsForbidden) {
+				continue;
+			}
+
+
 			// Versuche Liste der Dateien zu erreichen und füge Datei ein
 			List<Path> fileList = extensionFilesMap.get(Utilities.getFileExtenstion(file
 					.toString()));
@@ -175,6 +197,7 @@ public class SyntaxAnalyzer implements Analyzable {
 		// Alle Programmiersprachen durchgehen
 		for (Map.Entry<LanguageSetting, List<Path>> languageFilesEntry : this
 				.languageFilesMap.entrySet()) {
+
 			// ResultSet für diese Sprache initialisieren
 			Map<CHECK_RESULT, Integer> checkResults = new HashMap<>();
 			// Für jedes existente Result den Wert 0 initialisieren
@@ -182,23 +205,35 @@ public class SyntaxAnalyzer implements Analyzable {
 				checkResults.put(result, 0);
 			}
 
-			// Alle Dateien der Sprache parsen
-			for (Path file : languageFilesEntry.getValue()) {
-				// Timeboxing prüfen
-				if (Whoami.getTimeProgress() > 99) {
-					return;
+			// Liste der Dateien in möglichst gleichgroßen Sürüngen so durchgehen,
+			// dass die maximale Anzahl an Dateien nicht überschritten wird
+			Path[] files = languageFilesEntry.getValue().toArray(new Path[languageFilesEntry
+					.getValue().size()]);
+
+			if (files.length > 0) {
+				int jump;
+				if (files.length > MAX_FILES_PER_LANGUAGE) {
+					jump = files.length / MAX_FILES_PER_LANGUAGE;
+				} else {
+					jump = 1;
 				}
 
-				CHECK_RESULT checkResult = this.checkSyntax(languageFilesEntry.getKey(), file);
-				// Entsprechende Summe der Results um eins erhöhen
-				checkResults.put(checkResult, checkResults.get(checkResult) + 1);
+				for (int currentIndex = 0; currentIndex / jump < MAX_FILES_PER_LANGUAGE; currentIndex += jump) {
+					// Timeboxing und ArrayIndex prüfen
+					if (Whoami.getTimeProgress() > 99 || currentIndex >= files.length) {
+						break;
+					}
+
+					Path file = files[currentIndex];
+					CHECK_RESULT checkResult = this.checkSyntax(languageFilesEntry.getKey(), file);
+					// Entsprechende Summe der Results um eins erhöhen
+					checkResults.put(checkResult, checkResults.get(checkResult) + 1);
+				}
 			}
 
 			// Ergebnisse für diese Sprache speichern
 			this.syntaxCheckResults.put(languageFilesEntry.getKey(), checkResults);
 		}
-
-		int i = 0;
 	}
 
 	/**
@@ -252,7 +287,10 @@ public class SyntaxAnalyzer implements Analyzable {
 				return CHECK_RESULT.SYNTAX_ERROR;
 			}
 
-		} catch (IOException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+		} catch (Exception e) {
+			// Pokemon Exception Handling - Catch them all!
+			//
+			// Wenn wir was nicht parsen könne, können wir es nicht parsen
 			// Hier landen wir nur, wenn etwas schief gegangen ist. Was genau ist eigentlich
 			// uninteressant. Wichtig ist: Wir können die Datei nicht parsen. Warum auch immer.
 			return CHECK_RESULT.CANT_PARSE;
