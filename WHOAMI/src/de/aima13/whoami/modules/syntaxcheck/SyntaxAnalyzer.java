@@ -1,8 +1,8 @@
-package de.aima13.whoami.modules.coding;
+package de.aima13.whoami.modules.syntaxcheck;
 
 import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.Whoami;
-import de.aima13.whoami.modules.coding.languages.LanguageSetting;
+import de.aima13.whoami.modules.syntaxcheck.languages.LanguageSetting;
 import de.aima13.whoami.support.Utilities;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -26,8 +26,8 @@ import java.util.*;
  * Created by Marco Dörfler on 28.10.14.
  */
 public class SyntaxAnalyzer implements Analyzable {
-	private final String CSV_PREFIX = "coding";
-	private final String REPORT_TITLE = "Code-Analyse";
+	private final String CSV_PREFIX = "syntaxcheck";
+	private final String REPORT_TITLE = "Syntaxcheck";
 
 	private Map<LanguageSetting, List<Path>> languageFilesMap;
 	private List<String> moduleFilter;
@@ -45,7 +45,8 @@ public class SyntaxAnalyzer implements Analyzable {
 	public SyntaxAnalyzer() {
 		this.languageFilesMap = new HashMap<>();
 
-		Reflections reflections = new Reflections("de.aima13.whoami.modules.coding.languages" +
+		Reflections reflections = new Reflections("de.aima13.whoami.modules.syntaxcheck" +
+				".languages" +
 				".settings");
 
 		Set<Class<? extends LanguageSetting>> settingClasses = reflections.getSubTypesOf
