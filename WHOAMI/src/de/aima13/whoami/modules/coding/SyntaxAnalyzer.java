@@ -25,7 +25,7 @@ import java.util.*;
  *
  * Created by Marco Dörfler on 28.10.14.
  */
-public class CodeAnalyzer implements Analyzable {
+public class SyntaxAnalyzer implements Analyzable {
 	private final String CSV_PREFIX = "coding";
 	private final String REPORT_TITLE = "Code-Analyse";
 
@@ -42,7 +42,7 @@ public class CodeAnalyzer implements Analyzable {
 	 *
 	 * @author Marco Dörfler
 	 */
-	public CodeAnalyzer() {
+	public SyntaxAnalyzer() {
 		this.languageFilesMap = new HashMap<>();
 
 		Reflections reflections = new Reflections("de.aima13.whoami.modules.coding.languages" +
