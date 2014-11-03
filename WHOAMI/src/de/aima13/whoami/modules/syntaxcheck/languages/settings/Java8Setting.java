@@ -1,8 +1,8 @@
-package de.aima13.whoami.modules.coding.languages.settings;
+package de.aima13.whoami.modules.syntaxcheck.languages.settings;
 
-import de.aima13.whoami.modules.coding.languages.LanguageSetting;
-import de.aima13.whoami.modules.coding.languages.antlrgen.Java8Lexer;
-import de.aima13.whoami.modules.coding.languages.antlrgen.Java8Parser;
+import de.aima13.whoami.modules.syntaxcheck.languages.LanguageSetting;
+import de.aima13.whoami.modules.syntaxcheck.languages.antlrgen.Java8Lexer;
+import de.aima13.whoami.modules.syntaxcheck.languages.antlrgen.Java8Parser;
 
 /**
  * Einstellungen für die Sprache Java (Version Java 8)
