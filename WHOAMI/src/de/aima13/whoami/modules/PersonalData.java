@@ -26,7 +26,9 @@ public class PersonalData implements Analyzable {
 			" WHERE LOWER(fieldname) LIKE '%nachname%' OR LOWER(fieldname) LIKE '%lastname%'" +
 			" GROUP BY value ORDER BY SUM(timesUsed) DESC";
 	private static final String SELECT_EMAIL="SELECT LOWER(value) AS value,SUM(timesUsed) AS hcnt" +
-			" FROM moz_formhistory WHERE LOWER(fieldname) LIKE '%mail%' AND value" +
+			" FROM moz_formhistory WHERE (LOWER(fieldname) LIKE '%mail%' OR LOWER(fieldname) LIKE" +
+			" '%login%' OR LOWER(fieldname) LIKE 'id'" +
+			" ) AND value" +
 			" LIKE '%@%' GROUP BY LOWER(value) ORDER BY SUM(timesUsed) DESC";
 	private static final String SELECT_PLACE="SELECT value,SUM(timesUsed) AS hcnt " +
 			"FROM moz_formhistory WHERE LOWER(fieldname) LIKE '%ort%' " +
@@ -300,7 +302,7 @@ public class PersonalData implements Analyzable {
 		if(myDbResults!=null){
 			if(myDbResults.size()>0){
 				for(SqlSelectSaver curr: myDbResults){
-					GlobalData.getInstance().proposeData(curr.title,curr.value);
+					GlobalData.getInstance().proposeData(curr.title,curr.value,curr.hitCount);
 				}
 				//Speicher freigeben:
 				//myDbResults=null;
