@@ -4,38 +4,51 @@ import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.support.Utilities;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.SortedMap;
+import java.util.*;
 
 /**
- * Created by D060469 on 03.11.14.
+ * Modul zum Analysieren der Häufigkeit der verschiedenen Programmiersprachen,
+ * die der Nutzer verwendet
+ *
+ * Created by Marco Dörfler on 03.11.14.
  */
 public class CodeStatistics implements Analyzable {
 
 	private final FileExtension[] fileExtensions;
+	// Inhaltstyp der JSon Datei
 	private class FileExtension {
 		public String ext;
 		public String lang;
 	}
 
+	private final String REPORT_TITLE = "Coding Statistiken";
+	private final String CSV_PREFIX = "codestatistics";
+
+	private List<Path> fileInput;
+	private Map<FileExtension, Integer> statisticResults;
+
 	/**
 	 * Im Konstruktor wird die JSon Datei der Dateiendungen eingelesen und gespeichert (wird
-	 * schon bei der Ausgabe der Filter benötigt
+	 * schon bei der Ausgabe der Filter benötigt. Des weiteren wird die Map der Ergebnisse
+	 * initialisiert
+	 *
+	 * @author Marco Dörfler
 	 */
 	public CodeStatistics() {
-		fileExtensions = Utilities.loadDataFromJson("/data/CodeStatistics_FileExtensions.json",
-				FileExtension[].class);
+		this.fileExtensions = Utilities.loadDataFromJson("/data/CodeStatistics_FileExtensions" +
+				".json", FileExtension[].class);
 
-		for (FileExtension fileExtension : fileExtensions) {
-			System.out.println(fileExtension.ext + "->" + fileExtension.lang);
+		this.statisticResults = new HashMap<>();
+		for (FileExtension fileExtension : this.fileExtensions) {
+			this.statisticResults.put(fileExtension, 0);
 		}
-		System.exit(0);
 	}
 
 	/**
 	 * Konstruiert die Filtereinstellungen aus der Liste der unterstützten Dateiendungen
 	 * @return Die erstellte Liste der Filter
+	 *
+	 * @author Marco Dörfler
 	 */
 	@Override
 	public List<String> getFilter() {
@@ -48,9 +61,16 @@ public class CodeStatistics implements Analyzable {
 		return filter;
 	}
 
+	/**
+	 * Dateien werden einfach gespeichert und später genutzt
+	 * @param files Liste der gefundenen Dateien
+	 * @throws Exception
+	 *
+	 * @author Marco Dörfler
+	 */
 	@Override
 	public void setFileInputs(List<Path> files) throws Exception {
-
+		this.fileInput = files;
 	}
 
 	@Override
@@ -60,21 +80,49 @@ public class CodeStatistics implements Analyzable {
 
 	@Override
 	public String getReportTitle() {
-		return null;
+		return REPORT_TITLE;
 	}
 
 	@Override
 	public String getCsvPrefix() {
-		return null;
+		return CSV_PREFIX;
 	}
 
+
+	/**
+	 * Iteriere über die Statistiken und füge sie in die Ergebnis-Map für die CSV Datei ein
+	 * @return Die fertige CSV-Datei
+	 *
+	 * @author Marco Dörfler
+	 */
 	@Override
 	public SortedMap<String, String> getCsvContent() {
-		return null;
+		SortedMap<String, String> csvContent = new TreeMap<>();
+
+		for (Map.Entry<FileExtension, Integer> statisticsEntry : this.statisticResults.entrySet()) {
+			csvContent.put(statisticsEntry.getKey().lang, statisticsEntry.getValue().toString());
+		}
+
+		return csvContent;
 	}
 
+	/**
+	 * Iteriert über die Dateien und sortiert diese nach den verschiedenen Endungen
+	 *
+	 * @author Marco Dörfler
+	 */
 	@Override
 	public void run() {
-
+		// Über Dateien iterieren
+		for (Path file : this.fileInput) {
+			// Über Sprache entscheiden
+			for (FileExtension fileExtension : this.fileExtensions) {
+				// Wenn die Dateiendung passt, Wert um eins erhöhen
+				if (file.toString().endsWith(fileExtension.ext)) {
+					this.statisticResults.put(fileExtension, this.statisticResults.get
+							(fileExtension) + 1);
+				}
+			}
+		}
 	}
 }

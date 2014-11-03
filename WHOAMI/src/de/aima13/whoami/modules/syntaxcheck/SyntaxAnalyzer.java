@@ -21,7 +21,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 /**
- * Modul zum Analysieren des auf dem System gefundenen Codes
+ * Modul zum Analysieren des auf dem System gefundenen Codes auf syntaktische Korrektheit
  *
  * Created by Marco Dörfler on 28.10.14.
  */
@@ -159,6 +159,8 @@ public class SyntaxAnalyzer implements Analyzable {
 	/**
 	 * Kalkulieren der CSV-Ausgabe. Jedes Feld soll wie volgt aussehen: SPRACHE-RESULT -> Anzahl
 	 * @return Die Map der CSV-Einträge
+	 *
+	 * @author Marco Dörfler
 	 */
 	@Override
 	public SortedMap<String, String> getCsvContent() {
@@ -205,7 +207,7 @@ public class SyntaxAnalyzer implements Analyzable {
 				checkResults.put(result, 0);
 			}
 
-			// Liste der Dateien in möglichst gleichgroßen Sürüngen so durchgehen,
+			// Liste der Dateien in möglichst gleichgroßen Sprüngen so durchgehen,
 			// dass die maximale Anzahl an Dateien nicht überschritten wird
 			Path[] files = languageFilesEntry.getValue().toArray(new Path[languageFilesEntry
 					.getValue().size()]);
