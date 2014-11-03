@@ -1,23 +1,13 @@
 package de.aima13.whoami;
 
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.PageSize;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.tool.xml.XMLWorkerHelper;
-import com.itextpdf.tool.xml.exceptions.RuntimeWorkerException;
 import de.aima13.whoami.support.Utilities;
 import org.stringtemplate.v4.ST;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 /**
  * Created by Marco Dörfler on 16.10.14.
@@ -33,11 +23,10 @@ public class ReportCreator {
 	private final String PDF_TITLE = "Analysebericht"; // Titel der PDF (Meta-Daten)
 
 
-
 	/**
 	 * Constructor
-	 * @param representables Liste aller Representables, die in den Bericht aufgenommen werden
 	 *
+	 * @param representables Liste aller Representables, die in den Bericht aufgenommen werden
 	 * @author Marco Dörfler
 	 */
 	public ReportCreator(List<Representable> representables) {
@@ -48,6 +37,7 @@ public class ReportCreator {
 	/**
 	 * HTML parsen und als HTML speichern
 	 * Vorsicht: Hat nur ein Modul fehlerhaften HTML-Code kann kein Report gespeichert werden!
+	 *
 	 * @return Erfolgsmeldung: PDF gespeichert oder nicht
 	 *
 	 * @author Marco Dörfler
@@ -78,6 +68,7 @@ public class ReportCreator {
 
 	/**
 	 * Erzeuge nur wenn nötig den HTML-Code und speicher diesen
+	 *
 	 * @return der HTML-Code
 	 *
 	 * @author Marco Dörfler
@@ -92,6 +83,7 @@ public class ReportCreator {
 	/**
 	 * Lade HTML Template aus den Resourcen und fülle es mit den Daten der Representables
 	 * Rendere danach das Template
+	 *
 	 * @return Der HTML-Code des Berichts
 	 *
 	 * @author Marco Dörfler
@@ -124,6 +116,7 @@ public class ReportCreator {
 
 	/**
 	 * Lade alle HTML-Snippets der Representables
+	 *
 	 * @return Liste der HTML-Snippets
 	 *
 	 * @author Marco Dörfler
