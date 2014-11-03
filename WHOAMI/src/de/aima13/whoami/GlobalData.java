@@ -149,6 +149,8 @@ public class GlobalData implements Representable {
 		return instance;
 	}
 
+
+
 	/**
 	 * Synchronized Methode zum Erstellen der Instanz
 	 * So wird verhindert, dass es am Ende mehrere unterschiedliche Instanzen gibt
@@ -163,14 +165,28 @@ public class GlobalData implements Representable {
 	}
 
 
+
 	/**
-	 * Vorschlagen von persönlichen Daten
+	 * Überladung der Methode proposeDate - Normalerweise wird ein einzelner Fund gemeldet
 	 * @param key Key des Datensatzes (z.B. "Name")
 	 * @param value Wert des Datensatzes (z.B. der Name des Nutzers)
 	 *
 	 * @author Marco Dörfler
 	 */
 	public synchronized void proposeData(String key, String value) {
+		this.proposeData(key, value, 1);
+	}
+
+
+	/**
+	 * Vorschlagen von persönlichen Daten
+	 * @param key Key des Datensatzes (z.B. "Name")
+	 * @param value Wert des Datensatzes (z.B. der Name des Nutzers)
+	 * @param count Wie oft wurde der Wert gefunden?
+	 *
+	 * @author Marco Dörfler
+	 */
+	public synchronized void proposeData(String key, String value, int count) {
 		if (!this.dataProposalsAllowed) {
 			throw new RuntimeException("No data proposals allowed after calculating the results!");
 		}
@@ -189,9 +205,9 @@ public class GlobalData implements Representable {
 
 		// Entscheide, ob dieser Wert für diesen Keyschonmal vorgeschlagen wurde
 		if (valueProposals.containsKey(value)) {
-			valueProposals.put(value, valueProposals.get(value) + 1);
+			valueProposals.put(value, valueProposals.get(value) + count);
 		} else {
-			valueProposals.put(value, 1);
+			valueProposals.put(value, count);
 		}
 	}
 
