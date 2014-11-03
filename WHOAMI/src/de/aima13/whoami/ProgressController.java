@@ -29,7 +29,7 @@ public class ProgressController {
 		GuiManager.pgController= this;
 	}
 
-	public void addComment(String comment){
+	public synchronized void addComment(String comment){
 		mainTextArea.appendText(comment+"\n");
 	}
 

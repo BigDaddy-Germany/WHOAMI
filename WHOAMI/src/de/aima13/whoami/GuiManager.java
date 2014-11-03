@@ -28,7 +28,7 @@ public class GuiManager {
 		System.out.println(GUI_PREFIX + "GUI PROGRESS STARTED");
 	}
 
-	public static void updateProgress(String status) {
+	public synchronized static void updateProgress(String status) {
 		pgController.addComment(status);
 	}
 
