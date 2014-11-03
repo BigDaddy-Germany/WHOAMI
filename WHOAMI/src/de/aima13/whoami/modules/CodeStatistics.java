@@ -4,6 +4,7 @@ import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.support.Utilities;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 
@@ -18,6 +19,10 @@ public class CodeStatistics implements Analyzable {
 		public String lang;
 	}
 
+	/**
+	 * Im Konstruktor wird die JSon Datei der Dateiendungen eingelesen und gespeichert (wird
+	 * schon bei der Ausgabe der Filter benötigt
+	 */
 	public CodeStatistics() {
 		fileExtensions = Utilities.loadDataFromJson("/data/CodeStatistics_FileExtensions.json",
 				FileExtension[].class);
@@ -28,9 +33,19 @@ public class CodeStatistics implements Analyzable {
 		System.exit(0);
 	}
 
+	/**
+	 * Konstruiert die Filtereinstellungen aus der Liste der unterstützten Dateiendungen
+	 * @return Die erstellte Liste der Filter
+	 */
 	@Override
 	public List<String> getFilter() {
-		return null;
+		List<String> filter = new ArrayList<>();
+
+		for (FileExtension fileExtension : this.fileExtensions) {
+			filter.add("**." + fileExtension.ext);
+		}
+
+		return filter;
 	}
 
 	@Override
