@@ -39,19 +39,6 @@ public class Food implements Analyzable {
 	private String myOnCookHtml="";
 	private TreeMap<String, String> myCsvData = new TreeMap<String, String>();
 
-
-	//URLs nach dennen gesucht werden soll
-	private static  final String[] MY_SEARCH_DELIEVERY_URLS={"lieferheld","pizza.de"};
-	private static  final String[] MY_SEARCH_COOKING_URLS={"chefkoch.de","thestonerscookbook.com"};
-	//Größen ab dennen Rezepte gewertet werden in Byte
-	private static  final int MINIMUM_DOCX_SIZE=20000;
-	private static  final int MINIMUM_TXT_SIZE =0;
-	//Ab so vielen Bytes über dem Limit gibt es Punkte
-	private static  final int NEXT_RECIPE_POINT =500;
-	//gibt die maximale Größe an bis zu der es Punkte gibt (in Byte)
-	private static final long MAXIMUM_FILE_SIZE=100000000;
-	private static final String MY_NAME="Essgewohnheiten";
-
 	@Override
 	public List<String> getFilter() {
 		List<String> searchList = new ArrayList<String>();
@@ -224,6 +211,7 @@ public class Food implements Analyzable {
 	 * lastModified Date.Es leifert den Hauptteil zur Analyse.
 	 */
 	private void recipeAnalysis() {
+		String localRecipeHtml="";
 		//eigentliche Rezeptanalyse
 		if (myFoodFiles != null && myFoodFiles.size() != 0) {
 
@@ -359,7 +347,7 @@ public class Food implements Analyzable {
 	private void analyzeOnlineCookBooks() {
 		String localOnCookHtml="";
 		ResultSet[] dbResults = this.getViewCountAndUrl(MY_SEARCH_COOKING_URLS);
-		TreeMap<String, Integer> chefKochReciepts = new TreeMap<>();
+		TreeMap<String, Integer> chefKochReciepts = new TreeMap<String,Integer>();
 		int countCookingSiteAccess = 0;
 		boolean clientIsStoner = false;
 		for (ResultSet rs : dbResults) {
@@ -409,16 +397,22 @@ public class Food implements Analyzable {
 
 		//Chefkoch Rezepte auswerten
 
-		if(chefKochReciepts.size()>5){
-			localOnCookHtml+="<p>";
+		if (chefKochReciepts.size() > 5) {
+			localOnCookHtml += "<p>";
 			//ersten drei Top-Hits ausgeben(sortiert nach visit_count):
-			for(int i=1; i<5; i++) {
-				int topHit = chefKochReciepts.firstKey();
-				String recipeName=chefKochReciepts.get(topHit);
-				localOnCookHtml+="Dein Nummer " + i +" Rezept auf Chefkoch ist:\"" + recipeName +"\".";
-				myCsvData.put("Chefkoch Top-"+i,recipeName);
+			for (int i = 0; i < 3; i++) {
+				try {
+					Map.Entry<String, Integer> highestEntry = Utilities.getHighestEntry(chefKochReciepts);
+					localOnCookHtml += "Dein Nummer " + i + " Rezept auf Chefkoch ist:\"" + highestEntry.getKey
+							() + "\".";
+					myCsvData.put("Chefkoch Top-" + i, String.valueOf(highestEntry.getValue()));
+					chefKochReciepts.remove(highestEntry.getKey());
+				}catch (NoSuchElementException e){
+					// hier erzeuge auch irgendetwas
+				}
+
 			}
-			localOnCookHtml+="</p>\n";
+			localOnCookHtml += "</p>\n";
 		}
 		myOnCookHtml=localOnCookHtml;
 
