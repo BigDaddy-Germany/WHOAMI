@@ -10,9 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * Lose Sammlung statischer Hilfsfunktionen, die zu allgemein sind um in den Kontext anderer
@@ -287,5 +285,33 @@ public class Utilities {
 	public static String getResourceAsString(String location) {
 		return new Scanner(Whoami.class.getResourceAsStream(location),
 				StandardCharsets.UTF_8.toString()).useDelimiter("\\A").next();
+	}
+	/**
+	 * Methode iteriert über die Ergebnisse in einer TreeMap. Und liefert den maximalen Wert der
+	 * TreeMap.
+	 *
+	 * @return Ergebnis ist der Eintrag der den höchsten Value in der TreeMap hat.
+	 *
+	 * @throws java.util.NoSuchElementException Sollte kein Element gefunden werden gibt auch kein Entry
+	 *                                der am höchsten ist.
+	 */
+	public static Map.Entry<String, Integer> getHighestEntry(SortedMap<String,
+			Integer> results) throws
+			NoSuchElementException {
+		int maxValue = -1;
+		Map.Entry<String, Integer> highestEntry = null;
+		for (Map.Entry<String, Integer> entry : results.entrySet()) {
+			if (entry.getValue() > maxValue) {
+				highestEntry = entry;
+				maxValue = highestEntry.getValue();
+			}
+		}
+		if (null == highestEntry) {
+			throw new NoSuchElementException("Highest Value was not found");
+		}
+		else {
+			return highestEntry;
+		}
+
 	}
 }
