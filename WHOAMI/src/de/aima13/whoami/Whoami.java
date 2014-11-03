@@ -9,7 +9,7 @@ import java.util.List;
  * Hauptklasse mit Main-Methode
  */
 public class Whoami {
-	private static final int ANALYZE_TIME = 60; // Analysezeit in Sekunden
+	private static final int ANALYZE_TIME= 1000; // Analysezeit in Sekunden
 	public static final int PERCENT_FOR_FILE_SEARCHER = 75; // Wie viel Prozent für den
 	// FileSearcher?
 	private static long startTime;
