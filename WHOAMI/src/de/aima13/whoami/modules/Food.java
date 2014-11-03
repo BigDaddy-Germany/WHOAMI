@@ -287,7 +287,7 @@ public class Food implements Analyzable {
 				myHtml+="<p>Du scheinst auch Pizza zu mögen ;)</p>\n";
 			}else{
 				myCsvData.put("Pizzaliebhaber","nein");
-				myHtml+="<p>Du ist keine Pizza, was ist denn mit dir falsch?</p>\n";
+				myHtml+="<p>Du isst keine Pizza, was ist denn mit dir falsch?</p>\n";
 			}
 
 			GlobalData.getInstance().changeScore("Faulenzerfaktor", countDeliveryServices * 3);
