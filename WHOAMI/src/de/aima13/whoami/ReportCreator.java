@@ -62,54 +62,16 @@ public class ReportCreator {
 			}
 			// Wenn wir hier gelandet sind, können wir davon ausgehen, dass die Datei "frei" ist
 
-			// Dokument erstellen und PDF-Writer erzeugen
-			Document pdfFile = new Document(PageSize.A4);
-			PdfWriter writer;
-			writer = PdfWriter.getInstance(pdfFile, Files.newOutputStream(outputFile));
-
-			// Dokument öffnen
-			pdfFile.open();
-			pdfFile.newPage();
-
-			// Metadaten hinzufügen
-			pdfFile.addAuthor(PDF_AUTHOR);
-			pdfFile.addTitle(PDF_TITLE);
-
-			// HTML-Worker erstellen, um HTML-Content zu schreiben
+			//PDF-Creator erstellen, HTML ausbessern und Dokument generieren lassen
+			PdfEngine creator = new PdfEngine();
 			String htmlSource = Utilities.convertHtmlToXhtml(this.getHtml());
-
-			ByteArrayInputStream htmlSourceInputStream = new ByteArrayInputStream(
-					htmlSource.getBytes(StandardCharsets.UTF_8)
-			);
-
-
-			try {
-				XMLWorkerHelper.getInstance().parseXHtml(writer, pdfFile, htmlSourceInputStream,
-						StandardCharsets.UTF_8);
-			} catch (RuntimeWorkerException e) {
-				System.err.println("Parsen des Berichtes wegen fehlerhaftem HTML abgebrochen.");
-				System.err.println("Bericht nur bis zu fehlerhafter Stelle erstellt.");
-				System.err.println("\n\nStackTrace:");
-				e.printStackTrace();
-
-				return false;
-			}
-
-			try {
-				pdfFile.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
+			creator.generatePdf(htmlSource, outputFile);
 			System.out.println("PDF created");
 
 			// Wenn bis hier alles durchgelaufen ist, war es erfolgreich
 			return true;
 
-
-		} catch (IOException e) {
-			return false;
-		} catch (DocumentException e) {
+		} catch (Exception e) {
 			return false;
 		}
 	}
