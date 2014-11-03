@@ -397,10 +397,10 @@ public class Food implements Analyzable {
 
 		//Chefkoch Rezepte auswerten
 
-		if (chefKochReciepts.size() > 5) {
+		if (chefKochReciepts.size() > 3) {
 			localOnCookHtml += "<p>";
 			//ersten drei Top-Hits ausgeben(sortiert nach visit_count):
-			for (int i = 0; i < 3; i++) {
+			for (int i = 1; i < 4; i++) {
 				try {
 					Map.Entry<String, Integer> highestEntry = Utilities.getHighestEntry(chefKochReciepts);
 					localOnCookHtml += "Dein Nummer " + i + " Rezept auf Chefkoch ist:\"" + highestEntry.getKey
