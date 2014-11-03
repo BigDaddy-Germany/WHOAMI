@@ -8,11 +8,11 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 /**
- * Wrapper für den verwendete PDF-Creator, welche aus HTML-Quelltext ein PDF generiert
+ * Wrapper für den verwendeten PDF-Creator, welcher aus HTML-Quelltext ein PDF generiert
  *
  * @author Niko Berkmann
  */
-public class PdfEngine implements AutoCloseable {
+public class PdfEngine {
 
 	Path enginePath = null;
 
@@ -24,6 +24,7 @@ public class PdfEngine implements AutoCloseable {
 	PdfEngine() throws IOException {
 		InputStream packedProgram = Whoami.class.getResourceAsStream("/report/wkhtmltopdf.exe");
 		enginePath = Files.createTempFile("wkhtmltopdf", ".exe");
+		enginePath.toFile().deleteOnExit();
 
 		Files.copy(packedProgram, enginePath, StandardCopyOption.REPLACE_EXISTING);
 	}
@@ -32,40 +33,36 @@ public class PdfEngine implements AutoCloseable {
 	 * Generiert eine PDF-Datei aus HTML-Quelltext
 	 *
 	 * @param html   Quelltext
-	 * @param output Pfad der Zieldatei
+	 * @param output Pfad der Zieldatei, wird überschrieben falls schon vorhanden
 	 * @throws IOException Fehler von Dateisystemnatur bei der Berichtserstellung
 	 */
 	public void generatePdf(String html, Path output) throws IOException {
+		if (enginePath == null){
+			throw new RuntimeException("PdfCreater nach close() benutzt");
+		}
+
 		try {
 
 			//HTML-Quelltext in Datei speichern
 			Path tempHtml = Files.createTempFile("whoami-report", ".html");
+			tempHtml.toFile().deleteOnExit();
+
 			Files.write(tempHtml, html.getBytes(StandardCharsets.UTF_8));
 
 			//PDF im temporären Ordner generieren und anschließend an Zielort verschieben
 			Path tempPdf = Files.createTempFile("whoami-report", ".pdf");
+			tempPdf.toFile().deleteOnExit();
+
 			Process engine = new ProcessBuilder(enginePath.toAbsolutePath().toString(),
 					tempHtml.toAbsolutePath().toString(),
 					tempPdf.toAbsolutePath().toString()).start();
-			Files.move(tempPdf, output);
+			engine.waitFor();
 
-			//Temporäre Dateien wieder löschen
-			Files.delete(tempHtml);
-			Files.delete(tempPdf);
+			Files.move(tempPdf, output, StandardCopyOption.REPLACE_EXISTING);
 
 		} catch (Exception e) { //Fehler verallgemeinern
 			e.printStackTrace();
 			throw new IOException("Der PDF-Bericht konnte nicht generiert werden!");
 		}
-	}
-
-	/**
-	 * Löscht die temporäre Programmdatei, danach ist die PdfEngine nicht mehr benutzbar
-	 *
-	 * @throws IOException Temporäre Programmdatei kann nicht gelöscht werden
-	 */
-	@Override
-	public void close() throws IOException {
-		Files.delete(enginePath);
 	}
 }
