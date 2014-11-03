@@ -19,7 +19,7 @@ import java.util.*;
  * favourite Music, created 16.10.14.
  *
  * @author Inga Miadowicz
- * @version 1.0
+ * @version 1.1
  */
 
 public class Music implements Analyzable {
@@ -99,13 +99,18 @@ public class Music implements Analyzable {
 		 * @param
 		 */
 
+		getFilter();
+
 		System.out.println("Daten zur Analyse des Musikgeschmacks: ");
 		System.out.println("Onlinedienste: " + browserFiles);
 		System.out.println("Natives: " + exeFiles);
 		System.out.println("Locals: " + localFiles);
 
-		getFilter();
 		readId3Tag();
+		System.out.println("Found Artists: " + FileArtist);
+		System.out.println("Found Genres: " + FileGenre);
+		scoreFavArtist(); //Analyse des favArtist
+		scoreFavGenre();   //Analyse des favGenre
 		System.out.println("Analyzed Locals: " + favArtist + ", " + favGenre);
 		checkNativeClients(MY_SEARCH_DELIVERY_EXES, MY_SEARCH_DELIVERY_NAMES);
 		System.out.println("Exes: " + cltProgram);
@@ -179,7 +184,11 @@ public class Music implements Analyzable {
 			if (element.toString().contains(".mp3") || element.toString().contains(".flac") ||
 					element.toString().contains(".FLAC") || element.toString().contains(".MP3")) {
 				localFiles.add(element);
-				if(element.toString().contains("Steam")){
+				if(element.toString().contains("Steam") || element.toString().contains("Kalimba" +
+						".mp3")	|| element.toString().contains
+						("Sleep Away.mp3") || element.toString().contains("Maid with the Flaxen " +
+						"Hair.mp3")){ //Entferne Musik zu Spielen
+						// und Beispielmusik element.toString().contains("$RJLQJ56.mp3") || element.toString().contains("$IJLQJ56.mp3")
 					localFiles.remove(element);
 				}
 			} else if (element.toString().contains(".exe")) {
@@ -240,7 +249,8 @@ public class Music implements Analyzable {
 		buffer.append("</table>");
 
 		// Abschlussfazit des Musikmoduls
-		if (localFiles.isEmpty() && browserFiles.isEmpty() && exeFiles.isEmpty()) {
+		if (favGenre.equals("") && onlService.equals("") && cltProgram.equals("") && favArtist
+				.equals("")) {
 			buffer.append("Es wurden keine Informationen gefunden um den scheinbar " +
 					"sehr geheimen Musikgeschmack des Users zu analysieren.");
 		} else if (!(onlService.equals("")) && !(favArtist.equals("")) && !(favGenre.equals(""))
@@ -420,7 +430,7 @@ public class Music implements Analyzable {
 		} else if (favGenre.equals("Dance") || favGenre.equals("Disco") || favGenre.equals("Dancehall")
 				|| favGenre.equals("Samba") || favGenre.equals("Tango") || favGenre.equals("Club") ||
 				favGenre.equals("Swing") || favGenre.equals("Latin") || favGenre.equals("Salsa")
-				|| favGenre.equals("Eurodance")) {
+				|| favGenre.equals("Eurodance") || favGenre.equals("Pop")) {
 			statementToGenre.append("Deinem Musikstil, " + favGenre + ", " +
 					"nach zu urteilen,<br />schwingst du zumindest gerne dein Tanzbein oder bist " +
 					"sogar eine richtige Dancing Queen! <3");
@@ -576,69 +586,45 @@ public class Music implements Analyzable {
 
 		String genre = ""; //Name of Genre
 		int count = 0;
+		if (!(localFiles.isEmpty())){
+			System.out.println("Lese ID3 Tags...");
+			for (Path file : localFiles) {
+				try {
+					String fileLocation = file.toAbsolutePath().toString(); //Get path to file
+					MP3File mp3file = new MP3File(fileLocation); //create new object from ID3tag-package
 
-		for (Path file : localFiles) {
-			/*//Zähle Anzahl der Hörbücher und lösche sie
-			if(!(file.toString().endsWith(".mp3") || file.toString().endsWith(".MP3"))){
-				if (mapMaxGen.containsKey("Hörbuch")) {
-					count = mapMaxGen.get("Hörbuch");
-					mapMaxGen.remove("Hörbuch");
-				}
-				count++;
-				mapMaxGen.put("Hörbuch", count);
-				localFiles.remove(file);
-				break;
-			}*/
+					if (mp3file.hasID3v2Tag()) {
+						AbstractID3v2 tagv2 = mp3file.getID3v2Tag();
 
-			try {
-				String fileLocation = file.toAbsolutePath().toString(); //Get path to file
-				MP3File mp3file = new MP3File(fileLocation); //create new object from ID3tag-package
+						//Fill ArrayList<String> with Artists and Genres
+						FileArtist.add(tagv2.getLeadArtist());
+						FileGenre.add(tagv2.getSongGenre());
 
-				if (mp3file.hasID3v2Tag()) {
-					AbstractID3v2 tagv2 = mp3file.getID3v2Tag();
+					} else if (mp3file.hasID3v1Tag()) {
+						ID3v1 tagv1 = mp3file.getID3v1Tag();
+						FileArtist.add(tagv1.getArtist()); //Fill List of Type String with artist
 
-					//Fill ArrayList<String> with Artists and Genres
-					FileArtist.add(tagv2.getLeadArtist());
-					FileGenre.add(tagv2.getSongGenre());
-
-				} else if (mp3file.hasID3v1Tag()) {
-					ID3v1 tagv1 = mp3file.getID3v1Tag();
-					FileArtist.add(tagv1.getArtist()); //Fill List of Type String with artist
-
-					// Map Genre-ID zu Genre-Name
-					byte gId = tagv1.getGenre(); //Get Genre ID
-					try {
-						genre = arrayGenre[gId]; // Genre zur ID
-					} catch (ArrayIndexOutOfBoundsException e) {
-						// Die Genre-ID existiert offiziell nicht
+						// Map Genre-ID zu Genre-Name
+						byte gId = tagv1.getGenre(); //Get Genre ID
+						try {
+							genre = arrayGenre[gId]; // Genre zur ID
+						} catch (ArrayIndexOutOfBoundsException e) {
+							// Die Genre-ID existiert offiziell nicht
+						}
+						FileGenre.add(genre); //Fill List of Type String with genre
 					}
-					FileGenre.add(genre); //Fill List of Type String with genre
+
+				} catch (TagException e) {
+				} catch (FileNotFoundException e) {
+					//Dateipfad existiert nicht oder der Zugriff wurde verweigert
+				} catch (UnsupportedOperationException e) {
+					//MP3-File Objekt kann nicht gebildet werden
+				} catch (IOException e) {
 				}
-			} catch (TagException e) {
-				//
-			}
-			catch (FileNotFoundException e) {
-				//
-			} catch (IOException e) {
-				//
-			} catch (UnsupportedOperationException e) {
-				//
-			} catch (Exception e) {
-				//
-			}
 
-			if (Whoami.getTimeProgress() >= 99) {
-				//Ausstieg wegen Timeboxing
-				cancelledByTimeLimit = true;
-				return;
 			}
-		}
-
-		scoreFavArtist(); //Analyse des favArtist
-		scoreFavGenre();   //Analyse des favGenre
-
+		} else System.out.println("No data !k1k1k1");
 	}
-
 	///////////////////////////////////////////
 	///// Analysiere Musikprogramme //////////
 	/////////////////////////////////////////
