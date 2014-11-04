@@ -7,5 +7,6 @@ out/*
 !/.idea/codeStyleSettings.xml
 /*.iml
 */META-INF/*
+wkhtmltopdf.exe
 
 WHOAMI_Analyze_Results*
