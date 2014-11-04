@@ -13,6 +13,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,7 +30,7 @@ public class AntlrLauncher {
 	 * reinen Zahlen. Dadurch ist es später sehr schön erweiterbar
 	 */
 	public static enum CHECK_RESULT {
-		CANT_PARSE(0), CORRECT(1), SYNTAX_ERROR(2);
+		CORRECT(0), CANT_PARSE(1), SYNTAX_ERROR(2);
 
 		/**
 		 * Für die Konvertierung zwischen CheckResult und den Codes brauchen wir die einzelnen
@@ -78,10 +79,39 @@ public class AntlrLauncher {
 
 	/**
 	 * Erlaubt den Aufruf von der CommandLine
-	 * @param args Commandline-Argumente. 0 = Sprache, 1 = Datei
+	 * @param args Commandline-Argumente. 0 = Name des Settings der Sprache, 1 = Datei
 	 */
 	public static void main(String[] args) {
+		// Wenn Anzahl der Argumente nicht stimmt, beende den Task
+		if (args.length != 2) {
+			System.exit(CHECK_RESULT.CANT_PARSE.getReturnCode());
+		}
 
+		// Teste, ob die Datei exisitert
+		Path file = Paths.get(args[1]);
+		if (!Files.exists(file)) {
+			System.exit(CHECK_RESULT.CANT_PARSE.getReturnCode());
+		}
+
+		// Versuche das SprachSetting zu laden
+		LanguageSetting languageSetting;
+		try {
+			languageSetting = (LanguageSetting) Class.forName("de.aima13.whoami.modules" +
+					".syntaxcheck.languages" +
+					".settings." +
+					args[0]).newInstance();
+
+
+			// Wenn wir hier gelandet sind, sollte alles okay sein und wir können Parsen
+			// Auch das Ergebnis des Parsens geben wir als ReturnCode zurück
+			System.exit(checkSyntax(languageSetting, file).getReturnCode());
+
+		} catch (Exception e) {
+			// Auch hier können wir einfach alle Exceptions abfangen, da der Grund des Fehlers
+			// nichts zur Sache tut - wir können die Datei jetzt nicht parsen.
+			e.printStackTrace();
+			System.exit(CHECK_RESULT.CANT_PARSE.getReturnCode());
+		}
 	}
 
 
@@ -94,7 +124,7 @@ public class AntlrLauncher {
 	 *
 	 * @author Marco Dörfler
 	 */
-	private CHECK_RESULT checkSyntax(LanguageSetting languageSetting, Path file) {
+	private static CHECK_RESULT checkSyntax(LanguageSetting languageSetting, Path file) {
 		try {
 			// ANTLRInputStrem erzeugen
 			ANTLRInputStream inputStream = new ANTLRInputStream(Files.newInputStream(file));
