@@ -1,11 +1,13 @@
 package de.aima13.whoami.modules.syntaxcheck;
 
 import de.aima13.whoami.modules.syntaxcheck.languages.LanguageSetting;
+import de.aima13.whoami.modules.syntaxcheck.languages.settings.Java8Setting;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -71,7 +73,12 @@ public class AntlrLauncher {
 		 * @return Das dazugehörige CheckResult
 		 */
 		public static CHECK_RESULT getCheckResultFromReturnCode(int returnCode) {
-			return returnValueToCheckResult.get(returnCode);
+			CHECK_RESULT checkResult = returnValueToCheckResult.get(returnCode);
+			if (checkResult != null) {
+				return checkResult;
+			} else {
+				return CHECK_RESULT.CANT_PARSE;
+			}
 		}
 	}
 
