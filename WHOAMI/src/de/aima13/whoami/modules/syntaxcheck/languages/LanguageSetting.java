@@ -1,4 +1,4 @@
-package de.aima13.whoami.modules.coding.languages;
+package de.aima13.whoami.modules.syntaxcheck.languages;
 
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;

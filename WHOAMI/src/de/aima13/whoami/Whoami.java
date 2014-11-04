@@ -1,7 +1,5 @@
 package de.aima13.whoami;
 
-import de.aima13.whoami.modules.coding.CodeAnalyzer;
-
 import java.util.ArrayList;
 import java.util.List;
 
