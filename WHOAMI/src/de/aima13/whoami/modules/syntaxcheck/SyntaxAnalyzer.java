@@ -37,7 +37,7 @@ public class SyntaxAnalyzer implements Analyzable {
 	 * Durch späteren Zufall soll eine Auswahl getroffen werden,
 	 * welche später eine repräsentative Sicht auf die Qualität des Codings zu bieten
 	 */
-	private final int MAX_FILES_PER_LANGUAGE = 250;
+	private final int MAX_FILES_PER_LANGUAGE = 50;
 	private final String[] FORBIDDEN_CONTAINS = {"jdk", "jre", "adt", "tex"};
 
 	private Map<LanguageSetting, List<Path>> languageFilesMap;
