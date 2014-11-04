@@ -620,8 +620,10 @@ public class Music implements Analyzable {
 				} catch (UnsupportedOperationException e) {
 					//MP3-File Objekt kann nicht gebildet werden
 				} catch (IOException e) {
+					//
+				} catch (Exception e) {
+					// ungültige Dateinamen, die nicht verarbeitet werden können
 				}
-
 			}
 		} else System.out.println("No data !k1k1k1");
 	}
