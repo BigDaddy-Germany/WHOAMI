@@ -19,7 +19,7 @@ public class GlobalData implements Representable {
 	private final String CSV_PREFIX_SCORE = "score";
 	private final String CSV_PREFIX_DATA = "data";
 	private final String TEMPLATE_LOCATION = "/data/GlobalData_Output.html";
-	private final int MAX_SCORE_VALUE = 100;
+	public final int MAX_SCORE_VALUE = 100;
 	private boolean dataProposalsAllowed = true;
 
 	// Zuordnung: Key - Value
