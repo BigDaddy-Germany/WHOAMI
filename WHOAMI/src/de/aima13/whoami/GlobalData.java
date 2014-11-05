@@ -10,6 +10,10 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
+ * Diese Klasse bietet allen Modulen an, globale Scores und persönliche Daten zu sammeln. Dies
+ * ist nur zur Laufzeit der Module und nicht während der Auswertung der HTML- und CSV-Dateien
+ * möglich
+ *
  * Created by Marco Dörfler on 16.10.14.
  */
 public class GlobalData implements Representable {
