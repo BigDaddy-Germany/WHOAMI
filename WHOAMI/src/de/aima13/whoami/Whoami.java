@@ -4,21 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Marco Dörfler on 16.10.14.
- *
  * Hauptklasse mit Main-Methode
+ *
+ * @author Marco Dörfler
  */
 public class Whoami {
 	private static final int ANALYZE_TIME= 1000; // Analysezeit in Sekunden
 	public static final int PERCENT_FOR_FILE_SEARCHER = 75; // Wie viel Prozent für den
-	// FileSearcher?
 	private static long startTime;
 
 	/**
 	 * Standard Main-Methode
 	 * @param args Commandline Argumente
-	 *
-	 * @author Marco Dörfler
 	 */
 	public static void main(String[] args) {
 		startTime = System.currentTimeMillis();
@@ -72,8 +69,6 @@ public class Whoami {
 	/**
 	 * Information über die bisherige und restliche Laufzeit des Programms
 	 * @return Ganzzahliger Prozentwert zwischen 0 und 100 (100: Zeit ist um)
-	 *
-	 * @author Marco Dörfler
 	 */
 	public static int getTimeProgress() {
 		float elapsedTime = (float) ((System.currentTimeMillis() - startTime) / 1000);
@@ -86,6 +81,10 @@ public class Whoami {
 		}
 	}
 
+	/**
+	 * Kalkulieren der noch verbleibenden Analysezeit
+	 * @return Die Anzahl der Millisekunden, welche noch übrig sind
+	 */
 	public static long getRemainingMillis() {
 		long elapsedTime = System.currentTimeMillis() - startTime;
 		return ANALYZE_TIME - elapsedTime;

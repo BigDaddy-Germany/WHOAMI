@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Marco Dörfler on 16.10.14.
+ * Diese Klasse ist für die Ausführung der Module zuständig
+ *
+ * @author Marco Dörfler
  */
 public class SlaveDriver {
 
@@ -17,8 +19,6 @@ public class SlaveDriver {
 	 * Module parallel als Threads starten
 	 *
 	 * @param analyzables Liste der zu startenden Module
-	 *
-	 * @author Marco Dörfler
 	 */
 	public static void startModules(List<Analyzable> analyzables) {
 		// Liste der erstellten Threads

@@ -25,13 +25,13 @@ import java.util.*;
 /**
  * Modul zum Analysieren des auf dem System gefundenen Codes auf syntaktische Korrektheit
  *
- * Created by Marco Dörfler on 28.10.14.
+ * @author Marco Dörfler
  */
 public class SyntaxAnalyzer implements Analyzable {
 	private final String CSV_PREFIX = "syntaxcheck";
 	private final String REPORT_TITLE = "Syntaxcheck";
 
-	/**
+	/*
 	 * Es soll nur eine Stichprobe von Dateien pro Sprache geparst werden, um zu vermeiden,
 	 * dass die Laufzeit durch ANTLR zu hoch wird
 	 * Durch späteren Zufall soll eine Auswahl getroffen werden,
@@ -46,8 +46,6 @@ public class SyntaxAnalyzer implements Analyzable {
 
 	/**
 	 * Im Konstruktor werden alle Settings geladen und instanziiert
-	 *
-	 * @author Marco Dörfler
 	 */
 	public SyntaxAnalyzer() {
 		this.languageFilesMap = new HashMap<>();
@@ -75,8 +73,6 @@ public class SyntaxAnalyzer implements Analyzable {
 	 * und danach zurückgeben
 	 *
 	 * @return Liste der Filter
-	 *
-	 * @author Marco Dörfler
 	 */
 	@Override
 	public List<String> getFilter() {
@@ -99,8 +95,6 @@ public class SyntaxAnalyzer implements Analyzable {
 	 * Erhaltene Dateien müssen den Programmiersprachen zugeordnet werden
 	 *
 	 * @param files Liste der gefundenen Dateien
-	 *
-	 * @author Marco Dörfler
 	 */
 	@Override
 	public void setFileInputs(List<Path> files) {
@@ -157,8 +151,6 @@ public class SyntaxAnalyzer implements Analyzable {
 	/**
 	 * Kalkulieren der CSV-Ausgabe. Jedes Feld soll wie volgt aussehen: SPRACHE-RESULT -> Anzahl
 	 * @return Die Map der CSV-Einträge
-	 *
-	 * @author Marco Dörfler
 	 */
 	@Override
 	public SortedMap<String, String> getCsvContent() {
@@ -186,8 +178,6 @@ public class SyntaxAnalyzer implements Analyzable {
 	 * Iterieren über alle gefundenen Sprachen und die dazugehörigen Dateien. Bei jedem Eintrag
 	 * wird ein Syntax-Check durchgeführt und die Ergebnisse gespeichert. Es entsteht eine
 	 * Taelle, welche Auskunft darüber gibt, wie viele Dateien mit welchem Result geprüft wurden
-	 *
-	 * @author Marco Dörfler
 	 */
 	@Override
 	public void run() {
@@ -244,8 +234,6 @@ public class SyntaxAnalyzer implements Analyzable {
 	 * @param languageSetting Die Sprache, auf die geprüft werden soll
 	 * @param file Die Datei, die geprüft werden soll
 	 * @return ENUM, welches entscheidet, wie der Status der Datei ist
-	 *
-	 * @author Marco Dörfler
 	 */
 	private CHECK_RESULT checkSyntax(LanguageSetting languageSetting, Path file) {
 		// Zusammenbauen des Commands

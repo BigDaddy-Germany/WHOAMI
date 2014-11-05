@@ -10,7 +10,7 @@ import java.util.*;
  * Modul zum Analysieren der Häufigkeit der verschiedenen Programmiersprachen,
  * die der Nutzer verwendet
  *
- * Created by Marco Dörfler on 03.11.14.
+ * @author Marco Dörfler
  */
 public class CodeStatistics implements Analyzable {
 
@@ -31,8 +31,6 @@ public class CodeStatistics implements Analyzable {
 	 * Im Konstruktor wird die JSon Datei der Dateiendungen eingelesen und gespeichert (wird
 	 * schon bei der Ausgabe der Filter benötigt. Des weiteren wird die Map der Ergebnisse
 	 * initialisiert
-	 *
-	 * @author Marco Dörfler
 	 */
 	public CodeStatistics() {
 		this.fileExtensions = Utilities.loadDataFromJson("/data/CodeStatistics_FileExtensions" +
@@ -47,8 +45,6 @@ public class CodeStatistics implements Analyzable {
 	/**
 	 * Konstruiert die Filtereinstellungen aus der Liste der unterstützten Dateiendungen
 	 * @return Die erstellte Liste der Filter
-	 *
-	 * @author Marco Dörfler
 	 */
 	@Override
 	public List<String> getFilter() {
@@ -65,8 +61,6 @@ public class CodeStatistics implements Analyzable {
 	 * Dateien werden einfach gespeichert und später genutzt
 	 * @param files Liste der gefundenen Dateien
 	 * @throws Exception
-	 *
-	 * @author Marco Dörfler
 	 */
 	@Override
 	public void setFileInputs(List<Path> files) throws Exception {
@@ -92,8 +86,6 @@ public class CodeStatistics implements Analyzable {
 	/**
 	 * Iteriere über die Statistiken und füge sie in die Ergebnis-Map für die CSV Datei ein
 	 * @return Die fertige CSV-Datei
-	 *
-	 * @author Marco Dörfler
 	 */
 	@Override
 	public SortedMap<String, String> getCsvContent() {
@@ -108,8 +100,6 @@ public class CodeStatistics implements Analyzable {
 
 	/**
 	 * Iteriert über die Dateien und sortiert diese nach den verschiedenen Endungen
-	 *
-	 * @author Marco Dörfler
 	 */
 	@Override
 	public void run() {
