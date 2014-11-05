@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class SlaveDriver {
 
-	private static final int MAX_TIME_OVERHEAD = 5;
+	private static final long MAX_TIME_OVERHEAD = 5000;
 
 
 	/**
@@ -33,24 +33,22 @@ public class SlaveDriver {
 
 		// Warten auf alle Module
 		for (Thread moduleThread : moduleThreads) {
-			try {
-				// Das Modul hat Zeit, bis die vorgesehene Programmlaufzeit abgelaufen ist
-				long remainingMillis = Whoami.getRemainingMillis();
-				System.out.println("Remaining: " + remainingMillis);
-				if (remainingMillis > 0) {
-					moduleThread.join(Whoami.getRemainingMillis());
-				}
+			// Das Modul hat noch die geplante Analysezeit plus eine oben festgelegte Toleranz
+			long remainingMillis = Whoami.getRemainingMillis() + MAX_TIME_OVERHEAD;
+			System.out.println("Modul hat noch " + remainingMillis + " Millis");
 
-				// Wenn das Modul noch lebt, wird es abgeschossen, sobald die Laufzeit um eine
-				// gewissen Zeit überschritten wurde
-				if (remainingMillis > MAX_TIME_OVERHEAD * 1000 * -1) {
-					Thread.sleep(MAX_TIME_OVERHEAD * 1000 - remainingMillis * -1);
+			// Gebe dem Modul noch die Zeit, die es verdient
+			if (remainingMillis > 0) {
+				try {
+					moduleThread.join(remainingMillis);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
-				if (moduleThread.isAlive()) {
-					moduleThread.interrupt();
-				}
-			} catch (InterruptedException e) {
-				// Niemand sollte diesen Thread interrupten
+			}
+
+			// Spätestens jetzt muss es abgeschossen werden
+			if (moduleThread.isAlive()) {
+				moduleThread.interrupt();
 			}
 		}
 		DataSourceManager.closeRemainingOpenConnections();
