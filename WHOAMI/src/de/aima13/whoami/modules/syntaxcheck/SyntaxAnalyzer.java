@@ -11,6 +11,7 @@ import org.antlr.v4.runtime.Parser;
 import org.reflections.Reflections;
 
 import de.aima13.whoami.modules.syntaxcheck.AntlrLauncher.CHECK_RESULT;
+import org.stringtemplate.v4.ST;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +29,7 @@ import java.util.*;
  * @author Marco Dörfler
  */
 public class SyntaxAnalyzer implements Analyzable {
+	private static final String TEMPLATE_LOCATION = "/data/antlrStats.html";
 	private final String CSV_PREFIX = "syntaxcheck";
 	private final String REPORT_TITLE = "Syntaxcheck";
 
@@ -134,7 +136,14 @@ public class SyntaxAnalyzer implements Analyzable {
 
 	@Override
 	public String getHtml() {
-		return null;
+		// Template laden
+		ST template = new ST(Utilities.getResourceAsString(TEMPLATE_LOCATION), '$', '$');
+		template.add("anzahl",1000);
+		template.add("parseError",10);
+		template.add("incorrected",500);
+		template.add("percentage",49);
+		template.add("Kommentar","Damit bist unterdurchschnittlich");
+		return template.render();
 	}
 
 	@Override
