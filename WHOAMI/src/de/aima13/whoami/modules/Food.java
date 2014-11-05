@@ -42,30 +42,33 @@ public class Food implements Analyzable {
 	@Override
 	public List<String> getFilter() {
 		List<String> searchList = new ArrayList<String>();
-		searchList.add("**" + "/" + "Rezepte/**.txt");
-		searchList.add("**" + "/" + "Rezepte/**.docx");
+		searchList.add("**Rezepte**.txt");
+		searchList.add("**Rezepte**.docx");
 
-		searchList.add("**" + "/" + "Rezept/**.txt");
-		searchList.add("**" + "/" + "Rezept/**.docx");
+		searchList.add("**Rezept**.txt");
+		searchList.add("**Rezept**.docx");
 
-		searchList.add("**" + "/" + "rezept/**.txt");
-		searchList.add("**" + "/" + "rezept/**.docx");
+		searchList.add("**rezept**.txt");
+		searchList.add("**rezept**.docx");
 
-		searchList.add("**" + "/" + "backen/**.txt");
-		searchList.add("**" + "/" + "backen/**.docx");
+		searchList.add("**backen**.txt");
+		searchList.add("**backen**.docx");
 
-		searchList.add("**" + "/" + "Kuchen/**.txt");
-		searchList.add("**" + "/" + "Kuchen/**.docx");
+		searchList.add("**Kuchen**.txt");
+		searchList.add("**Kuchen**.docx");
 
-		searchList.add("**" + "/" + "Pizza/**.txt");
-		searchList.add("**" + "/" + "Pizza/**.docx");
+		searchList.add("**Kochen**.txt");
+		searchList.add("**Kochen**.docx");
+
+		searchList.add("**Pizza**.txt");
+		searchList.add("**Pizza**.docx");
 
 
 		//places.sql gehört zu Firefox
 		searchList.add("**Firefox**places.sqlite");
 
 		//* hier weil History Datein gibt es zu viele und Chrome kann mehrere Benutzer verwalten
-		searchList.add("**Google" + "/" + "Chrome**History");
+		searchList.add("**Google/Chrome**History");
 
 
 		return searchList;
