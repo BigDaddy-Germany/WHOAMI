@@ -2,18 +2,32 @@ package de.aima13.whoami.support;
 
 import org.sqlite.JDBC;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
- * Created by Marvin on 18.10.2014.
+ * DataSourceManager der die Verbindungen zu den SQLite Datenbank handelt.
+ *
+ * @author Marvin Klose
+ * @version 2.0
  */
+
+
 public class DataSourceManager {
 
+	// Connections werden einmalig je Path angelegt, da mehrere Module sich für die Browser
+	// Datenbanken interessieren geht der Zugriff durch die Zuordnung schneller
+	private static Map<Path, Connection> openConnections = new TreeMap<Path, Connection>();
+	
 	private Connection dbConnection = null;
-	private static List<Connection> openConnections = new ArrayList<Connection>();
+
+
 	/**
 	 * Konstruktor erzeugt eine Verbindung zur Datenbank und lädt den JDBC Treiber dafür.
 	 * Ebenso gibt es einen Hook, dass wenn die Runtime beendet wird, auf die Connection getrennt
@@ -24,21 +38,79 @@ public class DataSourceManager {
 	public DataSourceManager(Path sqliteDatabase) throws ClassNotFoundException, SQLException {
 		Class.forName("org.sqlite.JDBC");
 
-        System.out.println("Found " + JDBC.class.getName() + "!");
-		dbConnection = getAlreadyOpenConnection(sqliteDatabase.toString());
-		if(dbConnection == null){
-			dbConnection = DriverManager.getConnection
-					("jdbc:sqlite:" + sqliteDatabase.toString());
+		System.out.println("Found " + JDBC.class.getName() + "!");
+
+		dbConnection = getAlreadyOpenConnection(sqliteDatabase);
+		if (dbConnection == null) {
+			if (sqliteDatabase.toString().contains("Chrome")) {
+				dbConnection = getConnectionFromShadowCopy(sqliteDatabase);
+			} else {
+				dbConnection = DriverManager.getConnection
+						("jdbc:sqlite:" + sqliteDatabase.toString());
+			}
 		}
 	}
 
 	/**
+	 * Sind alle Module fertig alle Resourcen wieder freigeben.
+	 */
+	public static void closeRemainingOpenConnections() {
+		for (Map.Entry<Path, Connection> entry : openConnections.entrySet()) {
+			try {
+				if (!entry.getValue().isClosed()) {
+					entry.getValue().close();
+					openConnections.remove(entry.getKey());
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * Google Chrome sperrt, wenn es läuft komplett seine Datenbank,
+	 * folglich gibt es dann bei Querys 'Database locked Exceptions'. Durch die in dieser Methode
+	 * angelegte Schattenkopie ist dieses Problem ausgehebelt, weil die Verbdinung zur Kopie in
+	 * den temporären Files besteht.
+	 *
+	 * @param source Google Chrome sqlite Pfad
+	 * @return Connection Verbindung zur kopierten SQLite Datenbank.
+	 */
+	private Connection getConnectionFromShadowCopy(Path source) {
+		File chromeCopy = null;
+		try {
+			chromeCopy = File.createTempFile("chrome", ".sqlite", null);
+			chromeCopy.deleteOnExit();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		try {
+			Files.copy(source, chromeCopy.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		Connection fakedConnection = null;
+		try {
+			Class.forName("org.sqlite.JDBC");
+			fakedConnection = DriverManager.getConnection
+					("jdbc:sqlite:" + chromeCopy.toString());
+			openConnections.put(source, fakedConnection);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return fakedConnection;
+	}
+
+	/**
 	 * Zur Abfrage, ob Verbindung noch offen ist bzw von null verschieden.
+	 *
 	 * @return Boolean, der angibt ob die Verbindung zustande gekommen ist, bzw. noch offen ist.
 	 */
-	public boolean isConnected(){
+	public boolean isConnected() {
 		try {
-			return  !dbConnection.isClosed();
+			return !dbConnection.isClosed();
 		} catch (SQLException e) {
 			return false;
 		}
@@ -55,36 +127,12 @@ public class DataSourceManager {
 		ResultSet rs = s.executeQuery(statement);
 		return rs;
 	}
-	private Connection getAlreadyOpenConnection(String dbUrl){
-		for (Connection c : openConnections){
-			try {
-				if (c.getMetaData().getURL().equals(dbUrl)){
-					return c;
-				}
-			} catch (SQLException e) {
-				return null;
-			}
+
+	private Connection getAlreadyOpenConnection(Path lookUpPath) {
+		if (openConnections.containsKey(lookUpPath)) {
+			return openConnections.get(lookUpPath);
 		}
 		return null;
-	}
-
-	/**
-	 * Wrapper zum schließen und freigeben der Verbindung!
-	 */
-	private static void closeConnection(Connection c) {
-		try {
-			if (c != null && !c.isClosed() ) {
-				openConnections.remove(c);
-				c.close();
-			}
-		} catch (SQLException e) {
-
-		}
-	}
-	public static void closeRemainingOpenConnections(){
-		for (Connection c : openConnections){
-			closeConnection(c);
-		}
 	}
 
 }
