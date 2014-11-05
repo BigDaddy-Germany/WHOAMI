@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.*;
 
 /**
- * Persönliche Daten Modul zum erfassen von Adresse,Name,Email-Adresse
+ * Persönliche Daten Modul zum erfassen von u.a. Adresse,Name,Email-Adresse
  */
 public class PersonalData implements Analyzable {
 
@@ -84,7 +84,7 @@ public class PersonalData implements Analyzable {
 		List<String> filter = new ArrayList<>();
 		//formhistory.sql gehört zu Firefox
 		filter.add("**Firefox**formhistory.sqlite");
-
+		//chrome dependant zur formhistory in FireFox
 		filter.add("**Google**Web Data");
 
 
@@ -130,18 +130,12 @@ public class PersonalData implements Analyzable {
 		if(Whoami.getTimeProgress()<100){
 			this.dbExtraction();
 		}
-
-
 		if(Whoami.getTimeProgress()<100){
 			this.analyseFfForms();
 		}
-
-
 		if(Whoami.getTimeProgress()<100){
-			//this.analyseChromeForms();
+			this.analyseChromeForms();
 		}
-		//@Todo besprechen ob das legitim ist
-		//egal ob Zeit abgelaufen ist Daten ausgeben
 		this.transmitBrowserForensik();
 		if(Whoami.getTimeProgress()<100){
 
@@ -150,6 +144,71 @@ public class PersonalData implements Analyzable {
 
 	}
 
+	/**
+	 * Diese Methode sendet die SQL Statements an die Chrome Web Data Datenbank(Ablage des Chrome
+	 * Browser für Form Verläufe)  um folgende Daten zu ermitteln:
+	 * Vornanme,Nachname,Wohnort(Straße,Ort),Telefonummer,IBAN,Emailadresse
+	 */
+	private void analyseChromeForms(){
+
+		if(myDbs.size()>0){
+			if(myDbResults==null){
+				myDbResults=new LinkedList<SqlSelectSaver>();
+			}
+
+			for (Path curr : myDbs) {
+				String path=curr.toString().toLowerCase();
+				if(path.contains("google") && path.contains("web data")) {
+					for (int i = 0; i < 7; i++) {
+						String title = "";
+						String select = "";
+						switch (i) {
+							case 0:
+								title = "Vorname";
+								select = SELECT_FIRST_NAME_CHROME;
+								break;
+							case 1:
+								title = "Nachname";
+								select = SELECT_LAST_NAME_CHROME;
+								break;
+							case 2:
+								title = "Straße";
+								select = SELECT_STREET_CHROME;
+								break;
+							case 3:
+								title = "Ort";
+								select = SELECT_PLACE_CHROME;
+								break;
+							case 4:
+								title = "Telefon";
+								select = SELECT_PHONE_NUMBER_CHROME;
+								break;
+							case 5:
+								title = "Email";
+								select = SELECT_EMAIL_CHROME;
+								break;
+							case 6:
+								title = "IBAN";
+								select = SELECT_BANK_ACCOUNT_CHROME;
+
+						}
+						myDbResults.addAll(executeSqlAndReturn(curr,
+								title, select));
+					}
+				}
+			}
+
+
+
+		}
+
+	}
+
+	/**
+	 *Diese MEthode sendet SQL Statements and die sogenannte FireFox FormHistory um folgende
+	 * Daten zu ermitteln:
+	 * Vornanme,Nachname,Wohnort(Straße,Ort),Telefonummer,IBAN,Emailadresse
+	 */
 	private void analyseFfForms(){
 
 
@@ -160,12 +219,15 @@ public class PersonalData implements Analyzable {
 			List<Path> ffDbs=new LinkedList<Path>();
 			for(Path curr: myDbs){
 				String path=curr.toString().toLowerCase();
-				if(path.contains("firefox") && path.contains("formhistory")){
+				if(path.toLowerCase().contains("firefox") && path.toLowerCase().contains
+						("formhistory")){
 					ffDbs.add(curr);
 				}
 			}
 			if(ffDbs.size()>0) {
-				myDbResults= new LinkedList<>();
+				if(myDbResults==null) {
+					myDbResults = new LinkedList<>();
+				}
 				for (Path curr : ffDbs) {
 					for(int i=0;i<7;i++) {
 						String title="";
@@ -193,23 +255,8 @@ public class PersonalData implements Analyzable {
 									select=SELECT_BANK_ACCOUNT;
 
 						}
-						myDbResults.addAll(executeSqlAndReturnFromFf(curr,
+						myDbResults.addAll(executeSqlAndReturn(curr,
 								title, select));
-
-						//überprüfen ob der Wert schon enthalten ist
-						/**
-						boolean alreadyInList = false;
-						for (SqlSelectSaver old : myDbResults) {
-							if (old.title.equals(result.value) && old.value.equals(result.value)) {
-								alreadyInList = true;
-								old.hitCount += result.hitCount;
-							}
-						}
-							if (!alreadyInList) {
-								myDbResults.add(result);
-							}
-						*/
-
 					}
 				}
 			}
@@ -217,15 +264,19 @@ public class PersonalData implements Analyzable {
 		}
 	}
 
-	//@Todo Kommentar updaten
 	/**
-	 *Diese Methode dient der einfachen Abfrage von Daten aus der FireFox formHistory und liefert
-	 * @param formHistoryPath Der Pfad zu einer
-	 * @param
-	 * @return Das oberste Ergebniss der Abfrage oder ein leerer String falls es zu Fehlern kamm
+	 *
+	 * @param formHistoryPath Pfad zu einer Datenbak auf der das SQL Statement asugeführt werden
+	 *                           soll
+	 * @param title Der Titel
+	 * @param sqlStatement Das SQL Statement welches die Daten auf der Datenbank erfasst,
+	 *                        es sollte mit "SELECT (XXXXX) AS value, (XXXXX) AS hcnt" beginnen
+	 * @return gibt eine List von SqlSelectSaver Instanzen zurück die die Werte von value und
+	 * hcnt zusammen mit dem übergebenen Titel enthalten, falls die Anfrage fehlerhaft war oder
+	 * keine Werte selektiert wurden wird eine leere Liste zurückgegeben
 	 */
-		private List<SqlSelectSaver> executeSqlAndReturnFromFf(Path formHistoryPath,
-		                                                       String title, String sqlStatement) {
+		private List<SqlSelectSaver> executeSqlAndReturn(Path formHistoryPath,
+		                                                 String title, String sqlStatement) {
 
 
 			LinkedList<SqlSelectSaver> sqlResults = new LinkedList<>();
@@ -244,20 +295,13 @@ public class PersonalData implements Analyzable {
 				try {
 					resultSet = dbManager.querySqlStatement(sqlStatement);
 
-					//resultSet.next();
-
 				} catch (Exception e) {
-					//kann eigentlich nur crashen wenn es absolut keinen Eintrag gibt
+					//kann eigentlich nur crashen wenn die Datenbank Probleme macht
+					//oder das Statement falsch ist
 					error = true;
 					resultSet=null;
 				}
 				if (!error && resultSet!=null) {
-				/**	try {
-						resultSet.beforeFirst();
-					} catch (SQLException e) {
-						//kann eigentlich nur crashen wenn es absolut keinen Eintrag gibt
-						error = true;
-					}*/
 					try {
 						while (!error && resultSet.next()) {
 							try {
@@ -274,7 +318,6 @@ public class PersonalData implements Analyzable {
 						}
 					} catch (SQLException e) {
 						//nix machen
-						e = e;
 					}
 
 
@@ -290,10 +333,8 @@ public class PersonalData implements Analyzable {
 	 * Filtert aus allen Daten die für dieses Modul die SQlite DBs heraus da diese anders
 	 * behandelt werden als "normale" Dateien.
 	 */
-	//@Todo korrigierte Methode auslagern und aufrufen
 	private void dbExtraction(){
 		//sqlite daten rausspeichern
-		//@Todo Fehler wie er in Food auftrat behandeln wenn mehr als 2 sqlite dbs gefunden werden
 		myDbs = new ArrayList<Path>();
 		int foundDbs = 0;
 
@@ -302,7 +343,7 @@ public class PersonalData implements Analyzable {
 				if (curr != null) {
 					String path;
 					try {
-						path = curr.toString();//getCanonicalPath();
+						path = curr.toString().toLowerCase();
 					} catch (Exception e) {
 						e.printStackTrace();
 						path = "";
@@ -311,38 +352,37 @@ public class PersonalData implements Analyzable {
 					if (path.contains(".sqlite")) {
 						myDbs.add( curr);
 						foundDbs++;
-					} else if (path.contains("History")) {
+					} else if (path.contains("web data")) {
 						myDbs.add(curr);
 						foundDbs++;
 					}
 
-					if (foundDbs > 1) {
-						break;
-					}
 				}
 			}
 		}catch(Exception e){e.printStackTrace();}
 
-		//Db-Files aus myFoodFiles Liste löschen
+		//Db-Files aus Liste mit anderen Files löschen
 		for(int i=0; i<foundDbs; i++) {
 			try {
 
 				myPersonalDataPath.remove(myDbs.get(i));
 			}catch(Exception e){
-				e.printStackTrace();
+
 			}
 		}
 	}
 
-
+	/**
+	 * übermittelt die gesammelten Resultate der FireFox und Chrome analyse bezüglich der
+	 * FormFields gesammelt an die Global Data Klasse
+	 */
 	private void transmitBrowserForensik(){
 		if(myDbResults!=null){
 			if(myDbResults.size()>0){
+				GlobalData gd=GlobalData.getInstance();
 				for(SqlSelectSaver curr: myDbResults){
-					GlobalData.getInstance().proposeData(curr.title,curr.value,curr.hitCount);
+					gd.proposeData(curr.title,curr.value,curr.hitCount);
 				}
-				//Speicher freigeben:
-				//myDbResults=null;
 			}
 		}
 
