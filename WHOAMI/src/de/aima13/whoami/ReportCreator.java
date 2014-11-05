@@ -10,8 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Marco Dörfler on 16.10.14.
  * Erstellen und Speichern des Reportes aus allen Representables
+ *
+ * @author Marco Dörfler
  */
 public class ReportCreator {
 	private List<Representable> representableList;
@@ -27,7 +28,6 @@ public class ReportCreator {
 	 * Constructor
 	 *
 	 * @param representables Liste aller Representables, die in den Bericht aufgenommen werden
-	 * @author Marco Dörfler
 	 */
 	public ReportCreator(List<Representable> representables) {
 		this.representableList = representables;
@@ -39,8 +39,6 @@ public class ReportCreator {
 	 * Vorsicht: Hat nur ein Modul fehlerhaften HTML-Code kann kein Report gespeichert werden!
 	 *
 	 * @return Erfolgsmeldung: PDF gespeichert oder nicht
-	 *
-	 * @author Marco Dörfler
 	 */
 	public boolean savePdf() {
 		try {
@@ -70,8 +68,6 @@ public class ReportCreator {
 	 * Erzeuge nur wenn nötig den HTML-Code und speicher diesen
 	 *
 	 * @return der HTML-Code
-	 *
-	 * @author Marco Dörfler
 	 */
 	public String getHtml() {
 		if (this.htmlContent == null) {
@@ -85,8 +81,6 @@ public class ReportCreator {
 	 * Rendere danach das Template
 	 *
 	 * @return Der HTML-Code des Berichts
-	 *
-	 * @author Marco Dörfler
 	 */
 	private String createHtml() {
 		// Template laden
@@ -118,8 +112,6 @@ public class ReportCreator {
 	 * Lade alle HTML-Snippets der Representables
 	 *
 	 * @return Liste der HTML-Snippets
-	 *
-	 * @author Marco Dörfler
 	 */
 	private List<String> getHtmlSnippets() {
 		List<String> htmlSnippets = new ArrayList<>();

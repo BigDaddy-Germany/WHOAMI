@@ -23,7 +23,7 @@ import java.util.Map;
  * Diese Klasse erlaubt den Aufruf des ANTLR Parsings innerhalb einer neuen JVM. Dies stellt
  * sicher, dass durch ANTLR kein DFA-Caching vorgenommen werden kann
  *
- * Created by Marco Dörfler on 04.11.14.
+ * @author Marco Dörfler
  */
 public class AntlrLauncher {
 
@@ -34,14 +34,14 @@ public class AntlrLauncher {
 	public static enum CHECK_RESULT {
 		CORRECT(0), CANT_PARSE(1), SYNTAX_ERROR(2);
 
-		/**
+		/*
 		 * Für die Konvertierung zwischen CheckResult und den Codes brauchen wir die einzelnen
 		 * Variablen und die untenstehenden Methoden
 		 */
 		private int returnCode;
 		private static Map<Integer, CHECK_RESULT> returnValueToCheckResult = new HashMap<>();
 
-		/**
+		/*
 		 * Da wir das öfter brauchen werden, speichern wir uns die Zuordnung int->checkResult in
 		 * einer Map. Die Zuordnung checkResult->int speichert sich jedes checkResult selbst
 		 */
@@ -128,8 +128,6 @@ public class AntlrLauncher {
 	 * @param languageSetting Die Sprache, auf die geprüft werden soll
 	 * @param file Die Datei, die geprüft werden soll
 	 * @return ENUM, welches entscheidet, wie der Status der Datei ist
-	 *
-	 * @author Marco Dörfler
 	 */
 	private static CHECK_RESULT checkSyntax(LanguageSetting languageSetting, Path file) {
 		try {

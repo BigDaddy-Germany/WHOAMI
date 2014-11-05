@@ -8,9 +8,10 @@ import java.util.*;
 import java.util.regex.Matcher;
 
 /**
- * Created by Marco Dörfler on 16.10.14.
  * Diese Klasse kümmert sich um den Suchlauf nach Dateien und die Einsortierung der
  * Ergebnisse in die einzelnen Module
+ *
+ * @author Marco Dörfler
  */
 public class FileSearcher {
 
@@ -35,8 +36,6 @@ public class FileSearcher {
 		 * Konstruktor zum Erstellen der Instanz
 		 *
 		 * @param matcherMap Bereits zusammengesetzte Matcher zu Modulen
-		 *
-		 * @author Marco Dörfler
 		 */
 		private FileFinder(Map<Analyzable, PathMatcher> matcherMap) {
 			this.matcherMap = matcherMap;
@@ -52,8 +51,6 @@ public class FileSearcher {
 		 * Rückgabe der Suchergebnisse
 		 *
 		 * @return Liste der Paths
-		 *
-		 * @author Marco Dörfler
 		 */
 		public Map<Analyzable, List<Path>> getResults() {
 			return this.resultMap;
@@ -69,8 +66,6 @@ public class FileSearcher {
 		 * @return Konstante von FileVisitResult - Wie soll weitergemacht werden?
 		 *
 		 * @throws IOException Fehler beim Lesen von Dateien
-		 *
-		 * @author Marco Dörfler
 		 */
 		@Override
 		public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
@@ -102,12 +97,25 @@ public class FileSearcher {
 		 * @param exc Die Exception, welche beim Besuchen aufgetreten ist
 		 * @return Flag, wie das Programm weiter vorgehen soll
 		 * @throws IOException ein weiterer Fehler ist aufgetreten
-		 *
-		 * @author Marco Dörfler
 		 */
 		@Override
 		public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
 			return FileVisitResult.SKIP_SUBTREE;
+		}
+
+		/**
+		 * Der Papierkorb hat hat $Recycle.Bin im Pfad und soll komplett übersprungen werden
+		 * @param dir Der Ordner, dessen Besuch bevorsteht
+		 * @param attrs Die Attribute des Ordners
+		 * @return Flag, wie das Programm weiter vorgehen soll
+		 * @throws IOException ein Fehler ist aufgetreten
+		 */
+		@Override
+		public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+			if (dir.toString().contains("$Recycle.Bin")) {
+				return FileVisitResult.SKIP_SUBTREE;
+			}
+			return FileVisitResult.CONTINUE;
 		}
 	}
 
@@ -119,8 +127,6 @@ public class FileSearcher {
 	/**
 	 * Startet die Suche nach Dateien
 	 * @param analyzables Liste der Module aus der Hauptklasse
-	 *
-	 * @author Marco Dörfler
 	 */
 	public static void startSearch(List<Analyzable> analyzables) {
 		// Sammelt alle Ergebnisse über alle gestarteten FileWalks
@@ -149,8 +155,6 @@ public class FileSearcher {
 	 * Zusammenstellen der Filter und Erstellen eines Glob-Patterns
 	 * @param analyzables Liste der Module aus der Hauptklasse
 	 * @return Zusammengesetztes Glob-Pattern
-	 *
-	 * @author Marco Dörfler
 	 */
 	private static Map<Analyzable, PathMatcher> getMatchers(List<Analyzable> analyzables) {
 		Map<Analyzable, PathMatcher> matcherMap = new HashMap<>();
@@ -184,12 +188,10 @@ public class FileSearcher {
 	 * Durchsucht alle gewünschten Ordner/Laufwerke und speichert die Ergebnisse
 	 * direkt im übergebenen FileFinder. Daher keine Rückgabe
 	 * @param fileFinder die Instanz des FileFinders, welche genutzt werden soll
-	 *
-	 * @author Marco Dörfler
 	 */
 	private static void startFinder(FileFinder fileFinder) {
 
-		/**
+		/*
 		 * Wenn debugdir gesetzt ist, nur dort suchen
 		 * Ansonsten auf allen verfügbaren Laufwerken
 		 */
