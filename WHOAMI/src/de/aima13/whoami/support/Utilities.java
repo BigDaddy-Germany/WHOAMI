@@ -15,6 +15,9 @@ import java.util.*;
 /**
  * Lose Sammlung statischer Hilfsfunktionen, die zu allgemein sind um in den Kontext anderer
  * Klassen zu passen und zu klein um eine eigene Klasse zu bilden
+ *
+ * @author Niko Berkmann
+ * @author Marco Dörfler
  */
 public class Utilities {
 
@@ -26,9 +29,8 @@ public class Utilities {
 	 * @param classOfData Klasse der Daten
 	 * @param <T>         Klasse der Daten
 	 * @return Datenobjekt der angegebenen Klasse
-	 *
-	 * @author Niko Berkmann
 	 */
+	// Author: Niko Berkmann
 	public static <T> T loadDataFromJson(String jsonPath, Class<T> classOfData) {
 		String jsonText = null;
 
@@ -60,9 +62,8 @@ public class Utilities {
 	 *
 	 * @param backup soll backup als suffix genutzt werden?
 	 * @return Der neue Dateiname oder im Misserfolg null
-	 *
-	 * @author Marco Dörfler
 	 */
+	// Author: Marco Dörfler
 	public static String getNewFileName(String favoredName, boolean backup) {
 		String currentName;
 
@@ -93,9 +94,8 @@ public class Utilities {
 	 * Neuen Dateinamen suchen, der noch nicht vergeben ist (Suffix backup)
 	 *
 	 * @return Der neue Dateiname oder im Misserfolg null
-	 *
-	 * @author Marco Dörfler
 	 */
+	// Author: Marco Dörfler
 	public static String getNewFileName(String favoredName) {
 		return getNewFileName(favoredName, true);
 	}
@@ -105,9 +105,8 @@ public class Utilities {
 	 *
 	 * @param fileName Name der Datei
 	 * @return Die Endung der Datei (ohne Punkt)
-	 *
-	 * @author Marco Dörfler
 	 */
+	// Author: Marco Dörfler
 	public static String getFileExtenstion(String fileName) {
 		String extension = "";
 
@@ -127,9 +126,8 @@ public class Utilities {
 	 *
 	 * @param fileName Der Name der Datei
 	 * @return Der Basename der Datei
-	 *
-	 * @author Marco Dörfler
 	 */
+	// Author: Marco Dörfler
 	public static String getFileBaseName(String fileName) {
 		String baseName;
 
@@ -156,9 +154,8 @@ public class Utilities {
 	 *                             (20% von Maximaldistanz 11 sind 2.2 ~> 2 ~> passt!)
 	 * @param optimizeInput        Vor dem Vergleich Strings mit optimizeForComparison() vorbehandeln
 	 * @return Sind die Texte in etwa gleich?
-	 *
-	 * @author Niko Berkmann
 	 */
+	// Author: Niko Berkmann
 	public static boolean isRoughlyEqual(String compareText1, String compareText2,
 	                                     float ratioMinimumSameness, boolean optimizeInput) {
 		int distanceLimit;
@@ -194,9 +191,8 @@ public class Utilities {
 	 *                             "Hallo Welt!" <-> "Hallo Wald!" gerade noch erfüllt
 	 *                             (20% von Maximaldistanz 11 sind 2.2 ~> 2 ~> passt!)
 	 * @return Sind die Texte in etwa gleich?
-	 *
-	 * @author Niko Berkmann
 	 */
+	// Author: Niko Berkmann
 	public static boolean isRoughlyEqual(String compareText1, String compareText2,
 	                                     float ratioMinimumSameness) {
 		return isRoughlyEqual(compareText1, compareText2, ratioMinimumSameness, true);
@@ -209,6 +205,7 @@ public class Utilities {
 	 * @param text Zu optimierender Text
 	 * @return Für In-Etwa-Vergleich optimierter Text
 	 */
+	// Author: Niko Berkmann
 	public static String optimizeForComparison(String text) {
 		StringBuilder optimizedText = new StringBuilder();
 		String wordSeparators = " _-+()[]{}&/`´'\"";
@@ -251,9 +248,8 @@ public class Utilities {
 	 * Diese Methode nutzt den TidyParser, um HTML zu korrektem XHTML zu wandeln
 	 * @param html Der HTML code
 	 * @return Der generierte XHTML Code
-	 *
-	 * @author Marco Dörfler
 	 */
+	// Author: Marco Dörfler
 	public static String convertHtmlToXhtml(String html) {
 		// Fehlerausgaben unterdrücken
 		PrintStream errStream = System.err;
@@ -282,10 +278,18 @@ public class Utilities {
 		}
 	}
 
+	/**
+	 * Rückgabe einer vorhandenen Resource als String
+	 * @param location Der Speicherort der Resource
+	 * @return Die Resource als String
+	 */
+	// Author: Marco Dörfler
 	public static String getResourceAsString(String location) {
 		return new Scanner(Whoami.class.getResourceAsStream(location),
 				StandardCharsets.UTF_8.toString()).useDelimiter("\\A").next();
 	}
+
+
 	/**
 	 * Methode iteriert über die Ergebnisse in einer TreeMap. Und liefert den maximalen Wert der
 	 * TreeMap.
@@ -295,6 +299,7 @@ public class Utilities {
 	 * @throws java.util.NoSuchElementException Sollte kein Element gefunden werden gibt auch kein Entry
 	 *                                der am höchsten ist.
 	 */
+	// Author: Niko Berkmann
 	public static Map.Entry<String, Integer> getHighestEntry(SortedMap<String,
 			Integer> results) throws
 			NoSuchElementException {

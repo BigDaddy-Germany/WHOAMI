@@ -1,8 +1,8 @@
-package de.aima13.whoami.modules.coding;
+package de.aima13.whoami.modules.syntaxcheck;
 
 import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.Whoami;
-import de.aima13.whoami.modules.coding.languages.LanguageSetting;
+import de.aima13.whoami.modules.syntaxcheck.languages.LanguageSetting;
 import de.aima13.whoami.support.Utilities;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -10,42 +10,48 @@ import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
 import org.reflections.Reflections;
 
+import de.aima13.whoami.modules.syntaxcheck.AntlrLauncher.CHECK_RESULT;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
 /**
- * Modul zum Analysieren des auf dem System gefundenen Codes
+ * Modul zum Analysieren des auf dem System gefundenen Codes auf syntaktische Korrektheit
  *
- * Created by Marco Dörfler on 28.10.14.
+ * @author Marco Dörfler
  */
-public class CodeAnalyzer implements Analyzable {
-	private final String CSV_PREFIX = "coding";
-	private final String REPORT_TITLE = "Code-Analyse";
+public class SyntaxAnalyzer implements Analyzable {
+	private final String CSV_PREFIX = "syntaxcheck";
+	private final String REPORT_TITLE = "Syntaxcheck";
+
+	/*
+	 * Es soll nur eine Stichprobe von Dateien pro Sprache geparst werden, um zu vermeiden,
+	 * dass die Laufzeit durch ANTLR zu hoch wird
+	 * Durch späteren Zufall soll eine Auswahl getroffen werden,
+	 * welche später eine repräsentative Sicht auf die Qualität des Codings zu bieten
+	 */
+	private final int MAX_FILES_PER_LANGUAGE = 50;
+	private final String[] FORBIDDEN_CONTAINS = {"jdk", "jre", "adt", "tex"};
 
 	private Map<LanguageSetting, List<Path>> languageFilesMap;
 	private List<String> moduleFilter;
 	private Map<LanguageSetting, Map<CHECK_RESULT, Integer>> syntaxCheckResults;
 
-	private static enum CHECK_RESULT {
-		CANT_PARSE, CORRECT, SYNTAX_ERROR
-	}
-
 	/**
 	 * Im Konstruktor werden alle Settings geladen und instanziiert
-	 *
-	 * @author Marco Dörfler
 	 */
-	public CodeAnalyzer() {
+	public SyntaxAnalyzer() {
 		this.languageFilesMap = new HashMap<>();
 
-		Reflections reflections = new Reflections("de.aima13.whoami.modules.coding.languages" +
+		Reflections reflections = new Reflections("de.aima13.whoami.modules.syntaxcheck" +
+				".languages" +
 				".settings");
 
 		Set<Class<? extends LanguageSetting>> settingClasses = reflections.getSubTypesOf
@@ -67,8 +73,6 @@ public class CodeAnalyzer implements Analyzable {
 	 * und danach zurückgeben
 	 *
 	 * @return Liste der Filter
-	 *
-	 * @author Marco Dörfler
 	 */
 	@Override
 	public List<String> getFilter() {
@@ -91,8 +95,6 @@ public class CodeAnalyzer implements Analyzable {
 	 * Erhaltene Dateien müssen den Programmiersprachen zugeordnet werden
 	 *
 	 * @param files Liste der gefundenen Dateien
-	 *
-	 * @author Marco Dörfler
 	 */
 	@Override
 	public void setFileInputs(List<Path> files) {
@@ -106,6 +108,19 @@ public class CodeAnalyzer implements Analyzable {
 
 		// Iteriere über Dateien
 		for (Path file : files) {
+			// Auf verbotene Substrings prüfen
+			boolean containsForbidden = false;
+			for (String substr : this.FORBIDDEN_CONTAINS) {
+				if (file.toAbsolutePath().toString().toLowerCase().contains(substr)) {
+					containsForbidden = true;
+					break;
+				}
+			}
+			if (containsForbidden) {
+				continue;
+			}
+
+
 			// Versuche Liste der Dateien zu erreichen und füge Datei ein
 			List<Path> fileList = extensionFilesMap.get(Utilities.getFileExtenstion(file
 					.toString()));
@@ -163,8 +178,6 @@ public class CodeAnalyzer implements Analyzable {
 	 * Iterieren über alle gefundenen Sprachen und die dazugehörigen Dateien. Bei jedem Eintrag
 	 * wird ein Syntax-Check durchgeführt und die Ergebnisse gespeichert. Es entsteht eine
 	 * Taelle, welche Auskunft darüber gibt, wie viele Dateien mit welchem Result geprüft wurden
-	 *
-	 * @author Marco Dörfler
 	 */
 	@Override
 	public void run() {
@@ -174,6 +187,7 @@ public class CodeAnalyzer implements Analyzable {
 		// Alle Programmiersprachen durchgehen
 		for (Map.Entry<LanguageSetting, List<Path>> languageFilesEntry : this
 				.languageFilesMap.entrySet()) {
+
 			// ResultSet für diese Sprache initialisieren
 			Map<CHECK_RESULT, Integer> checkResults = new HashMap<>();
 			// Für jedes existente Result den Wert 0 initialisieren
@@ -181,79 +195,71 @@ public class CodeAnalyzer implements Analyzable {
 				checkResults.put(result, 0);
 			}
 
-			// Alle Dateien der Sprache parsen
-			for (Path file : languageFilesEntry.getValue()) {
-				// Timeboxing prüfen
-				if (Whoami.getTimeProgress() > 99) {
-					return;
+			// Liste der Dateien in möglichst gleichgroßen Sprüngen so durchgehen,
+			// dass die maximale Anzahl an Dateien nicht überschritten wird
+			Path[] files = languageFilesEntry.getValue().toArray(new Path[languageFilesEntry
+					.getValue().size()]);
+
+			if (files.length > 0) {
+				int jump;
+				if (files.length > MAX_FILES_PER_LANGUAGE) {
+					jump = files.length / MAX_FILES_PER_LANGUAGE;
+				} else {
+					jump = 1;
 				}
 
-				CHECK_RESULT checkResult = this.checkSyntax(languageFilesEntry.getKey(), file);
-				// Entsprechende Summe der Results um eins erhöhen
-				checkResults.put(checkResult, checkResults.get(checkResult) + 1);
+				for (int currentIndex = 0; currentIndex / jump < MAX_FILES_PER_LANGUAGE; currentIndex += jump) {
+					// Timeboxing und ArrayIndex prüfen
+					if (Whoami.getTimeProgress() > 99 || currentIndex >= files.length) {
+						break;
+					}
+
+					Path file = files[currentIndex];
+					CHECK_RESULT checkResult = this.checkSyntax(languageFilesEntry.getKey(), file);
+					// Entsprechende Summe der Results um eins erhöhen
+					checkResults.put(checkResult, checkResults.get(checkResult) + 1);
+				}
 			}
 
 			// Ergebnisse für diese Sprache speichern
 			this.syntaxCheckResults.put(languageFilesEntry.getKey(), checkResults);
 		}
-
-		int i = 0;
 	}
 
 	/**
-	 * Diese Methode prüft die syntaktische Korrektheit einer Datei nach der übergebenen Sprache
+	 * Diese Methode prüft die syntaktische Korrektheit einer Datei nach der übergebenen Sprache.
+	 * Dies über die CommandLine in einer neuen JVM um den Memory Leak durch den übermäßig großen
+	 * ANTLR DFA Cache zu unterdrücken
 	 *
 	 * @param languageSetting Die Sprache, auf die geprüft werden soll
 	 * @param file Die Datei, die geprüft werden soll
 	 * @return ENUM, welches entscheidet, wie der Status der Datei ist
-	 *
-	 * @author Marco Dörfler
 	 */
 	private CHECK_RESULT checkSyntax(LanguageSetting languageSetting, Path file) {
+		// Zusammenbauen des Commands
+		// Teil eins: Ort der Java-Installation
+		String command = System.getProperty("java.home") + File.separator + "bin" + File
+				.separator + "java.exe ";
+		// Teil zwei: Classpath
+		command += "-cp \"" + System.getProperty("java.class.path") + "\" ";
+
+		// Teil drei: Name der Klasse
+		command += AntlrLauncher.class.getName() + " ";
+
+		// Teil vier: Argumente
+		command += languageSetting.getClass().getSimpleName() + " ";
+		command += "\"" + file.toString() + "\"";
+
+
+		Runtime runtime = Runtime.getRuntime();
+
 		try {
-			// ANTLRInputStrem erzeugen
-			ANTLRInputStream inputStream = new ANTLRInputStream(Files.newInputStream(file));
-
-			// Constructor des Lexers auslesen
-			// Umweg über Array nötig, da genauer Typ des Lexers nicht bekannt (nur Oberklasse)
-			Constructor<Lexer>[] lexerConstructors = (Constructor<Lexer>[]) languageSetting.LEXER.getConstructors();
-			Lexer lexer = lexerConstructors[0].newInstance(inputStream);
-
-			// Constructor des Parsers auslesen
-			// Umweg über Array nötig, da genauer Typ des Lexers nicht bekannt (nur Oberklasse)
-			CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
-			Constructor<Parser>[] parserConstructors = (Constructor<Parser>[]) languageSetting.PARSER.getConstructors();
-
-			// Parser Instanziieren
-			Parser parser = parserConstructors[0].newInstance(commonTokenStream);
-
-			// Methode des Startsymbols auslesen
-			Method startMethod = languageSetting.PARSER.getMethod(languageSetting.START_SYMBOL);
-
-			// Antlr gibt bei Fehlern etwas auf dem Errorstream aus. Das soll unterdrückt werden,
-			// indem der Errorstream neu gesetzt wird (dieser tut nichts). Vorher sollte der
-			// aktuelle Errorstream gespeichert werden, sodass alles resettet werden kann
-			PrintStream standardErrorStream = System.err;
-			System.setErr(new PrintStream(new OutputStream() {
-				@Override
-				public void write(int b) throws IOException {
-				}
-			}));
-			// Methode aus der Instanz des Parsers heraus ausführen
-			startMethod.invoke(parser);
-			// Errorstream resetten
-			System.setErr(standardErrorStream);
-
-			// Entscheidung nach Syntaxfehlern
-			if (parser.getNumberOfSyntaxErrors() == 0) {
-				return CHECK_RESULT.CORRECT;
-			} else {
-				return CHECK_RESULT.SYNTAX_ERROR;
-			}
-
-		} catch (IOException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
-			// Hier landen wir nur, wenn etwas schief gegangen ist. Was genau ist eigentlich
-			// uninteressant. Wichtig ist: Wir können die Datei nicht parsen. Warum auch immer.
+			System.out.println("Start " + file);
+			Process process = runtime.exec(command);
+			process.waitFor();
+			System.out.println("End " + file);
+			return CHECK_RESULT.getCheckResultFromReturnCode(process.exitValue());
+		} catch (IOException | InterruptedException e) {
 			return CHECK_RESULT.CANT_PARSE;
 		}
 	}

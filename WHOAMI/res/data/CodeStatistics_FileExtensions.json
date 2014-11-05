@@ -1,0 +1,11 @@
+[
+	{"ext":"php", "lang":"PHP"},
+	{"ext":"java", "lang":"Java"},
+	{"ext":"c", "lang":"C"},
+	{"ext":"py", "lang":"Python"},
+	{"ext":"html", "lang":"HTML"},
+	{"ext":"cpp", "lang":"C++"},
+	{"ext":"cs", "lang":"C#"},
+	{"ext":"m", "lang":"Objective C"},
+	{"ext":"vb", "lang":"Visual Basic"}
+]

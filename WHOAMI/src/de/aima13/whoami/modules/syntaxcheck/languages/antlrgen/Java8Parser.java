@@ -1,4 +1,4 @@
-package de.aima13.whoami.modules.coding.languages.antlrgen;
+package de.aima13.whoami.modules.syntaxcheck.languages.antlrgen;
 // Generated from Java8.g4 by ANTLR 4.4
 
 /**
@@ -66,8 +66,6 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.*;
 import org.antlr.v4.runtime.tree.*;
 import java.util.List;
-import java.util.Iterator;
-import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class Java8Parser extends Parser {
