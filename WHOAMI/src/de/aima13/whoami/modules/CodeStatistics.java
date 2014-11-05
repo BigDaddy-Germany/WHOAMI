@@ -16,10 +16,31 @@ import java.util.*;
 public class CodeStatistics implements Analyzable {
 
 	private static final String TEMPLATE_LOCATION = "/data/programmStats.html";
-	private static final String WEB_TYPE ="web";
+	private static final String WEB_TYPE = "web";
 	private static final String NORMAL_CODE = "native";
 	private final FileExtension[] fileExtensions;
-	// Inhaltstyp der JSon Datei
+
+	/**
+	 * Rückgabe der Sprache, die am häufigsten Verwendet wird
+	 * @return Der Name der Sprache als String
+	 */
+	private String getTopLanguage() {
+		String topLanguage = null;
+		int counter = 0;
+		for (Map.Entry<FileExtension, Integer> statisticsEntry : this.statisticResults.entrySet()) {
+			if (statisticsEntry.getValue() > counter) {
+				topLanguage = statisticsEntry.getKey().lang;
+				counter = statisticsEntry.getValue();
+			}
+		}
+		return topLanguage;
+	}
+
+	/**
+	 * Inhaltstyp der json Datei als innere Klasse
+	 *
+	 * @author Marco Dörfler
+	 */
 	private class FileExtension {
 		public String ext;
 		public String lang;
@@ -49,6 +70,7 @@ public class CodeStatistics implements Analyzable {
 
 	/**
 	 * Konstruiert die Filtereinstellungen aus der Liste der unterstützten Dateiendungen
+	 *
 	 * @return Die erstellte Liste der Filter
 	 */
 	@Override
@@ -64,6 +86,7 @@ public class CodeStatistics implements Analyzable {
 
 	/**
 	 * Dateien werden einfach gespeichert und später genutzt
+	 *
 	 * @param files Liste der gefundenen Dateien
 	 * @throws Exception
 	 */
@@ -72,28 +95,49 @@ public class CodeStatistics implements Analyzable {
 		this.fileInput = files;
 	}
 
+
+	/**
+	 * Erzeugt den Modul-spezifischen HTML Code
+	 * @return Der HTML Code für den Report
+	 */
 	@Override
 	public String getHtml() {
 		// Template laden
 		ST template = new ST(Utilities.getResourceAsString(TEMPLATE_LOCATION), '$', '$');
-		if(moreWebCoding()){
-			template.add("moreWebLanguage",true);
-		}else{
-			template.add("moreNativeLanguage",true);
+
+		String topLanguage = this.getTopLanguage();
+		template.add("topLanguage", topLanguage);
+		// Wenn keine Programmierdateien auf dem Rechner gefunden wurden,
+		// soll isProgrammer false sein
+		template.add("isProgrammer", topLanguage != null);
+
+
+		if (this.moreWebCoding()) {
+			template.add("moreWebLanguage", true);
+			template.add("moreNativeLanguage", false);
+		} else {
+			template.add("moreNativeLanguage", true);
+			template.add("moreWebLanguage", false);
 		}
 		for (Map.Entry<FileExtension, Integer> statisticsEntry : this.statisticResults.entrySet()) {
-			template.addAggr("programm.{extension, counter}",statisticsEntry.getKey().lang,
+			template.addAggr("programm.{extension, counter}", statisticsEntry.getKey().lang,
 					statisticsEntry.getValue().toString());
 		}
 		return template.render();
 	}
 
+	/**
+	 * Entscheidet darüber, ob der Benutzer eher nativ oder web-basiert programmiert
+	 * @return True, wenn der Benutzer mehr im Web programmiert
+	 */
 	private boolean moreWebCoding() {
-		int webFiles=0; int nativeFiles=0;
+		int webFiles = 0;
+		int nativeFiles = 0;
+
 		for (Map.Entry<FileExtension, Integer> statisticsEntry : this.statisticResults.entrySet()) {
-			if(statisticsEntry.getKey().type.equals(WEB_TYPE)){
+			if (statisticsEntry.getKey().type.equals(WEB_TYPE)) {
 				webFiles++;
-			}else{
+			} else {
 				nativeFiles++;
 			}
 		}
@@ -113,6 +157,7 @@ public class CodeStatistics implements Analyzable {
 
 	/**
 	 * Iteriere über die Statistiken und füge sie in die Ergebnis-Map für die CSV Datei ein
+	 *
 	 * @return Die fertige CSV-Datei
 	 */
 	@Override
