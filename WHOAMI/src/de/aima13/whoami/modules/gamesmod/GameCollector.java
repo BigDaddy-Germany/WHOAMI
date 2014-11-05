@@ -5,6 +5,7 @@ import de.aima13.whoami.Whoami;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
@@ -42,7 +43,7 @@ class GameCollector {
 		//SteamApps-Verzeichnis extrahieren
 		try {
 			Games.steamAppsPath = steamExe.getParent().resolve("SteamApps");
-		} catch (Exception e) {
+		} catch (InvalidPathException ignored) {
 		} //Fehler resultieren in später behandeltem Initalwert
 
 		if (Games.steamAppsPath != null) {
@@ -97,7 +98,7 @@ class GameCollector {
 						addGame(gameName, gameFolderPath);
 					}
 				}
-			} catch (Exception e) {
+			} catch (IOException ignored) {
 			} //Zugriffsprobleme bewusst ignorieren
 
 			if (Whoami.getTimeProgress() >= 99) {
