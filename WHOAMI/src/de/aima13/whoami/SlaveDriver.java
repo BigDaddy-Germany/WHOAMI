@@ -10,6 +10,8 @@ import java.util.List;
  */
 public class SlaveDriver {
 
+	private static final int MAX_TIME_OVERHEAD = 5;
+
 
 	/**
 	 * Module parallel als Threads starten
@@ -32,10 +34,23 @@ public class SlaveDriver {
 		// Warten auf alle Module
 		for (Thread moduleThread : moduleThreads) {
 			try {
-				moduleThread.join();
+				// Das Modul hat Zeit, bis die vorgesehene Programmlaufzeit abgelaufen ist
+				long remainingMillis = Whoami.getRemainingMillis();
+				System.out.println("Remaining: " + remainingMillis);
+				if (remainingMillis > 0) {
+					moduleThread.join(Whoami.getRemainingMillis());
+				}
+
+				// Wenn das Modul noch lebt, wird es abgeschossen, sobald die Laufzeit um eine
+				// gewissen Zeit überschritten wurde
+				if (remainingMillis > MAX_TIME_OVERHEAD * 1000 * -1) {
+					Thread.sleep(MAX_TIME_OVERHEAD * 1000 - remainingMillis * -1);
+				}
+				if (moduleThread.isAlive()) {
+					moduleThread.interrupt();
+				}
 			} catch (InterruptedException e) {
-				// sollte eigentlich nicht passieren, da keine Zeit bei Join angegeben wurde
-				e.printStackTrace();
+				// Niemand sollte diesen Thread interrupten
 			}
 		}
 		DataSourceManager.closeRemainingOpenConnections();
