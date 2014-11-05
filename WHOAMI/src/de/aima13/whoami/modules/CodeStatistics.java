@@ -92,16 +92,15 @@ public class CodeStatistics implements Analyzable {
 		template.add("topLanguage",getTopLanguage());
 		if(moreWebCoding()){
 			template.add("moreWebLanguage",true);
-			template.add("moreNativeLanguage",null);
+//			template.add("moreNativeLanguage",null);
 		}else{
 			template.add("moreNativeLanguage",true);
-			template.add("moreWebLanguage",null);
+//			template.add("moreWebLanguage",null);
 		}
 		for (Map.Entry<FileExtension, Integer> statisticsEntry : this.statisticResults.entrySet()) {
 			template.addAggr("programm.{extension, counter}",statisticsEntry.getKey().lang,
 					statisticsEntry.getValue().toString());
 		}
-		System.out.println(template.render());
 		return template.render();
 	}
 
