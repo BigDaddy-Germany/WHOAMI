@@ -7,9 +7,12 @@ import de.aima13.whoami.modules.syntaxcheck.languages.antlrgen.CParser;
 /**
  * Einstellungen für die Sprache C
  *
- * Created by Marco dörfler on 29.10.14.
+ * @author Marco Dörfler
  */
 public class CSetting extends LanguageSetting {
+	/**
+	 * Einstellungen der Sprache werden gesetzt
+	 */
 	public CSetting() {
 		super(
 				"C",
