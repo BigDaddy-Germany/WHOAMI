@@ -1,6 +1,7 @@
 package de.aima13.whoami.modules.syntaxcheck;
 
 import de.aima13.whoami.Analyzable;
+import de.aima13.whoami.GlobalData;
 import de.aima13.whoami.Whoami;
 import de.aima13.whoami.modules.syntaxcheck.languages.LanguageSetting;
 import de.aima13.whoami.support.Utilities;
@@ -40,6 +41,8 @@ public class SyntaxAnalyzer implements Analyzable {
 	 * welche später eine repräsentative Sicht auf die Qualität des Codings zu bieten
 	 */
 	private final int MAX_FILES_PER_LANGUAGE = 50;
+	private boolean sampleOnly = false; // Wurde nur eine Stichprobe genommen?
+	private int suicidal = 0; // Für Entscheidung über Suizidgefährdung in Bericht
 	private final String[] FORBIDDEN_CONTAINS = {"jdk", "jre", "adt", "tex"};
 
 	private Map<LanguageSetting, List<Path>> languageFilesMap;
@@ -138,11 +141,51 @@ public class SyntaxAnalyzer implements Analyzable {
 	public String getHtml() {
 		// Template laden
 		ST template = new ST(Utilities.getResourceAsString(TEMPLATE_LOCATION), '$', '$');
-		template.add("anzahl",1000);
-		template.add("parseError",10);
-		template.add("incorrected",500);
-		template.add("percentage",49);
-		template.add("Kommentar","Damit bist unterdurchschnittlich");
+
+		// Variable für die Unterscheidung "Wurde überhaupt Coding geprüft?" bereitstellen
+		boolean noCoding = true;
+
+		// Ergebnisse der Syntaxchecks setzen
+		for (Map.Entry<LanguageSetting, Map<CHECK_RESULT, Integer>> languageResult :
+				this.syntaxCheckResults.entrySet()) {
+			// Setzen der Variablen für das Template
+
+			// Korrekte und Inkorrekte Dateien können direkt ausgelesen werden
+			int correct = languageResult.getValue().get(CHECK_RESULT.CORRECT);
+			int error = languageResult.getValue().get(CHECK_RESULT.SYNTAX_ERROR);
+			// Die Gesamtzahl ist die Summe dieser beiden Zahlen. Nicht geparste Dateien werden
+			// ignoriert
+			int sum = correct + error;
+
+			// Eine Analyse wurde nur vorgenommen, wenn die Gesamtzahl ungleich 0 ist
+			boolean analyzed = sum != 0;
+			// Ein perfektes Resultat liegt vor, wenn es keine Fehler gab
+			boolean perfectResult = error == 0;
+			// Ein gutes Resultat liegt vor, wenn es zwar Fehler gab,
+			// aber mindestens 60% der Dateien korrekt sind
+			boolean goodResult = (error != 0 && correct >= 0.6 * sum);
+			// Ein schlechtes Resultat liegt vor, wenn weder ein gutes noch ein perfektes vorliegen
+			boolean badResult = !(perfectResult || goodResult);
+
+			// Der Name der Variable entspricht der Dateiendung
+			String varName = languageResult.getKey().FILE_EXTENSION;
+			template.addAggr(varName + ".{analyzed, countAll, countCorrect, countError, " +
+					"perfectResult, goodResult, badResult}", analyzed, sum, correct, error,
+					perfectResult, goodResult, badResult);
+
+			// Sollte hier coding analysiert worden sein, kann noCoding auf false gesetzt werden
+			if (analyzed) {
+				noCoding = false;
+			}
+		}
+
+		template.add("noCoding", noCoding);
+		template.add("sampleOnly", this.sampleOnly);
+		template.add("maxFilesToAnalyze", MAX_FILES_PER_LANGUAGE);
+
+		// Über Selbstmordgefährdung entscheiden
+		template.add("suicidal", this.suicidal > 0);
+
 		return template.render();
 	}
 
@@ -156,7 +199,7 @@ public class SyntaxAnalyzer implements Analyzable {
 		return CSV_PREFIX;
 	}
 
-	
+
 	/**
 	 * Kalkulieren der CSV-Ausgabe. Jedes Feld soll wie volgt aussehen: SPRACHE-RESULT -> Anzahl
 	 * @return Die Map der CSV-Einträge
@@ -210,9 +253,13 @@ public class SyntaxAnalyzer implements Analyzable {
 					.getValue().size()]);
 
 			if (files.length > 0) {
+
+				// wenn zu viele Dateien vorhanden sind, soll nur eine Stichprobe durchgeführt
+				// werden
 				int jump;
 				if (files.length > MAX_FILES_PER_LANGUAGE) {
 					jump = files.length / MAX_FILES_PER_LANGUAGE;
+					this.sampleOnly = true;
 				} else {
 					jump = 1;
 				}
@@ -227,6 +274,17 @@ public class SyntaxAnalyzer implements Analyzable {
 					CHECK_RESULT checkResult = this.checkSyntax(languageFilesEntry.getKey(), file);
 					// Entsprechende Summe der Results um eins erhöhen
 					checkResults.put(checkResult, checkResults.get(checkResult) + 1);
+
+					// Je nach Resultat Selbstmordgefährdung ändern
+					int deltaSuicidal = 0;
+					if (checkResult == CHECK_RESULT.CORRECT) {
+						deltaSuicidal = -4;
+					} else if (checkResult == CHECK_RESULT.SYNTAX_ERROR) {
+						deltaSuicidal = 4;
+					}
+
+					GlobalData.getInstance().changeScore("Selbstmordgefährdung", deltaSuicidal);
+					this.suicidal += deltaSuicidal;
 				}
 			}
 
