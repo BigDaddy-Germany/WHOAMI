@@ -109,6 +109,23 @@ public class FileSearcher {
 		public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
 			return FileVisitResult.SKIP_SUBTREE;
 		}
+
+		/**
+		 * Der Papierkorb hat hat $Recycle.Bin im Pfad und soll komplett übersprungen werden
+		 * @param dir Der Ordner, dessen Besuch bevorsteht
+		 * @param attrs Die Attribute des Ordners
+		 * @return Flag, wie das Programm weiter vorgehen soll
+		 * @throws IOException ein Fehler ist aufgetreten
+		 *
+		 * @author Marco Dörfler
+		 */
+		@Override
+		public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+			if (dir.toString().contains("$Recycle.Bin")) {
+				return FileVisitResult.SKIP_SUBTREE;
+			}
+			return FileVisitResult.CONTINUE;
+		}
 	}
 
 
