@@ -5,7 +5,6 @@ import de.aima13.whoami.GlobalData;
 import de.aima13.whoami.Whoami;
 import de.aima13.whoami.support.DataSourceManager;
 import de.aima13.whoami.support.SqlSelectSaver;
-import de.aima13.whoami.support.Utilities;
 
 import java.nio.file.Path;
 import java.sql.ResultSet;
@@ -173,10 +172,11 @@ public class PersonalData implements Analyzable {
 									select=SELECT_BANK_ACCOUNT;
 
 						}
-						SqlSelectSaver result = executeSqlAndReturnSingleStringFf(curr,
-								new SqlSelectSaver(title), select);
+						myDbResults.addAll(executeSqlAndReturnFromFf(curr,
+								title, select));
 
 						//überprüfen ob der Wert schon enthalten ist
+						/**
 						boolean alreadyInList = false;
 						for (SqlSelectSaver old : myDbResults) {
 							if (old.title.equals(result.value) && old.value.equals(result.value)) {
@@ -187,6 +187,7 @@ public class PersonalData implements Analyzable {
 							if (!alreadyInList) {
 								myDbResults.add(result);
 							}
+						*/
 
 					}
 				}
@@ -202,38 +203,64 @@ public class PersonalData implements Analyzable {
 	 * @param
 	 * @return Das oberste Ergebniss der Abfrage oder ein leerer String falls es zu Fehlern kamm
 	 */
-		private SqlSelectSaver executeSqlAndReturnSingleStringFf(Path formHistoryPath,
-		                                                SqlSelectSaver saver, String sqlStatement){
-			String resultStrg="";
-			int resultHitCnt=0;
-			boolean error=false;
-			DataSourceManager dbManager=null;
+		private List<SqlSelectSaver> executeSqlAndReturnFromFf(Path formHistoryPath,
+		                                                       String title, String sqlStatement) {
+
+
+			LinkedList<SqlSelectSaver> sqlResults = new LinkedList<>();
+			String resultStrg = "";
+			int resultHitCnt = 0;
+			boolean error = false;
+			DataSourceManager dbManager = null;
 			try {
 				dbManager = new DataSourceManager(formHistoryPath);
-			}catch(Exception e){
+			} catch (Exception e) {
 				//merken dass es Probleme gab aber ansonsten nix machen
-				error=true;
+				error = true;
 			}
-			if(!error && dbManager!=null){
-				try{
-					ResultSet resultSet=dbManager.querySqlStatement(sqlStatement+" LIMIT 1");
-					//resultSet.beforeFirst();
+			if (!error && dbManager != null) {
+				ResultSet resultSet;
+				try {
+					resultSet = dbManager.querySqlStatement(sqlStatement);
+
 					//resultSet.next();
-					resultStrg =resultSet.getString("value");
-					resultHitCnt=resultSet.getInt("hcnt");
-				}catch(Exception e){
+
+				} catch (Exception e) {
 					//kann eigentlich nur crashen wenn es absolut keinen Eintrag gibt
-					error=true;
+					error = true;
+					resultSet=null;
+				}
+				if (!error && resultSet!=null) {
+				/**	try {
+						resultSet.beforeFirst();
+					} catch (SQLException e) {
+						//kann eigentlich nur crashen wenn es absolut keinen Eintrag gibt
+						error = true;
+					}*/
+					try {
+						while (!error && resultSet.next()) {
+							try {
+								resultStrg = resultSet.getString("value");
+								resultHitCnt = resultSet.getInt("hcnt");
+							}catch(Exception e){
+								resultStrg="";
+								resultHitCnt=0;
+							}
+							//keine leeren Elemente zulassen
+							if(!resultStrg.equals("")) {
+								sqlResults.add(new SqlSelectSaver(title, resultStrg, resultHitCnt));
+							}
+						}
+					} catch (SQLException e) {
+						//nix machen
+						e = e;
+					}
+
+
+
 				}
 			}
-			if(error){
-				resultStrg="";
-				resultHitCnt=0;
-			}
-			saver.hitCount=resultHitCnt;
-			saver.value=resultStrg;
-			return saver;
-
+			return sqlResults;
 		}
 
 

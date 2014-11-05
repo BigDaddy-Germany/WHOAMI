@@ -12,4 +12,10 @@ public class SqlSelectSaver {
 	public SqlSelectSaver(String mTitle){
 		title =mTitle;
 	}
+	public SqlSelectSaver(String mTitle , String mValue,int mHitCount){
+		title=mTitle;
+		value=mValue;
+		hitCount=mHitCount;
+	}
+
 }
