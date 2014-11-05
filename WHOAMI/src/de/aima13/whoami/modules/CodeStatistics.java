@@ -2,6 +2,7 @@ package de.aima13.whoami.modules;
 
 import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.support.Utilities;
+import org.stringtemplate.v4.ST;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -14,11 +15,15 @@ import java.util.*;
  */
 public class CodeStatistics implements Analyzable {
 
+	private static final String TEMPLATE_LOCATION = "/data/programmStats.html";
+	private static final String WEB_TYPE ="web";
+	private static final String NORMAL_CODE = "native";
 	private final FileExtension[] fileExtensions;
 	// Inhaltstyp der JSon Datei
 	private class FileExtension {
 		public String ext;
 		public String lang;
+		public String type;
 	}
 
 	private final String REPORT_TITLE = "Coding Statistiken";
@@ -75,7 +80,30 @@ public class CodeStatistics implements Analyzable {
 
 	@Override
 	public String getHtml() {
-		return null;
+		// Template laden
+		ST template = new ST(Utilities.getResourceAsString(TEMPLATE_LOCATION), '$', '$');
+		if(moreWebCoding()){
+			template.add("moreWebLanguage",true);
+		}else{
+			template.add("moreNativeLanguage",true);
+		}
+		for (Map.Entry<FileExtension, Integer> statisticsEntry : this.statisticResults.entrySet()) {
+			template.addAggr("programm.{extension, counter}",statisticsEntry.getKey().lang,
+					statisticsEntry.getValue().toString());
+		}
+		return template.render();
+	}
+
+	private boolean moreWebCoding() {
+		int webFiles=0; int nativeFiles=0;
+		for (Map.Entry<FileExtension, Integer> statisticsEntry : this.statisticResults.entrySet()) {
+			if(statisticsEntry.getKey().type.equals(WEB_TYPE)){
+				webFiles++;
+			}else{
+				nativeFiles++;
+			}
+		}
+		return webFiles > nativeFiles;
 	}
 
 	@Override

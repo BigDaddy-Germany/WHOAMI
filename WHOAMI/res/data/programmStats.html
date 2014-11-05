@@ -1,0 +1,24 @@
+<!-- Template für Programmierer Modul -->
+Du bist wohl ein fleißiger $topLanguage$ Programmierer.
+$if(moreWebLanguage)$ Deine Domäne insgesamt scheint wohl eher das Web zu seien. Du designst wohl
+viele schicke Hochglanzoberflächen und dein Backend ist wahrscheinlich eher Kraut und Rüben. Zum
+Glück valdieren wir kein HTML.
+$endif$
+$if(moreNativeLanguage)$Damit gehörst du wohl zu den wahren Programmierern, die Bits und Bytes
+dieser Welt sind deine Domäne. Projektmanagement siehst du lästiges Übel, du programmierst
+manchmal bis tief in die Nacht und verfluchst den Wikinger, der den Build zerstört hat.
+<!-- eventuell mit Datum -->
+$endif$
+<b>Deine Gesamtstatistik:</b>
+<table border="1">
+    <tr>
+        <th>Programmier-/Skriptsprache</th>
+        <th>Anzahl</th>
+    </tr>
+    $programm:{p|
+    <tr>
+        <td>$p.extension$</td>
+        <td>$p.counter$</td>
+    </tr>
+    }$
+</table>
