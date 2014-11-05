@@ -7,9 +7,12 @@ import de.aima13.whoami.modules.syntaxcheck.languages.antlrgen.Java8Parser;
 /**
  * Einstellungen für die Sprache Java (Version Java 8)
  *
- * Created by Marco Dörfler on 29.10.14.
+ * @author Marco Dörfler
  */
 public class Java8Setting extends LanguageSetting {
+	/**
+	 * Einstellungen der Sprache werden gesetzt
+	 */
 	public Java8Setting() {
 		super(
 				"Java",
