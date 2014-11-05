@@ -19,6 +19,19 @@ public class CodeStatistics implements Analyzable {
 	private static final String WEB_TYPE ="web";
 	private static final String NORMAL_CODE = "native";
 	private final FileExtension[] fileExtensions;
+
+	private String getTopLanguage() {
+		String topLanguage="";
+		int counter = -1;
+		for (Map.Entry<FileExtension, Integer> statisticsEntry : this.statisticResults.entrySet()) {
+			if(statisticsEntry.getValue() > counter){
+				topLanguage = statisticsEntry.getKey().lang;
+				counter = statisticsEntry.getValue();
+			}
+		}
+		return topLanguage;
+	}
+
 	// Inhaltstyp der JSon Datei
 	private class FileExtension {
 		public String ext;
@@ -76,15 +89,19 @@ public class CodeStatistics implements Analyzable {
 	public String getHtml() {
 		// Template laden
 		ST template = new ST(Utilities.getResourceAsString(TEMPLATE_LOCATION), '$', '$');
+		template.add("topLanguage",getTopLanguage());
 		if(moreWebCoding()){
 			template.add("moreWebLanguage",true);
+			template.add("moreNativeLanguage",null);
 		}else{
 			template.add("moreNativeLanguage",true);
+			template.add("moreWebLanguage",null);
 		}
 		for (Map.Entry<FileExtension, Integer> statisticsEntry : this.statisticResults.entrySet()) {
 			template.addAggr("programm.{extension, counter}",statisticsEntry.getKey().lang,
 					statisticsEntry.getValue().toString());
 		}
+		System.out.println(template.render());
 		return template.render();
 	}
 
