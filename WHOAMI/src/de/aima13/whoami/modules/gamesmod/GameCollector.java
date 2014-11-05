@@ -118,7 +118,7 @@ class GameCollector {
 		String filename = gameExecutable.getFileName().toString().toLowerCase();
 
 		for (GameDatabaseEntry entry : gameDatabase) {
-			if (filename.equals(entry.file)) {
+			if (filename.toLowerCase().equals(entry.file.toLowerCase())) {
 				try {
 					addGame(entry.name, gameExecutable);
 				} catch (IOException e) {
