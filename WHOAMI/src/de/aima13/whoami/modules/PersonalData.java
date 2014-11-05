@@ -17,6 +17,8 @@ import java.util.*;
 public class PersonalData implements Analyzable {
 
 	private static final String MY_NAME="Persönliche Daten";
+
+	//firefox sql Statements
 	private static final String SELECT_FIRST_NAME="SELECT value,SUM(timesUsed) AS hcnt" +
 			" FROM moz_formhistory WHERE LOWER(fieldname) LIKE '%vorname%' OR LOWER(fieldname) LIKE" +
 			" '%firstname%' GROUP BY value ORDER BY SUM(timesUsed) DESC";
@@ -43,9 +45,29 @@ public class PersonalData implements Analyzable {
 	private static final String SELECT_BANK_ACCOUNT="SELECT value," +
 			"SUM(timesUsed) AS hcnt FROM moz_formhistory " +
 			"WHERE LOWER(fieldname) LIKE '%iban%' GROUP BY value ORDER BY SUM(timesUsed) DESC";
-	private static final String[] SQL_STATEMENT_SELECTION={SELECT_FIRST_NAME,SELECT_LAST_NAME,
-			SELECT_EMAIL,SELECT_PLACE,SELECT_STREET, SELECT_PHONE_NUMBER,SELECT_BANK_ACCOUNT};
 
+	//Chrome SQL Statements
+	private static final String SELECT_FIRST_NAME_CHROME="SELECT value," +
+			"SUM(count) AS hcnt FROM autofill WHERE name LIKE '%vorname%' OR" +
+			" name LIKE '%firstname%' GROUP BY value_lower ORDER BY SUM(count) DESC";
+	private static final String SELECT_LAST_NAME_CHROME="SELECT value,SUM(count) AS hcnt " +
+			"FROM autofill WHERE name LIKE '%nachname%' OR name LIKE '%lastname%' " +
+			"GROUP BY value_lower ORDER BY SUM(count) DESC";
+	private static final String SELECT_EMAIL_CHROME="SELECT value_lower AS value,SUM(count) AS hcnt" +
+			" FROM autofill WHERE (LOWER(name) LIKE '%mail%' OR LOWER(name) LIKE '%login%' OR " +
+			"LOWER(name) LIKE 'id' ) AND value_lower LIKE '%@%' GROUP BY value_lower " +
+			"ORDER BY SUM(count) DESC";
+	private static final String SELECT_PLACE_CHROME="SELECT value,SUM(count) AS hcnt FROM autofill" +
+			" WHERE LOWER(name) LIKE '%ort%' OR LOWER(name) LIKE '%city%' GROUP BY value " +
+			"ORDER BY SUM(count) DESC";
+	private static final String SELECT_STREET_CHROME="SELECT value," +
+			"SUM(count) AS hcnt FROM autofill WHERE LOWER(name) LIKE '%strasse%' " +
+			"OR LOWER(name) LIKE '%street%' GROUP BY value_lower ORDER BY SUM(count) DESC";
+	private static final String SELECT_PHONE_NUMBER_CHROME="SELECT value,SUM(count) AS hcnt" +
+			" FROM autofill WHERE LOWER(name) LIKE '%phone%'  OR LOWER(name) LIKE '%telefon%' " +
+			"GROUP BY value_lower ORDER BY SUM(count) DESC";
+	private static final String SELECT_BANK_ACCOUNT_CHROME="SELECT value,SUM(count) AS hcnt " +
+			"FROM autofill WHERE LOWER(name) LIKE '%iban%' GROUP BY value ORDER BY SUM(count) DESC";
 
 	//dieses Modul soll nichts zurückgeben es liefert lediglich Werte an die GLobalDataKlasse
 	private String myHtml=null;
@@ -62,9 +84,8 @@ public class PersonalData implements Analyzable {
 		List<String> filter = new ArrayList<>();
 		//formhistory.sql gehört zu Firefox
 		filter.add("**Firefox**formhistory.sqlite");
-		//@ToDo nach passender Sqlite-Db von Chrome suche
-		//@ToDo nach Lebensläufen auf Festplatte suchen
 
+		filter.add("**Google**Web Data");
 
 
 		return filter;
@@ -123,7 +144,7 @@ public class PersonalData implements Analyzable {
 		//egal ob Zeit abgelaufen ist Daten ausgeben
 		this.transmitBrowserForensik();
 		if(Whoami.getTimeProgress()<100){
-			this.analyzeCV();
+
 
 		}
 
@@ -265,17 +286,6 @@ public class PersonalData implements Analyzable {
 
 
 
-
-	/*
-	*Methode die versucht aus eventuell gefundenen Lebensläufen, Daten zu extrahieren
-	*
-	*/
-	private void analyzeCV(){
-		//@ToDo ausimplementieren
-		if(myPersonalDataPath.size()>0){
-
-		}
-	}
 	/**
 	 * Filtert aus allen Daten die für dieses Modul die SQlite DBs heraus da diese anders
 	 * behandelt werden als "normale" Dateien.
