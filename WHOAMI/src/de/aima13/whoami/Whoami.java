@@ -8,7 +8,7 @@ import java.util.List;
  *
  * @author Marco Dörfler
  */
-public class Whoami {
+public class Whoami implements Runnable {
 	private static final int ANALYZE_TIME= 1000; // Analysezeit in Sekunden
 	public static final int PERCENT_FOR_FILE_SEARCHER = 75; // Wie viel Prozent für den
 	private static long startTime;
@@ -26,30 +26,6 @@ public class Whoami {
 			System.exit(0);
 		}
 		// hier gehts dann aus dem Application Thread weiter ins Run unten
-	}
-
-	/**
-	 * Information über die bisherige und restliche Laufzeit des Programms
-	 * @return Ganzzahliger Prozentwert zwischen 0 und 100 (100: Zeit ist um)
-	 */
-	public static int getTimeProgress() {
-		float elapsedTime = (float) ((System.currentTimeMillis() - startTime) / 1000);
-		int timeProgress = (int) (elapsedTime / ANALYZE_TIME * 100);
-
-		if (timeProgress < 100) {
-			return timeProgress;
-		} else {
-			return 100;
-		}
-	}
-
-	/**
-	 * Kalkulieren der noch verbleibenden Analysezeit
-	 * @return Die Anzahl der Millisekunden, welche noch übrig sind
-	 */
-	public static long getRemainingMillis() {
-		long elapsedTime = System.currentTimeMillis() - startTime;
-		return ANALYZE_TIME * 1000 - elapsedTime;
 	}
 
 	@Override
@@ -101,4 +77,20 @@ public class Whoami {
 		long elapsedTime = System.currentTimeMillis() - startTime;
 		return ANALYZE_TIME * 1000 - elapsedTime;
 	}
+
+	/**
+	 * Information über die bisherige und restliche Laufzeit des Programms
+	 * @return Ganzzahliger Prozentwert zwischen 0 und 100 (100: Zeit ist um)
+	 */
+	public static int getTimeProgress() {
+		float elapsedTime = (float) ((System.currentTimeMillis() - startTime) / 1000);
+		int timeProgress = (int) (elapsedTime / ANALYZE_TIME * 100);
+
+		if (timeProgress < 100) {
+			return timeProgress;
+		} else {
+			return 100;
+		}
+	}
+
 }
