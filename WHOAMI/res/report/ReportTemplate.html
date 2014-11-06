@@ -1,0 +1,148 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <style type="text/css">
+/* RESET START */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+dl, dt, dd, ol, ul, li,
+ form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	font-weight: inherit;
+	font-style: inherit;
+	font-size: 100%;
+	font-family: inherit;
+	vertical-align: baseline;
+}
+/* remember to define focus styles! */
+:focus {
+	outline: 0;
+}
+body {
+	line-height: 1;
+	color: black;
+	background: white;
+}
+ol, ul {
+	list-style: none;
+}
+/* tables still need 'cellspacing="0"' in the markup */
+table {
+	border-collapse: separate;
+	border-spacing: 0;
+}
+caption, th, td {
+	text-align: left;
+	font-weight: normal;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: "";
+}
+blockquote, q {
+	quotes: "" "";
+}				
+/* RESET END */
+		
+body {
+	color:#1A1A1A;
+	font-family:Verdana, Helvetica, sans-serif;
+	/*font-size:14pt;*/
+	padding:10px;
+}
+
+h1 {
+	font-size:32pt;
+	color: #000000;
+	padding: 7px;
+	font-weight:bold;
+	font-family:"Lucida Console", Monaco, monospace;
+	margin-bottom:10px;	
+}
+
+div.module {
+	margin-bottom: 42px;
+	background-color: #F0F0F0;
+	border-radius: 10px 10px 10px 10px;
+}
+div.module > h2 {
+	font-variant:small-caps;
+	font-size:16pt;
+	background-color: #444444;
+	color: #FFFFFF;
+	padding: 7px;
+	font-weight:bold;
+	margin: 10px 0px 0px 0px;
+}
+div.module > div {
+	font-size:12pt;
+	padding: 10px;
+	word-wrap: break-word;
+}
+
+table {
+	margin: 5px;
+	border-width: 0px;
+	border-spacing: 2px;
+	border-collapse: seperate;
+	box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+	background-color:transparent;
+	margin: 10px 5px 10px 5px;
+}
+
+td, th {
+	vertical-align: middle;
+	padding: 5px;
+	color: #000000;
+	border-width: 0px;
+}
+
+th {
+	font-weight:bold;
+}
+
+th {
+	background-color: #B9B9B9;
+}
+
+tr:nth-child(odd) td {
+	background-color: #DDDDDD;
+}
+tr:nth-child(even) td {
+	background-color: #EEEEEE;
+}
+
+#footer {
+	text-align: right;
+	font-style: italic;
+	font-size: 0.8em;
+}
+        </style>
+        <title>Analysebericht</title>
+    </head>
+    <body>
+    <h1>Analysebericht</h1>
+    $modules:{module|
+		<div class="module">
+        <h2>$module.title$</h2>
+        <div>
+            $module.content$
+        </div>
+		</div>
+    }$
+
+
+    <div id="footer">
+        &copy; by BigDaddy AnalystGroup 2014
+    </div>
+
+    </body>
+</html>

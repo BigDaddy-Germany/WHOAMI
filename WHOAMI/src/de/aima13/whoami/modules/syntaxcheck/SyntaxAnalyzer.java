@@ -1,6 +1,7 @@
 package de.aima13.whoami.modules.syntaxcheck;
 
 import de.aima13.whoami.Analyzable;
+import de.aima13.whoami.GlobalData;
 import de.aima13.whoami.Whoami;
 import de.aima13.whoami.modules.syntaxcheck.languages.LanguageSetting;
 import de.aima13.whoami.support.Utilities;
@@ -10,46 +11,44 @@ import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
 import org.reflections.Reflections;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import de.aima13.whoami.modules.syntaxcheck.AntlrLauncher.CHECK_RESULT;
+import org.stringtemplate.v4.ST;
+
+import java.io.*;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
 /**
- * Modul zum Analysieren des auf dem System gefundenen Codes
+ * Modul zum Analysieren des auf dem System gefundenen Codes auf syntaktische Korrektheit
  *
- * Created by Marco Dörfler on 28.10.14.
+ * @author Marco Dörfler
  */
 public class SyntaxAnalyzer implements Analyzable {
+	private static final String TEMPLATE_LOCATION = "/data/antlrStats.html";
 	private final String CSV_PREFIX = "syntaxcheck";
 	private final String REPORT_TITLE = "Syntaxcheck";
 
-	/**
+	/*
 	 * Es soll nur eine Stichprobe von Dateien pro Sprache geparst werden, um zu vermeiden,
 	 * dass die Laufzeit durch ANTLR zu hoch wird
 	 * Durch späteren Zufall soll eine Auswahl getroffen werden,
 	 * welche später eine repräsentative Sicht auf die Qualität des Codings zu bieten
 	 */
-	private final int MAX_FILES_PER_LANGUAGE = 250;
+	private final int MAX_FILES_PER_LANGUAGE = 50;
+	private final int FILES_PER_GROUP = 3;
+	private boolean sampleOnly = false; // Wurde nur eine Stichprobe genommen?
+	private int suicidal = 0; // Für Entscheidung über Suizidgefährdung in Bericht
 	private final String[] FORBIDDEN_CONTAINS = {"jdk", "jre", "adt", "tex"};
 
 	private Map<LanguageSetting, List<Path>> languageFilesMap;
 	private List<String> moduleFilter;
 	private Map<LanguageSetting, Map<CHECK_RESULT, Integer>> syntaxCheckResults;
 
-	private static enum CHECK_RESULT {
-		CANT_PARSE, CORRECT, SYNTAX_ERROR
-	}
-
 	/**
 	 * Im Konstruktor werden alle Settings geladen und instanziiert
-	 *
-	 * @author Marco Dörfler
 	 */
 	public SyntaxAnalyzer() {
 		this.languageFilesMap = new HashMap<>();
@@ -77,8 +76,6 @@ public class SyntaxAnalyzer implements Analyzable {
 	 * und danach zurückgeben
 	 *
 	 * @return Liste der Filter
-	 *
-	 * @author Marco Dörfler
 	 */
 	@Override
 	public List<String> getFilter() {
@@ -101,8 +98,6 @@ public class SyntaxAnalyzer implements Analyzable {
 	 * Erhaltene Dateien müssen den Programmiersprachen zugeordnet werden
 	 *
 	 * @param files Liste der gefundenen Dateien
-	 *
-	 * @author Marco Dörfler
 	 */
 	@Override
 	public void setFileInputs(List<Path> files) {
@@ -142,7 +137,54 @@ public class SyntaxAnalyzer implements Analyzable {
 
 	@Override
 	public String getHtml() {
-		return null;
+		// Template laden
+		ST template = new ST(Utilities.getResourceAsString(TEMPLATE_LOCATION), '$', '$');
+
+		// Variable für die Unterscheidung "Wurde überhaupt Coding geprüft?" bereitstellen
+		boolean noCoding = true;
+
+		// Ergebnisse der Syntaxchecks setzen
+		for (Map.Entry<LanguageSetting, Map<CHECK_RESULT, Integer>> languageResult :
+				this.syntaxCheckResults.entrySet()) {
+			// Setzen der Variablen für das Template
+
+			// Korrekte und Inkorrekte Dateien können direkt ausgelesen werden
+			int correct = languageResult.getValue().get(CHECK_RESULT.CORRECT);
+			int error = languageResult.getValue().get(CHECK_RESULT.SYNTAX_ERROR);
+			// Die Gesamtzahl ist die Summe dieser beiden Zahlen. Nicht geparste Dateien werden
+			// ignoriert
+			int sum = correct + error;
+
+			// Eine Analyse wurde nur vorgenommen, wenn die Gesamtzahl ungleich 0 ist
+			boolean analyzed = sum != 0;
+			// Ein perfektes Resultat liegt vor, wenn es keine Fehler gab
+			boolean perfectResult = error == 0;
+			// Ein gutes Resultat liegt vor, wenn es zwar Fehler gab,
+			// aber mindestens 60% der Dateien korrekt sind
+			boolean goodResult = (error != 0 && correct >= 0.6 * sum);
+			// Ein schlechtes Resultat liegt vor, wenn weder ein gutes noch ein perfektes vorliegen
+			boolean badResult = !(perfectResult || goodResult);
+
+			// Der Name der Variable entspricht der Dateiendung
+			String varName = languageResult.getKey().FILE_EXTENSION;
+			template.addAggr(varName + ".{analyzed, countAll, countCorrect, countError, " +
+					"perfectResult, goodResult, badResult}", analyzed, sum, correct, error,
+					perfectResult, goodResult, badResult);
+
+			// Sollte hier coding analysiert worden sein, kann noCoding auf false gesetzt werden
+			if (analyzed) {
+				noCoding = false;
+			}
+		}
+
+		template.add("noCoding", noCoding);
+		template.add("sampleOnly", this.sampleOnly);
+		template.add("maxFilesToAnalyze", MAX_FILES_PER_LANGUAGE);
+
+		// Über Selbstmordgefährdung entscheiden
+		template.add("suicidal", this.suicidal > 0);
+
+		return template.render();
 	}
 
 	@Override
@@ -155,7 +197,7 @@ public class SyntaxAnalyzer implements Analyzable {
 		return CSV_PREFIX;
 	}
 
-	
+
 	/**
 	 * Kalkulieren der CSV-Ausgabe. Jedes Feld soll wie volgt aussehen: SPRACHE-RESULT -> Anzahl
 	 * @return Die Map der CSV-Einträge
@@ -186,8 +228,6 @@ public class SyntaxAnalyzer implements Analyzable {
 	 * Iterieren über alle gefundenen Sprachen und die dazugehörigen Dateien. Bei jedem Eintrag
 	 * wird ein Syntax-Check durchgeführt und die Ergebnisse gespeichert. Es entsteht eine
 	 * Taelle, welche Auskunft darüber gibt, wie viele Dateien mit welchem Result geprüft wurden
-	 *
-	 * @author Marco Dörfler
 	 */
 	@Override
 	public void run() {
@@ -198,102 +238,187 @@ public class SyntaxAnalyzer implements Analyzable {
 		for (Map.Entry<LanguageSetting, List<Path>> languageFilesEntry : this
 				.languageFilesMap.entrySet()) {
 
-			// ResultSet für diese Sprache initialisieren
-			Map<CHECK_RESULT, Integer> checkResults = new HashMap<>();
-			// Für jedes existente Result den Wert 0 initialisieren
-			for (CHECK_RESULT result : CHECK_RESULT.values()) {
-				checkResults.put(result, 0);
-			}
+			// Die Ergebnisse der Checks werden vorerst in einem Array gespeichert,
+			// da hier das Ändern der Werte wesentlich einfacher ist
+			int[] languageCheckResults = new int[CHECK_RESULT.values().length];
 
-			// Liste der Dateien in möglichst gleichgroßen Sürüngen so durchgehen,
+			// Liste der Dateien in möglichst gleichgroßen Sprüngen so durchgehen,
 			// dass die maximale Anzahl an Dateien nicht überschritten wird
 			Path[] files = languageFilesEntry.getValue().toArray(new Path[languageFilesEntry
 					.getValue().size()]);
 
 			if (files.length > 0) {
+
+				// wenn zu viele Dateien vorhanden sind, soll nur eine Stichprobe durchgeführt
+				// werden, dazu berechnen wir eine sinnvolle Anzahl an Dateien,
+				// die bei jedem Schritt übersprungen werden
 				int jump;
 				if (files.length > MAX_FILES_PER_LANGUAGE) {
 					jump = files.length / MAX_FILES_PER_LANGUAGE;
+					this.sampleOnly = true;
 				} else {
 					jump = 1;
 				}
 
-				for (int currentIndex = 0; currentIndex / jump < MAX_FILES_PER_LANGUAGE; currentIndex += jump) {
-					// Timeboxing und ArrayIndex prüfen
-					if (Whoami.getTimeProgress() > 99 || currentIndex >= files.length) {
+
+				// Jetzt gilt es, Gruppen von Dateien der vorgegebenen Größe zu erstellen und
+				// diese dann zu parsen
+				// Die Gruppen sind Arrays, ihre Größe ändert sich nicht. Die Gruppen werden in
+				// einer Liste verwaltet, da deren Größe noch nicht bekannt ist
+				List<Path[]> fileGroups = new ArrayList<>();
+				// Die Gruppe wird erst komplett erstellt und dann in die Liste eingefügt
+				Path[] currentGroup = new Path[FILES_PER_GROUP];
+				int currentGroupIndex = 0;
+
+				// Die Gruppen werden in einer Schleife zusammengestellt
+				for (int currentFileIndex = 0; currentFileIndex / jump < MAX_FILES_PER_LANGUAGE;
+						currentFileIndex += jump) {
+					// Wenn alle Dateien abgearbeitet sind, sollten wir aufhören
+					if (currentFileIndex >= files.length) {
 						break;
 					}
 
-					Path file = files[currentIndex];
-					CHECK_RESULT checkResult = this.checkSyntax(languageFilesEntry.getKey(), file);
-					// Entsprechende Summe der Results um eins erhöhen
-					checkResults.put(checkResult, checkResults.get(checkResult) + 1);
+					if (currentGroupIndex < FILES_PER_GROUP) {
+						// Wenn die Gruppe noch nicht voll ist, wird die Datei einfach hinzugefügt
+						currentGroup[currentGroupIndex] = files[currentFileIndex];
+						currentGroupIndex++;
+					} else {
+						// Ansonsten soll die aktuelle Gruppe gespeichert werden und eine neue
+						// eröffnet werden.
+						fileGroups.add(currentGroup);
+
+						// Gruppe resetten und mit der aktuellen Datei initialisieren
+						currentGroup = new Path[FILES_PER_GROUP];
+						currentGroup[0] = files[currentFileIndex];
+						currentGroupIndex = 1;
+					}
+				}
+
+				// Wenn die aktuelle Gruppe angefangen, aber noch nicht gespeichert wurde,
+				// dann steht der Gruppenindex nicht auf 0, heißt wir müssen die Gruppe noch
+				// speichern
+				if (currentGroupIndex != 0) {
+					fileGroups.add(currentGroup);
+				}
+
+
+				// Jetzt können wir über die Gruppen iterieren und diese analysieren lassen.
+				// Hierbei müssen wir das timeboxing bedenken
+				for (Path[] group : fileGroups) {
+					// timeboxing
+					if (Whoami.getTimeProgress() > 99) {
+						break;
+					}
+
+					int[] groupCheckResults = this.checkSyntax(languageFilesEntry.getKey(), group);
+
+					// Resultate durchgehen und auf Sprachresultate aufaddieren
+					// Parallel können noch die Resultate SyntaxError und Correct die
+					// Selbstmordgefährdung beeinflussen
+					int deltaSuicidal = 0;
+					for (int resultCode = 0; resultCode < CHECK_RESULT.values().length;
+					     resultCode++) {
+						languageCheckResults[resultCode] += groupCheckResults[resultCode];
+
+						// Jede korrekte Datei erniedrigt die Selbstmordgefährdung um 4,
+						// jede falsche erhöht diese um 4 Punkte
+						if (resultCode == CHECK_RESULT.CORRECT.getReturnCode()) {
+							deltaSuicidal -= groupCheckResults[resultCode] * 4;
+						} else if (resultCode == CHECK_RESULT.SYNTAX_ERROR.getReturnCode()) {
+							deltaSuicidal += groupCheckResults[resultCode] * 4;
+						}
+
+						// Selbstmordgefährdung weiterleiten
+						GlobalData.getInstance().changeScore("Selbstmordgefährdung", deltaSuicidal);
+						this.suicidal += deltaSuicidal;
+					}
+
 				}
 			}
 
 			// Ergebnisse für diese Sprache speichern
-			this.syntaxCheckResults.put(languageFilesEntry.getKey(), checkResults);
+			// Die Ergebnisse werden in einer Map gespeichert, da wir hier die Zuordnung
+			// checkResult -> Integer vornehmen können
+
+			// Hierfür das Array der Results iterieren und alles in der Map speichern
+			Map<CHECK_RESULT, Integer> checkResultMap = new HashMap<>();
+			for (int resultCode = 0; resultCode < CHECK_RESULT.values().length; resultCode++) {
+				// Key des Eintrags erbigt sich durch das dem Code zugeordneten ENUM
+				// Der Wert ist die Anzahl der entsprechenden Dateien
+				checkResultMap.put(CHECK_RESULT.getCheckResultFromReturnCode(resultCode),
+						languageCheckResults[resultCode]);
+			}
+
+			this.syntaxCheckResults.put(languageFilesEntry.getKey(), checkResultMap);
 		}
 	}
 
 	/**
-	 * Diese Methode prüft die syntaktische Korrektheit einer Datei nach der übergebenen Sprache
+	 * Diese Methode prüft die syntaktische Korrektheit einer Datei nach der übergebenen Sprache.
+	 * Dies über die CommandLine in einer neuen JVM um den Memory Leak durch den übermäßig großen
+	 * ANTLR DFA Cache zu unterdrücken
 	 *
 	 * @param languageSetting Die Sprache, auf die geprüft werden soll
-	 * @param file Die Datei, die geprüft werden soll
-	 * @return ENUM, welches entscheidet, wie der Status der Datei ist
-	 *
-	 * @author Marco Dörfler
+	 * @param files Die Dateien, die geprüft werden sollen als Array
+	 * @return Array der Resultate, Index stellt den Returncode des ENUMS dar,
+	 *          das int die Anzahl der Dateien, die mit diesem Ergebnis geparst wurden
 	 */
-	private CHECK_RESULT checkSyntax(LanguageSetting languageSetting, Path file) {
-		try {
-			// ANTLRInputStrem erzeugen
-			ANTLRInputStream inputStream = new ANTLRInputStream(Files.newInputStream(file));
+	private int[] checkSyntax(LanguageSetting languageSetting, Path[] files) {
+		// Resultate als Array sind später besser zuzuweisen
+		int[] resultArray = new int[CHECK_RESULT.values().length];
 
-			// Constructor des Lexers auslesen
-			// Umweg über Array nötig, da genauer Typ des Lexers nicht bekannt (nur Oberklasse)
-			Constructor<Lexer>[] lexerConstructors = (Constructor<Lexer>[]) languageSetting.LEXER.getConstructors();
-			Lexer lexer = lexerConstructors[0].newInstance(inputStream);
+		// Zusammenbauen des Commands
+		// Teil eins: Ort der Java-Installation
+		String command = System.getProperty("java.home") + File.separator + "bin" + File
+				.separator + "java.exe ";
+		// Teil zwei: Classpath
+		command += "-cp \"" + System.getProperty("java.class.path") + "\" ";
 
-			// Constructor des Parsers auslesen
-			// Umweg über Array nötig, da genauer Typ des Lexers nicht bekannt (nur Oberklasse)
-			CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
-			Constructor<Parser>[] parserConstructors = (Constructor<Parser>[]) languageSetting.PARSER.getConstructors();
+		// Teil drei: Name der Klasse
+		command += AntlrLauncher.class.getName() + " ";
 
-			// Parser Instanziieren
-			Parser parser = parserConstructors[0].newInstance(commonTokenStream);
-
-			// Methode des Startsymbols auslesen
-			Method startMethod = languageSetting.PARSER.getMethod(languageSetting.START_SYMBOL);
-
-			// Antlr gibt bei Fehlern etwas auf dem Errorstream aus. Das soll unterdrückt werden,
-			// indem der Errorstream neu gesetzt wird (dieser tut nichts). Vorher sollte der
-			// aktuelle Errorstream gespeichert werden, sodass alles resettet werden kann
-			PrintStream standardErrorStream = System.err;
-			System.setErr(new PrintStream(new OutputStream() {
-				@Override
-				public void write(int b) throws IOException {
-				}
-			}));
-			// Methode aus der Instanz des Parsers heraus ausführen
-			startMethod.invoke(parser);
-			// Errorstream resetten
-			System.setErr(standardErrorStream);
-
-			// Entscheidung nach Syntaxfehlern
-			if (parser.getNumberOfSyntaxErrors() == 0) {
-				return CHECK_RESULT.CORRECT;
-			} else {
-				return CHECK_RESULT.SYNTAX_ERROR;
+		// Teil vier: Argumente (erst die Sprache, dann alle Dateien
+		command += languageSetting.getClass().getSimpleName() + " ";
+		for (Path file : files) {
+			if (file != null) {
+				command += "\"" + file.toString() + "\" ";
 			}
+		}
 
-		} catch (Exception e) {
-			// Pokemon Exception Handling - Catch them all!
-			//
-			// Wenn wir was nicht parsen könne, können wir es nicht parsen
-			// Hier landen wir nur, wenn etwas schief gegangen ist. Was genau ist eigentlich
-			// uninteressant. Wichtig ist: Wir können die Datei nicht parsen. Warum auch immer.
-			return CHECK_RESULT.CANT_PARSE;
+
+		Runtime runtime = Runtime.getRuntime();
+
+		try {
+			System.out.println("Start " + files.length + " files");
+			Process process = runtime.exec(command);
+			// Das gibt uns den OUTPUTstream des Prozesses (was für uns ja einen Inputstream
+			// darstellt, da wir etwas rein bekommen)
+			BufferedReader inputStreamReader = new BufferedReader(
+					new InputStreamReader(process.getInputStream()));
+			process.waitFor();
+			System.out.println("End");
+
+			// Inputstream analysieren
+			String line;
+			while ((line = inputStreamReader.readLine()) != null) {
+				// Pro Zeile sollte ein CheckResult ausgegeben werden
+				CHECK_RESULT checkResult = CHECK_RESULT.valueOf(line.trim());
+				if (checkResult != null) {
+					// Wenn es eine erfolgreiche Analyse der Ausgabe war,
+					// sollte das entsprechende int im resultArray um eins erhöht werden
+					resultArray[checkResult.getReturnCode()]++;
+				}
+			}
+			inputStreamReader.close();
+
+			return resultArray;
+
+
+		} catch (IOException | InterruptedException e) {
+			// In diesem Fall konnte keine Datei geparst werden
+			// Auf CANT_PARSE muss die Anzahl der Dateien gemapt werden
+			resultArray[CHECK_RESULT.CANT_PARSE.getReturnCode()] = files.length;
+			return resultArray;
 		}
 	}
 }
