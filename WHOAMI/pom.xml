@@ -141,12 +141,9 @@
                             <singleInstance>
                                 <mutexName>whoami_scanner</mutexName>
                             </singleInstance>
-                            <errTitle></errTitle>
-                            <cmdLine></cmdLine>
                             <chdir>.</chdir>
                             <priority>normal</priority>
                             <downloadUrl>http://java.com/download</downloadUrl>
-                            <supportUrl></supportUrl>
                             <stayAlive>false</stayAlive>
                             <manifest>launch4j/whoami.manifest</manifest>
                             <icon>launch4j/appicon.ico</icon>
@@ -155,12 +152,15 @@
                                 <minVersion>1.7.0</minVersion>
                                 <jdkPreference>jreOnly</jdkPreference>
                                 <runtimeBits>64/32</runtimeBits>
+                                <opts>
+                                    <opt>-Dlaunch4j.exedir="%EXEDIR%"</opt>
+                                </opts>
                             </jre>
                             <versionInfo>
                                 <fileVersion>1.0.0.0</fileVersion>
                                 <txtFileVersion>1.0.0.0</txtFileVersion>
                                 <fileDescription>WHOAMI-Scanner - Wissenschaftlich herausragend
-                                    objektive Analyse meiner Identität
+                                    objektive Analyse meiner Identitaet
                                 </fileDescription>
                                 <copyright>BigDaddy Analyst Group 2014</copyright>
                                 <productVersion>0.9.0.0</productVersion>
