@@ -41,12 +41,11 @@ public class Music implements Analyzable {
 	public String onlService = ""; //Genutzte Onlinedienste (siehe: MY_SEARCH_DELIVERY_URLS)
 	public String cltProgram = ""; //Installierte Programme
 	String stmtGenre = "";         //Kommentar zum Genre nach Kategorie
-	String Qualität = "";
-	private boolean cancelledByTimeLimit = false;
-	long nrAudio = 0;
+	String Qualität = "";          //Kommentar zu flac-Dateien
+	long nrAudio = 0;              //Anzahl der Audiodateien
 
 	private static final String[] MY_SEARCH_DELIEVERY_URLS = {"youtube.com", "myvideo.de", "dailymotion.com",
-			"soundcloud.com", "deezer.com"};
+			"soundcloud.com", "deezer.com", "spotify.com", "play.google.com"};
 	private static final String[] MY_SEARCH_DELIVERY_EXES = {"Deezer.exe", "spotify.exe",
 			"Amazon Music.exe", "SWYH.exe", "iTunes.exe", "napster.exe", "simfy.exe"};
 	private static final String[] MY_SEARCH_DELIVERY_NAMES = {"Deezer", "Spotify", "Amazon Music",
@@ -164,7 +163,6 @@ public class Music implements Analyzable {
 	@Override
 	/**
 	 * Ordnet musicDatabases für die Analyse des Musikgeschmacks
-	 *
 	 * @param List<File> files
 	 * @return void
 	 */
@@ -229,7 +227,6 @@ public class Music implements Analyzable {
 	@Override
 	/**
 	 * Das Ergebnis der Analyse wird in html als String in diesem Modul zusammengefügt
-	 *
 	 * @return String html
 	 * @param
 	 */
