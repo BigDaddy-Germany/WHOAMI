@@ -459,12 +459,14 @@ public class Food implements Analyzable {
 				}
 				if (dbManager != null) {
 					try {
-						resultList.add(dbManager.querySqlStatement(sqlStatement));
+						ResultSet rs = dbManager.querySqlStatement(sqlStatement);
+						if(rs !=null){
+							resultList.add(rs);
+						}
 					} catch (SQLException e) {
 						//anscheinend ist das SQL-Statement fehlerhaft oder die Datenbank hat in
 						// irgend einer Weise Fehler --> kann man nichts gegen machen
 						e=e;
-
 					}
 
 				}
