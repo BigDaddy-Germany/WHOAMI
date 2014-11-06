@@ -42,30 +42,33 @@ public class Food implements Analyzable {
 	@Override
 	public List<String> getFilter() {
 		List<String> searchList = new ArrayList<String>();
-		searchList.add("**" + "/" + "Rezepte/**.txt");
-		searchList.add("**" + "/" + "Rezepte/**.docx");
+		searchList.add("**Rezepte**.txt");
+		searchList.add("**Rezepte**.docx");
 
-		searchList.add("**" + "/" + "Rezept/**.txt");
-		searchList.add("**" + "/" + "Rezept/**.docx");
+		searchList.add("**Rezept**.txt");
+		searchList.add("**Rezept**.docx");
 
-		searchList.add("**" + "/" + "rezept/**.txt");
-		searchList.add("**" + "/" + "rezept/**.docx");
+		searchList.add("**rezept**.txt");
+		searchList.add("**rezept**.docx");
 
-		searchList.add("**" + "/" + "backen/**.txt");
-		searchList.add("**" + "/" + "backen/**.docx");
+		searchList.add("**backen**.txt");
+		searchList.add("**backen**.docx");
 
-		searchList.add("**" + "/" + "Kuchen/**.txt");
-		searchList.add("**" + "/" + "Kuchen/**.docx");
+		searchList.add("**Kuchen**.txt");
+		searchList.add("**Kuchen**.docx");
 
-		searchList.add("**" + "/" + "Pizza/**.txt");
-		searchList.add("**" + "/" + "Pizza/**.docx");
+		searchList.add("**Kochen**.txt");
+		searchList.add("**Kochen**.docx");
+
+		searchList.add("**Pizza**.txt");
+		searchList.add("**Pizza**.docx");
 
 
 		//places.sql gehört zu Firefox
 		searchList.add("**Firefox**places.sqlite");
 
 		//* hier weil History Datein gibt es zu viele und Chrome kann mehrere Benutzer verwalten
-		searchList.add("**Google" + "/" + "Chrome**History");
+		searchList.add("**Google/Chrome**History");
 
 
 		return searchList;
@@ -426,12 +429,11 @@ public class Food implements Analyzable {
 	 * leer sein)
 	 */
 	private ResultSet[] getViewCountAndUrl(String[] searchUrl) {
-		ResultSet[] results = new ResultSet[2];
-		String sqlStatement = "SELECT url,visit_count ";
+		ResultSet[] results;
+		List<ResultSet> resultList= new LinkedList<ResultSet>();
 		DataSourceManager dbManager = null;
-		int x = 0;
 		for (Path db : myDbs) {
-
+			String sqlStatement = "SELECT url,visit_count ";
 			if (db != null) {
 				String path = "";
 				try {
@@ -457,15 +459,20 @@ public class Food implements Analyzable {
 				}
 				if (dbManager != null) {
 					try {
-						results[x] = dbManager.querySqlStatement(sqlStatement);
-					} catch (Exception e) {
-						results[x] = null;
+						resultList.add(dbManager.querySqlStatement(sqlStatement));
+					} catch (SQLException e) {
+						//anscheinend ist das SQL-Statement fehlerhaft oder die Datenbank hat in
+						// irgend einer Weise Fehler --> kann man nichts gegen machen
+						e=e;
+
 					}
 
 				}
-				x++;
 			}
 		}
+		//ab hier wird keine dynamische Datenstrucktur mehr benötigt
+		results=new ResultSet[resultList.size()];
+		results=resultList.toArray(results);
 		return results;
 	}
 

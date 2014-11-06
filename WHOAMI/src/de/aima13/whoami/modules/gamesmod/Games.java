@@ -52,8 +52,7 @@ public class Games implements Analyzable {
 	}
 
 	/**
-	 * Spielemodul fragt nach einer Liste von Executables und benötigt den Pfad eines
-	 * gegebenenfalls vorhandenen "SteamApps"-Ordners
+	 * Spielemodul benötigt eine Liste von Executables
 	 *
 	 * @return Filterliste
 	 */

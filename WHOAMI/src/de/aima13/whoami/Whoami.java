@@ -87,6 +87,6 @@ public class Whoami {
 	 */
 	public static long getRemainingMillis() {
 		long elapsedTime = System.currentTimeMillis() - startTime;
-		return ANALYZE_TIME - elapsedTime;
+		return ANALYZE_TIME * 1000 - elapsedTime;
 	}
 }
