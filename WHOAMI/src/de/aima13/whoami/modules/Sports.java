@@ -18,6 +18,10 @@ public class Sports implements Analyzable{
 	private final String SPORTS_TITLE = "Sport";
 	private Sportart[] sportsList;
 
+	/**
+	 * Modul arbeitet mit SQLite von Firefox oder Chrome
+	 * @return List der Strings die den Filter spezifizieren
+	 */
 	@Override
 	public List<String> getFilter() {
 		ArrayList<String> myFilters = new ArrayList<String>();
@@ -27,11 +31,20 @@ public class Sports implements Analyzable{
 		return myFilters;
 	}
 
+	/**
+	 * Setzen der Pfad Objekte die behandelt werden sollen
+	 * @param files Liste der gefundenen Dateien
+	 * @throws Exception
+	 */
 	@Override
 	public void setFileInputs(List<Path> files) throws Exception {
 		inputFiles = files;
 	}
 
+	/**
+	 * Setzt sich zusammen aus dem HTML String und der populärsten Sportart.
+	 * @return HTML für den Bericht.
+	 */
 	@Override
 	public String getHtml() {
 		Map.Entry mostPopularSport = Utilities.getHighestEntry(sportPopularity);
@@ -49,6 +62,9 @@ public class Sports implements Analyzable{
 		return SPORTS_TITLE;
 	}
 
+	/**
+	 * @return TreeMap die den Inhalt für die CSV-Datei bereitstellt.
+	 */
 	@Override
 	public SortedMap<String, String> getCsvContent() {
 		TreeMap<String,String> csvResult = new TreeMap<String,String>();
@@ -56,6 +72,11 @@ public class Sports implements Analyzable{
 		return csvResult;
 	}
 
+	/**
+	 * Run lädt die Resourcen und iteriert dann über die Browser Chroniken.
+	 * Dabei liegt der Fokus primär entweder auf Suche nach der Sportart selbst oder
+	 * nach bestimmten Keywords die zusätzlich angegeben werden können.
+	 */
 	@Override
 	public void run() {
 		sportsList = Utilities.loadDataFromJson("/data/sport.json",Sportart[].class);
@@ -71,6 +92,14 @@ public class Sports implements Analyzable{
 		}
 	}
 
+	/**
+	 * Select prüft ob die Sportart in der URL oder im TITLE steht. Dabei interessiert nur die
+	 * Anzahl der Aufrufe. Zusätzlich kann nach weiteren beliebigen String in den 2 Spalten
+	 * gesucht werden.
+	 * @param sqliteDB  Pfad zu SQLite Datenbank
+	 * @param fromTable Tabelle von der gelesen werden soll. Also entweder moz_places oder urls je
+	 *                  nachdem ob es sich ob Firefox oder Chrome handelt
+	 */
 	private void handleBrowserHistory(Path sqliteDB, String fromTable) {
 		try {
 			DataSourceManager dSm = new DataSourceManager(sqliteDB);
@@ -85,9 +114,12 @@ public class Sports implements Analyzable{
 				}
 				sqlStatement += " ;";
 				ResultSet rs = dSm.querySqlStatement(sqlStatement);
-				while (rs.next()){
-					sportPopularity.put(s.sportart, sportPopularity.get(s.sportart)+ rs.getInt(1));
+				if(rs != null){
+					while (rs.next()){
+						sportPopularity.put(s.sportart, sportPopularity.get(s.sportart)+ rs.getInt(1));
+					}
 				}
+
 			}
 		} catch (ClassNotFoundException e) {
 
@@ -95,7 +127,7 @@ public class Sports implements Analyzable{
 
 		}
 	}
-
+	// Klasse zum Laden der JSON Resource
 	private class Sportart{
 		String sportart;
 		String [] zusatz;
