@@ -271,12 +271,13 @@ public class Music implements Analyzable {
 				&& !(cltProgram.equals(""))) {
 			buffer.append("<br /><b>Fazit:</b> Dein Computer enthält Informationen zu allem " +
 					"was wir gesucht haben. <br />Musik scheint ein wichtiger Teil deines Lebens " +
-					"zu sein. <br />" + stmtGenre);
+					"zu sein. <br />" + "Insgesamt haben wir " + nrAudio + " Musikdateien " +
+					"gefunden." + Qualität +  stmtGenre);
 		} else if (onlService.equals("") && cltProgram.equals("") && !(favGenre.equals(""))) {
 			buffer.append("<br /><b>Fazit:</b> Das Modul konnte weder online noch nativ " +
 					"herausfinden wie du Musik hörst. Du scheinst dies über einen nicht sehr " +
 					"verbreiteten Weg zu machen. Nichts desto trotz konnten wir deinen Geschmack " +
-					"analysieren: <br />" + "Insgesamt haben wir" + nrAudio + " Musikdateien " +
+					"analysieren: <br />" + "Insgesamt haben wir " + nrAudio + " Musikdateien " +
 					"gefunden." + Qualität + stmtGenre);
 		} else if (favGenre.equals("") && favArtist.equals("")) {
 			buffer.append("<br /><b>Fazit:</b> Es konnten keine Informationen dazu gefunden " +
@@ -284,6 +285,10 @@ public class Music implements Analyzable {
 					"offene Frage...");
 			if (!(onlService.equals("")) || !(cltProgram.equals(""))) {
 				buffer.append(" Aber Musik hörst du über " + onlService + ", " + cltProgram + ".");
+				if(nrAudio != 0){
+					buffer.append("Insgesamt haben wir zusätzlich " + nrAudio + " Musikdateien " +
+							"gefunden." + Qualität);
+				}
 			}
 		} else {
 			buffer.append("<br /><b>Fazit:</b> Zwar konnten einige Informationen über " +
@@ -301,7 +306,7 @@ public class Music implements Analyzable {
 				buffer.append("<br />" + stmtGenre);
 			}
 			if(!(localFiles.isEmpty())){
-				buffer.append("Insgesamt haben wir" + nrAudio + " Musikdateien gefunden." +
+				buffer.append("Insgesamt haben wir " + nrAudio + " Musikdateien gefunden." +
 						Qualität);
 			}
 		}
