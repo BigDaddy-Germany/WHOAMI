@@ -145,7 +145,7 @@
                             <downloadUrl>http://java.com/download</downloadUrl>
                             <supportUrl></supportUrl>
                             <stayAlive>false</stayAlive>
-                            <manifest></manifest>
+                            <manifest>launch4j/whoami.manifest</manifest>
                             <icon>launch4j/appicon.ico</icon>
                             <jre>
                                 <!--<path></path>
