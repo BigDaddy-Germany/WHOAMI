@@ -81,7 +81,6 @@
                 <directory>${basedir}/res/</directory>
             </resource>
         </resources>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -135,24 +134,34 @@
                             <goal>launch4j</goal>
                         </goals>
                         <configuration>
-                            <headerType>gui</headerType>
+                            <dontWrapJar>false</dontWrapJar>
+                            <headerType>console</headerType>
                             <jar>${project.build.directory}/${artifactId}-${version}.jar</jar>
                             <outfile>${project.build.directory}/WHOAMI-Scanner.exe</outfile>
+                            <errTitle></errTitle>
+                            <cmdLine></cmdLine>
+                            <chdir>.</chdir>
+                            <priority>normal</priority>
                             <downloadUrl>http://java.com/download</downloadUrl>
-                            <classPath>
-                                <mainClass>de.aima13.whoami.Whoami</mainClass>
-                                <preCp>anything</preCp>
-                            </classPath>
-                            <!--<icon>src/main/resources/icon/application.ico</icon>-->
+                            <supportUrl></supportUrl>
+                            <stayAlive>false</stayAlive>
+                            <manifest></manifest>
+                            <icon></icon>
                             <jre>
+                                <!--<path></path>
+                                <bundledJre64Bit>false</bundledJre64Bit>-->
                                 <minVersion>1.7.0</minVersion>
-                                <jdkPreference>preferJre</jdkPreference>
+                                <maxVersion></maxVersion>
+                                <jdkPreference>jreOnly</jdkPreference>
+                                <runtimeBits>64/32</runtimeBits>
                             </jre>
                             <versionInfo>
-                                <fileVersion>0.9.0.0</fileVersion>
-                                <txtFileVersion>${project.version}</txtFileVersion>
-                                <fileDescription>${project.name}</fileDescription>
-                                <copyright>2012 hasCode.com</copyright>
+                                <fileVersion>1.0.0.0</fileVersion>
+                                <txtFileVersion>1.0.0.0</txtFileVersion>
+                                <fileDescription>WHOAMI-Scanner - Wissenschaftlich herausragend
+                                    objektive Analyse meiner Identität
+                                </fileDescription>
+                                <copyright>BigDaddy Analyst Group 2014</copyright>
                                 <productVersion>0.9.0.0</productVersion>
                                 <txtProductVersion>0.9.0.0</txtProductVersion>
                                 <productName>WHOAMI-Scanner</productName>
