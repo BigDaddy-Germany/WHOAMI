@@ -34,8 +34,10 @@ public class GuiController implements Initializable {
 	@FXML // fx:id="aggreedOnEula"
 	private CheckBox aggreedOnEula; // Value injected by FXMLLoader
 
-	private double endScrollPosition = 182;
+	// 5335 ist der maximale Wert den die ScrollBar hat
+	private final double endScrollPosition = 5335.0;
 	private boolean eulaAccepted = false;
+	private boolean scrolledOnceDown = false;
 
 	/**
 	 * Called to initialize a controller after its root element has been
@@ -57,9 +59,10 @@ public class GuiController implements Initializable {
 	}
 
 	public void updateOkButton() {
-		if (wantExecution.isSelected() && aggreedOnEula.isSelected() &&
-				(isScrolledDown(agbArea.getScrollTop()) || true)) {
+		if (wantExecution.isSelected() && aggreedOnEula.isSelected() && (
+				isScrolledDown(agbArea.getScrollTop()) || scrolledOnceDown)) {
 			okButton.setDisable(false);
+			scrolledOnceDown = true;
 		} else {
 			okButton.setDisable(true);
 		}
