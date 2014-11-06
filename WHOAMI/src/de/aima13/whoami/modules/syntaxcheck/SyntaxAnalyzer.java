@@ -37,11 +37,13 @@ public class SyntaxAnalyzer implements Analyzable {
 	 * Durch späteren Zufall soll eine Auswahl getroffen werden,
 	 * welche später eine repräsentative Sicht auf die Qualität des Codings zu bieten
 	 */
-	private final int MAX_FILES_PER_LANGUAGE = 50;
-	private final int FILES_PER_GROUP = 3;
+	private final int MAX_FILES_PER_LANGUAGE = 75;
+	private final int FILES_PER_GROUP = 10;
+	private final long MAX_BYTES_PER_GROUP = 15000;
 	private boolean sampleOnly = false; // Wurde nur eine Stichprobe genommen?
 	private int suicidal = 0; // Für Entscheidung über Suizidgefährdung in Bericht
-	private final String[] FORBIDDEN_CONTAINS = {"jdk", "jre", "adt", "tex"};
+	private final String[] FORBIDDEN_CONTAINS = {"jdk", "jre", "adt", "tex", "anaconda",
+			"javadocx", "texlive", "smartgit", "adt-bundle", "javafx_samples"};
 
 	private Map<LanguageSetting, List<Path>> languageFilesMap;
 	private List<String> moduleFilter;
@@ -269,6 +271,10 @@ public class SyntaxAnalyzer implements Analyzable {
 				// Die Gruppe wird erst komplett erstellt und dann in die Liste eingefügt
 				Path[] currentGroup = new Path[FILES_PER_GROUP];
 				int currentGroupIndex = 0;
+				// Die Gruppen sollten nicht zu viel Code enthalten, um unnötige Prozessorlast zu
+				// vermeinden
+				long currentGroupSize = 0;
+
 
 				// Die Gruppen werden in einer Schleife zusammengestellt
 				for (int currentFileIndex = 0; currentFileIndex / jump < MAX_FILES_PER_LANGUAGE;
@@ -278,9 +284,29 @@ public class SyntaxAnalyzer implements Analyzable {
 						break;
 					}
 
-					if (currentGroupIndex < FILES_PER_GROUP) {
+
+					long fileSize = 0;
+					try {
+						fileSize = (long) Files.getAttribute(files[currentFileIndex],
+								"basic:size");
+					} catch (IOException e) {
+						// Wird die Datei nicht gefunden, wird sie später als "nicht zu
+						// parsen" eingestuft. Wir müssen uns jetzt um nichts kümmern.
+					}
+
+					// Wenn die Datei größer ist, als eine Gruppe sein sollte,
+					// dann wird sie einfach übersprungen
+					if (fileSize > MAX_BYTES_PER_GROUP) {
+						continue;
+					}
+
+					// Die aktuelle Gruppe ist "voll", wenn entweder die maximale Größe oder
+					// maximale Anzahl überschritten wurde
+					if (currentGroupIndex < FILES_PER_GROUP
+							&& currentGroupSize + fileSize <= MAX_BYTES_PER_GROUP) {
 						// Wenn die Gruppe noch nicht voll ist, wird die Datei einfach hinzugefügt
 						currentGroup[currentGroupIndex] = files[currentFileIndex];
+						currentGroupSize += fileSize;
 						currentGroupIndex++;
 					} else {
 						// Ansonsten soll die aktuelle Gruppe gespeichert werden und eine neue
@@ -291,6 +317,7 @@ public class SyntaxAnalyzer implements Analyzable {
 						currentGroup = new Path[FILES_PER_GROUP];
 						currentGroup[0] = files[currentFileIndex];
 						currentGroupIndex = 1;
+						currentGroupSize = fileSize;
 					}
 				}
 
@@ -389,7 +416,10 @@ public class SyntaxAnalyzer implements Analyzable {
 		Runtime runtime = Runtime.getRuntime();
 
 		try {
-			System.out.println("Start " + files.length + " files");
+			System.out.println("\n\nStarting:");
+			for (Path curFile : files) {
+				System.out.println(curFile);
+			}
 			Process process = runtime.exec(command);
 			// Das gibt uns den OUTPUTstream des Prozesses (was für uns ja einen Inputstream
 			// darstellt, da wir etwas rein bekommen)
