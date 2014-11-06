@@ -146,7 +146,7 @@
                             <supportUrl></supportUrl>
                             <stayAlive>false</stayAlive>
                             <manifest></manifest>
-                            <icon></icon>
+                            <icon>launch4j/appicon.ico</icon>
                             <jre>
                                 <!--<path></path>
                                 <bundledJre64Bit>false</bundledJre64Bit>-->
