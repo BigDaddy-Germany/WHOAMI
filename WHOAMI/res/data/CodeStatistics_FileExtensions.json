@@ -1,11 +1,11 @@
 [
-	{"ext":"php", "lang":"PHP"},
-	{"ext":"java", "lang":"Java"},
-	{"ext":"c", "lang":"C"},
-	{"ext":"py", "lang":"Python"},
-	{"ext":"html", "lang":"HTML"},
-	{"ext":"cpp", "lang":"C++"},
-	{"ext":"cs", "lang":"C#"},
-	{"ext":"m", "lang":"Objective C"},
-	{"ext":"vb", "lang":"Visual Basic"}
+	{"ext":"php", "lang":"PHP", "type":"web"},
+	{"ext":"java", "lang":"Java", "type":"native"},
+	{"ext":"c", "lang":"C", "type":"native"},
+	{"ext":"py", "lang":"Python", "type":"native"},
+	{"ext":"html", "lang":"HTML", "type":"web"},
+	{"ext":"cpp", "lang":"C++", "type":"native"},
+	{"ext":"cs", "lang":"C#", "type":"native"},
+	{"ext":"m", "lang":"Objective C", "type":"native"},
+	{"ext":"vb", "lang":"Visual Basic", "type":"native"}
 ]

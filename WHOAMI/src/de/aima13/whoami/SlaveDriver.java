@@ -48,7 +48,7 @@ public class SlaveDriver {
 
 			// Spätestens jetzt muss es abgeschossen werden
 			if (moduleThread.isAlive()) {
-				moduleThread.interrupt();
+				moduleThread.stop();
 			}
 		}
 		DataSourceManager.closeRemainingOpenConnections();
