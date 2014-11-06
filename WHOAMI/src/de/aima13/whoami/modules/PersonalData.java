@@ -137,11 +137,6 @@ public class PersonalData implements Analyzable {
 			this.analyseChromeForms();
 		}
 		this.transmitBrowserForensik();
-		if(Whoami.getTimeProgress()<100){
-
-
-		}
-
 	}
 
 	/**
