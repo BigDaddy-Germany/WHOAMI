@@ -183,7 +183,7 @@ public class Studienrichtung implements Analyzable {
 	 * @param courseResult Ergebnis nach der Datenbankabfrage
 	 */
 	private void analyzePathNames(ArrayList<CourseVisitedEntry> courseResult) {
-		float influence = 0;
+		float influence = 100;
 		if (courseResult != null && !courseResult.isEmpty()) {
 			influence = courseResult.get(0).visitCount * DROPBOX_WEIGHTING_FACTOR;
 		}
