@@ -1,5 +1,7 @@
 package de.aima13.whoami;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
@@ -71,14 +73,16 @@ public class FileSearcher {
 		public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 			// Kontrolle, ob Datei gebraucht wird
 			if (file != null) {
-
+				commentCurrentPath(file);
 				// Durchsuche alle Module und entscheide, ob Datei gebraucht wird
 				for (Map.Entry<Analyzable, PathMatcher> matcherEntry : this.matcherMap.entrySet()) {
 					if (matcherEntry.getValue().matches(file)) {
 
 						// Zuweisung durchführen
 						this.resultMap.get(matcherEntry.getKey()).add(file);
+
 						if (Math.random() < 0.001){
+
 							GuiManager.updateProgress(file.getFileName()+ " scheint wohl von " +
 									"Interesse zu sein...");
 						}
@@ -94,6 +98,8 @@ public class FileSearcher {
 				return FileVisitResult.CONTINUE;
 			}
 		}
+
+
 
 		/**
 		 * Sollte ein Fehler auftreten, Subtree überspringen
@@ -120,6 +126,17 @@ public class FileSearcher {
 				return FileVisitResult.SKIP_SUBTREE;
 			}
 			return FileVisitResult.CONTINUE;
+		}
+
+
+		private void commentCurrentPath(Path file) {
+			if (file.toString().endsWith("places.sqlite")){
+				GuiManager.updateProgress("Ahh was haben wir denn hier eine " +
+						"Firefox Datenbank die "+ FileUtils.byteCountToDisplaySize
+						(file.toFile().length()) +" " +
+						"groß ist!" );
+
+			}
 		}
 	}
 
@@ -179,8 +196,8 @@ public class FileSearcher {
 			pattern = pattern.substring(0, pattern.length() - 1) + "}";
 
 			matcherMap.put(module, FileSystems.getDefault().getPathMatcher(pattern));
-
 		}
+		GuiManager.updateProgress("Alle Matcher hochgefahren!");
 
 		return matcherMap;
 	}
@@ -233,4 +250,5 @@ public class FileSearcher {
 			}
 		}
 	}
+
 }
