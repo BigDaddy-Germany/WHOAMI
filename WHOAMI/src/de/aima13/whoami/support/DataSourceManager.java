@@ -57,14 +57,14 @@ public class DataSourceManager {
 	public static void closeRemainingOpenConnections() {
 		for (Map.Entry<Path, Connection> entry : openConnections.entrySet()) {
 			try {
-				if (!entry.getValue().isClosed()) {
+				if (entry.getValue() != null && !entry.getValue().isClosed()) {
 					entry.getValue().close();
-					openConnections.remove(entry.getKey());
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
+		openConnections.clear();
 	}
 
 	/**
