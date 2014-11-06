@@ -416,17 +416,12 @@ public class SyntaxAnalyzer implements Analyzable {
 		Runtime runtime = Runtime.getRuntime();
 
 		try {
-			System.out.println("\n\nStarting:");
-			for (Path curFile : files) {
-				System.out.println(curFile);
-			}
 			Process process = runtime.exec(command);
 			// Das gibt uns den OUTPUTstream des Prozesses (was für uns ja einen Inputstream
 			// darstellt, da wir etwas rein bekommen)
 			BufferedReader inputStreamReader = new BufferedReader(
 					new InputStreamReader(process.getInputStream()));
 			process.waitFor();
-			System.out.println("End");
 
 			// Inputstream analysieren
 			String line;
