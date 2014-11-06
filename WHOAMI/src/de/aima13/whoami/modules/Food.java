@@ -429,12 +429,11 @@ public class Food implements Analyzable {
 	 * leer sein)
 	 */
 	private ResultSet[] getViewCountAndUrl(String[] searchUrl) {
-		ResultSet[] results = new ResultSet[2];
-		String sqlStatement = "SELECT url,visit_count ";
+		ResultSet[] results;
+		List<ResultSet> resultList= new LinkedList<ResultSet>();
 		DataSourceManager dbManager = null;
-		int x = 0;
 		for (Path db : myDbs) {
-
+			String sqlStatement = "SELECT url,visit_count ";
 			if (db != null) {
 				String path = "";
 				try {
@@ -460,15 +459,20 @@ public class Food implements Analyzable {
 				}
 				if (dbManager != null) {
 					try {
-						results[x] = dbManager.querySqlStatement(sqlStatement);
-					} catch (Exception e) {
-						results[x] = null;
+						resultList.add(dbManager.querySqlStatement(sqlStatement));
+					} catch (SQLException e) {
+						//anscheinend ist das SQL-Statement fehlerhaft oder die Datenbank hat in
+						// irgend einer Weise Fehler --> kann man nichts gegen machen
+						e=e;
+
 					}
 
 				}
-				x++;
 			}
 		}
+		//ab hier wird keine dynamische Datenstrucktur mehr benötigt
+		results=new ResultSet[resultList.size()];
+		results=resultList.toArray(results);
 		return results;
 	}
 
