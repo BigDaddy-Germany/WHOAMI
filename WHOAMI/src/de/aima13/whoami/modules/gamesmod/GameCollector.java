@@ -25,7 +25,7 @@ class GameCollector {
 	 * Initialisiert einen GameCollector und lädt dabei die Spieledatenbank aus den Ressourcen
 	 */
 	GameCollector() {
-		gameDatabase = loadDataFromJson("/data/Games_database.json", GameDatabaseEntry[].class);
+		gameDatabase = loadDataFromJson("/data/Games_Database.json", GameDatabaseEntry[].class);
 	}
 
 	private class GameDatabaseEntry {
