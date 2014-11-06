@@ -19,6 +19,8 @@ public class CodeStatistics implements Analyzable {
 	private static final String WEB_TYPE = "web";
 	private static final String NORMAL_CODE = "native";
 	private final FileExtension[] fileExtensions;
+	private final String[] FORBIDDEN_CONTAINS = {"jdk", "jre", "adt", "tex", "anaconda",
+			"javadocx", "texlive", "smartgit", "adt-bundle", "javafx_samples"};
 
 	/**
 	 * Rückgabe der Sprache, die am häufigsten Verwendet wird
@@ -182,8 +184,18 @@ public class CodeStatistics implements Analyzable {
 			for (FileExtension fileExtension : this.fileExtensions) {
 				// Wenn die Dateiendung passt, Wert um eins erhöhen
 				if (file.toString().endsWith(fileExtension.ext)) {
-					this.statisticResults.put(fileExtension, this.statisticResults.get
-							(fileExtension) + 1);
+					// Auf verbotene Substrings im Pfad prüfen
+					boolean containsForbidden = false;
+					for (String substr : this.FORBIDDEN_CONTAINS) {
+						if (file.toAbsolutePath().toString().toLowerCase().contains(substr)) {
+							containsForbidden = true;
+							break;
+						}
+					}
+					if (!containsForbidden) {
+						this.statisticResults.put(fileExtension, this.statisticResults.get
+								(fileExtension) + 1);
+					}
 				}
 			}
 		}

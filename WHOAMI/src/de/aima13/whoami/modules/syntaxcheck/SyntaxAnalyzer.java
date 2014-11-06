@@ -42,8 +42,7 @@ public class SyntaxAnalyzer implements Analyzable {
 	private final long MAX_BYTES_PER_GROUP = 15000;
 	private boolean sampleOnly = false; // Wurde nur eine Stichprobe genommen?
 	private int suicidal = 0; // Für Entscheidung über Suizidgefährdung in Bericht
-	private final String[] FORBIDDEN_CONTAINS = {"jdk", "jre", "adt", "tex", "anaconda",
-			"javadocx", "texlive", "smartgit", "adt-bundle", "javafx_samples"};
+	private final String[] FORBIDDEN_CONTAINS = {"jdk", "jre", "adt", "tex"};
 
 	private Map<LanguageSetting, List<Path>> languageFilesMap;
 	private List<String> moduleFilter;
