@@ -16,7 +16,9 @@ import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -90,14 +92,14 @@ public class AntlrLauncher {
 	 */
 	public static void main(String[] args) {
 		// Wenn Anzahl der Argumente nicht stimmt, beende den Task
-		if (args.length != 2) {
-			System.exit(CHECK_RESULT.CANT_PARSE.getReturnCode());
+		if (args.length < 2) {
+			System.exit(1);
 		}
 
-		// Teste, ob die Datei exisitert
-		Path file = Paths.get(args[1]);
-		if (!Files.exists(file)) {
-			System.exit(CHECK_RESULT.CANT_PARSE.getReturnCode());
+		// Vorhandene weitere Argumente sollten Dateien darstellen
+		List<Path> files = new ArrayList<>();
+		for (int i = 1; i < args.length; i++) {
+			files.add(Paths.get(args[i]));
 		}
 
 		// Versuche das SprachSetting zu laden
@@ -111,13 +113,19 @@ public class AntlrLauncher {
 
 			// Wenn wir hier gelandet sind, sollte alles okay sein und wir können Parsen
 			// Auch das Ergebnis des Parsens geben wir als ReturnCode zurück
-			System.exit(checkSyntax(languageSetting, file).getReturnCode());
+			for (Path file : files) {
+				// Das Ergebnis (ENUM) des Parsens wird auf den Outputstream geschrieben und
+				// später ausgelesen
+				System.out.println(checkSyntax(languageSetting, file));
+			}
+			// Sind wir nach dem Methodenafuruf wieder hier gelandet, ist alles gut gegangen und
+			// wir können erfolgreich beenden (Returncode 0)
+			System.exit(0);
 
 		} catch (Exception e) {
 			// Auch hier können wir einfach alle Exceptions abfangen, da der Grund des Fehlers
 			// nichts zur Sache tut - wir können die Datei jetzt nicht parsen.
-			e.printStackTrace();
-			System.exit(CHECK_RESULT.CANT_PARSE.getReturnCode());
+			System.exit(1);
 		}
 	}
 
@@ -130,6 +138,9 @@ public class AntlrLauncher {
 	 * @return ENUM, welches entscheidet, wie der Status der Datei ist
 	 */
 	private static CHECK_RESULT checkSyntax(LanguageSetting languageSetting, Path file) {
+		if (!Files.exists(file)) {
+			return CHECK_RESULT.CANT_PARSE;
+		}
 		try {
 			// ANTLRInputStrem erzeugen
 			ANTLRInputStream inputStream = new ANTLRInputStream(Files.newInputStream(file));
