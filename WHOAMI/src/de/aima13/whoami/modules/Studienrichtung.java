@@ -26,11 +26,11 @@ public class Studienrichtung implements Analyzable {
 	private ArrayList<CourseVisitedEntry> courseResult = new ArrayList<CourseVisitedEntry>();
 
 	/**
-	 *  Das Modul interessiert sich für die Chrome und Firefox History zum Abgleich,
-	 *  mit dem Kurskalenderaufrufen und .dropbox die einen Shared-Folder identifizieren des
-	 *  Studiengangs.
+	 * Das Modul interessiert sich für die Chrome und Firefox History zum Abgleich,
+	 * mit dem Kurskalenderaufrufen und .dropbox die einen Shared-Folder identifizieren des
+	 * Studiengangs.
 	 *
-	 *  @return Liste die den Filter für diese Modul darstellt.
+	 * @return Liste die den Filter für diese Modul darstellt.
 	 */
 	@Override
 	public List<String> getFilter() {
@@ -42,7 +42,7 @@ public class Studienrichtung implements Analyzable {
 
 		// Datei in Shared Foldern
 		myFilters.add("**/*.dropbox");
-		
+
 		return myFilters;
 	}
 
@@ -70,6 +70,7 @@ public class Studienrichtung implements Analyzable {
 
 	/**
 	 * Aus den gefunden Ergebenissen wird ein netter Bericht erstellt.
+	 *
 	 * @return HTML als String der in Bericht einfließt.
 	 */
 	@Override
@@ -120,7 +121,7 @@ public class Studienrichtung implements Analyzable {
 			} else {
 				html.append("Viel Erfolg weiterhin im Studium!");
 			}
-		}else {
+		} else {
 			html.append("Das ist wohl ein Laptop oder Rechner, den du nicht hauptsächlich für das" +
 					" Studium an der DHBW Mannheim nutzt. Also können wir an dieser leider keine " +
 					"fundierte Aussage treffen");
@@ -142,6 +143,7 @@ public class Studienrichtung implements Analyzable {
 
 	/**
 	 * Für den CSV Part der den vermuteten Namen entspricht und Kursbezeichnung.
+	 *
 	 * @return TreeMap Was letztendlich in die CSV einfließt
 	 */
 	@Override
@@ -150,6 +152,9 @@ public class Studienrichtung implements Analyzable {
 		if (!courseResult.isEmpty()) {
 			csvOutput.put("Kurs", courseResult.get(0).name);
 			csvOutput.put("Kursbezeichnung", courseResult.get(0).kurzbez);
+		} else {
+			csvOutput.put("Kurs","Unkown");
+			csvOutput.put("Kursbezeichung","Unknown");
 		}
 		return csvOutput;
 	}
@@ -165,21 +170,28 @@ public class Studienrichtung implements Analyzable {
 		calenderCourseList = Utilities.loadDataFromJson("/data/studienbezeichner.json",
 				Kurskalendermap[].class);
 		courseResult = getViewedCalenders();
+		if( courseResult.isEmpty() ){
+			for ( Kurskalendermap entry : calenderCourseList){
+				courseResult.add(new CourseVisitedEntry(entry.id,100));
+			}
+		}
 		for (CourseVisitedEntry entry : courseResult) {
 			// Ergänze restlichen Informationen
 			entry.kurzbez = this.getKursById(entry.courseID);
 			addNameAndComment(entry);
 		}
+
 		analyzePathNames(courseResult);
 		Collections.sort(courseResult, new EntryComparator());
-		if (!courseResult.isEmpty()){
-			GlobalData.getInstance().proposeData("Kurskürzel",courseResult.get(0).kurzbez);
+		if (!courseResult.isEmpty()) {
+			GlobalData.getInstance().proposeData("Kurskürzel", courseResult.get(0).kurzbez);
 		}
 	}
 
 	/**
 	 * Vergleich der Kurse mit der Dropbox. Anhand des bisheringen Maximums kann die Dropbox
 	 * nochmal die Ergebnisse umwerfen oder deutlich bestätigen.
+	 *
 	 * @param courseResult Ergebnis nach der Datenbankabfrage
 	 */
 	private void analyzePathNames(ArrayList<CourseVisitedEntry> courseResult) {
@@ -187,9 +199,8 @@ public class Studienrichtung implements Analyzable {
 		if (courseResult != null && !courseResult.isEmpty()) {
 			influence = courseResult.get(0).visitCount * DROPBOX_WEIGHTING_FACTOR;
 		}
-
 		for (CourseVisitedEntry entry : courseResult) {
-			if (Whoami.getTimeProgress()>95){
+			if (Whoami.getTimeProgress() > 95) {
 				break;
 			}
 			for (Path p : dropboxFiles) {
@@ -210,6 +221,7 @@ public class Studienrichtung implements Analyzable {
 	/**
 	 * Es wird Prefix und Suffix extrahiert. Davon abhängig wird der volle Name des Kurses bzw.
 	 * Studiengang bestimmt. TINF13AIBC --> Angewandte Informatik
+	 *
 	 * @param entry Den wir um Name und Kommentar ergänzen wollen.
 	 */
 	private void addNameAndComment(CourseVisitedEntry entry) {
@@ -230,7 +242,7 @@ public class Studienrichtung implements Analyzable {
 					entry.name = course.name;
 					entry.kommentar = course.comment;
 					break; // perfekt Match mit Suffix wir können aufhören
-				} else {
+				} else if (!suffixNecessary(suffix) ) {
 					entry.name = course.name;
 					entry.kommentar = course.comment;
 					break; // es gibt keinen Suffix also können wir auch hier aufhören
@@ -240,18 +252,28 @@ public class Studienrichtung implements Analyzable {
 		}
 	}
 
+	private boolean suffixNecessary(String searchSuffix) {
+		for (Studiengang course : courseList) {
+			if(course.suffix != null && Arrays.asList(course.suffix).contains(searchSuffix)){
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * Nur die Kalender ID soll extrahiert werden von Firefox oder Chrome. Die Abfrage ist die
 	 * selbe, mit String Operationen wird die UID schon auf sqlite Seite bestimmt.
 	 * Chrome und Firefox unterscheiden sich nur in der Tabelle von der gelesen werden soll.
 	 * Die Iteration erfolgt über alle Pfade es sei denn es ist schon mehr als die Hälfte der
 	 * Zeit rum.
+	 *
 	 * @return 10 Vorlesungsplan IDs die am häufigsten aufgerufen werden.
 	 */
 	private ArrayList<CourseVisitedEntry> getViewedCalenders() {
 		ArrayList<CourseVisitedEntry> result = new ArrayList<CourseVisitedEntry>();
 		for (Path dbPath : databaseFiles) {
-			if (Whoami.getTimeProgress()>85){
+			if (Whoami.getTimeProgress() > 85) {
 				break;
 			}
 			String fromTable = "";
@@ -335,7 +357,7 @@ public class Studienrichtung implements Analyzable {
 	* Ab hier folgen nur noch Speicherklassen für JSON
 	* ------------------------------------------------
 	*/
-	
+
 	private class Studiengang {
 		String name;
 		String prefix;
