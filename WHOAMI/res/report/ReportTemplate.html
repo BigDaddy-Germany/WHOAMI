@@ -73,7 +73,7 @@ div.module {
 	background-color: #F0F0F0;
 	border-radius: 10px 10px 10px 10px;
 }
-.module h2 {
+div.module > h2 {
 	font-variant:small-caps;
 	font-size:16pt;
 	background-color: #444444;
@@ -82,9 +82,10 @@ div.module {
 	font-weight:bold;
 	margin: 10px 0px 0px 0px;
 }
-.moduleContent {
+div.module > div {
 	font-size:12pt;
 	padding: 10px;
+	word-wrap: break-word;
 }
 
 table {
@@ -125,10 +126,10 @@ tr:nth-child(even) td {
 	font-size: 0.8em;
 }
         </style>
-        <title>Analyseergebnisse</title>
+        <title>Analysebericht</title>
     </head>
     <body>
-    <h1>Analyseergebnisse</h1>
+    <h1>Analysebericht</h1>
     $modules:{module|
 		<div class="module">
         <h2>$module.title$</h2>
@@ -140,7 +141,7 @@ tr:nth-child(even) td {
 
 
     <div id="footer">
-        &copy; by BigDaddy AnalystGroup.
+        &copy; by BigDaddy AnalystGroup 2014
     </div>
 
     </body>

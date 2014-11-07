@@ -41,10 +41,11 @@ public class Music implements Analyzable {
 	public String onlService = ""; //Genutzte Onlinedienste (siehe: MY_SEARCH_DELIVERY_URLS)
 	public String cltProgram = ""; //Installierte Programme
 	String stmtGenre = "";         //Kommentar zum Genre nach Kategorie
-	private boolean cancelledByTimeLimit = false;
+	String Qualität = "";          //Kommentar zu flac-Dateien
+	long nrAudio = 0;              //Anzahl der Audiodateien
 
 	private static final String[] MY_SEARCH_DELIEVERY_URLS = {"youtube.com", "myvideo.de", "dailymotion.com",
-			"soundcloud.com", "deezer.com"};
+			"soundcloud.com", "deezer.com", "spotify.com", "play.google.com"};
 	private static final String[] MY_SEARCH_DELIVERY_EXES = {"Deezer.exe", "spotify.exe",
 			"Amazon Music.exe", "SWYH.exe", "iTunes.exe", "napster.exe", "simfy.exe"};
 	private static final String[] MY_SEARCH_DELIVERY_NAMES = {"Deezer", "Spotify", "Amazon Music",
@@ -52,7 +53,7 @@ public class Music implements Analyzable {
 
 	private static final String TITLE = "Musikgeschmack";
 
-	String[] arrayGenre = {    // Position im Array ist Byte des id3Tag:
+	String[] arrayGenre = {    // Position im Array ist die ID des id3Tag:
 			// z.B. GenreID ist 3: Genre zu 3 ist "Dance"
 			// Quelle: http://id3.org/id3v2.3.0
 
@@ -131,8 +132,17 @@ public class Music implements Analyzable {
 	public List<String> getFilter() {
 		List<String> filterMusic = new ArrayList<>();
 
-		// lokale MP3-files
+		// Audiodateien
 		filterMusic.add("**.mp3");
+		filterMusic.add("**.wav");
+		filterMusic.add("**.wma");
+		filterMusic.add("**.aac");
+		filterMusic.add("**.ogg");
+		filterMusic.add("**.flac");
+		filterMusic.add("**.rm");
+		filterMusic.add("**.M4a");
+		filterMusic.add("**.vox");
+		filterMusic.add("**.m4b");
 
 		// Browser-history
 		filterMusic.add("**Google/Chrome**History");
@@ -153,11 +163,12 @@ public class Music implements Analyzable {
 	@Override
 	/**
 	 * Ordnet musicDatabases für die Analyse des Musikgeschmacks
-	 *
 	 * @param List<File> files
 	 * @return void
 	 */
 	public void setFileInputs(List<Path> files) throws Exception {
+		long count = 0;
+
 		//Überprüfe ob Dateien gefunden wurden
 		if (!(files == null)) {
 			musicDatabases = files;
@@ -176,11 +187,25 @@ public class Music implements Analyzable {
 
 			if (element.toString().contains(".mp3") || element.toString().contains(".MP3")) {
 				localFiles.add(element);
+				count++;
+
+				//Kommentar zu ".flac-Dateien" abgeben
+				if(element.toString().endsWith(".flac")) {
+					Qualität = "Du bist ein richtiger Audiofan und legst wert auf die maximale " +
+							"Qualität deiner Musiksammlung! ";
+				}
+
+				//Entferne Musik zu PC-Spielen (aus Steam), Beispielmusik und
+				// Audiodateien die nicht auf Metadaten untersucht werden
 				if(element.toString().contains("Steam") || element.toString().contains("Kalimba" +
 						".mp3")	|| element.toString().contains("Sleep Away.mp3") || element.toString().contains("Maid with the Flaxen " +
 						"Hair.mp3") || element.toString().contains("$RJLQJ56.mp3") || element
-						.toString().contains("$IJLQJ56.mp3")) { //Entferne Musik zu PC-Spielen
-						// (aus Steam)und Beispielmusik
+						.toString().contains("$IJLQJ56.mp3") || element.toString().endsWith("" +
+						".wav") || element.toString().endsWith(".wma") || element.toString()
+						.endsWith(".aac") || element.toString().endsWith(".ogg") || element.toString
+						().endsWith(".flac") || element.toString().endsWith(".rm") || element
+						.toString().endsWith(".M4a") || element.toString().endsWith(".vox") ||
+						element.toString().endsWith("m4b")) {
 					localFiles.remove(element);
 				}
 			} else if (element.toString().contains(".exe")) {
@@ -192,6 +217,7 @@ public class Music implements Analyzable {
 		}
 
 		musicDatabases.clear();
+		nrAudio = count;
 	}
 
 	///////////////////////////////////////////////////////
@@ -201,7 +227,6 @@ public class Music implements Analyzable {
 	@Override
 	/**
 	 * Das Ergebnis der Analyse wird in html als String in diesem Modul zusammengefügt
-	 *
 	 * @return String html
 	 * @param
 	 */
@@ -243,18 +268,24 @@ public class Music implements Analyzable {
 				&& !(cltProgram.equals(""))) {
 			buffer.append("<br /><b>Fazit:</b> Dein Computer enthält Informationen zu allem " +
 					"was wir gesucht haben. <br />Musik scheint ein wichtiger Teil deines Lebens " +
-					"zu sein. <br />" + stmtGenre);
+					"zu sein. <br />" + "Insgesamt haben wir " + nrAudio + " Musikdateien " +
+					"gefunden." + Qualität +  stmtGenre);
 		} else if (onlService.equals("") && cltProgram.equals("") && !(favGenre.equals(""))) {
 			buffer.append("<br /><b>Fazit:</b> Das Modul konnte weder online noch nativ " +
 					"herausfinden wie du Musik hörst. Du scheinst dies über einen nicht sehr " +
 					"verbreiteten Weg zu machen. Nichts desto trotz konnten wir deinen Geschmack " +
-					"analysieren: <br />" + stmtGenre);
+					"analysieren: <br />" + "Insgesamt haben wir " + nrAudio + " Musikdateien " +
+					"gefunden." + Qualität + stmtGenre);
 		} else if (favGenre.equals("") && favArtist.equals("")) {
 			buffer.append("<br /><b>Fazit:</b> Es konnten keine Informationen dazu gefunden " +
 					"werden was du hörst. Deine Lieblingsgenre und Lieblingkünstler bleiben eine " +
 					"offene Frage...");
 			if (!(onlService.equals("")) || !(cltProgram.equals(""))) {
 				buffer.append(" Aber Musik hörst du über " + onlService + ", " + cltProgram + ".");
+				if(nrAudio != 0){
+					buffer.append("Insgesamt haben wir zusätzlich " + nrAudio + " Musikdateien " +
+							"gefunden." + Qualität);
+				}
 			}
 		} else {
 			buffer.append("<br /><b>Fazit:</b> Zwar konnten einige Informationen über " +
@@ -266,10 +297,14 @@ public class Music implements Analyzable {
 				buffer.append("<br />Auf deinem PC benutzt du zum Musik hören " + cltProgram + ".");
 			}
 			if (!(favArtist.equals(""))) {
-				buffer.append("<br />Deine Lieblingsband ist " + favArtist + ".");
+				buffer.append( "Deine Lieblingsband ist " + favArtist + ".");
 			}
 			if (!(favGenre.equals(""))) {
 				buffer.append("<br />" + stmtGenre);
+			}
+			if(!(localFiles.isEmpty())){
+				buffer.append("Insgesamt haben wir " + nrAudio + " Musikdateien gefunden." +
+						Qualität);
 			}
 		}
 
@@ -342,12 +377,12 @@ public class Music implements Analyzable {
 		//Ordne einem Genre seine Häufigkeit zu
 		for (String each : fileGenre) {
 
-			//Einige ID3-Tags sind fehlerhaft und das Byte wird in der Form "(XX)"als String
+			//Einige ID3-Tags sind fehlerhaft und die ID wird in der Form "(XX)"als String
 			// gespeichert. Hier wird nochmal geguckt ob das Genre zugeordnet werden kann.
 			if (each.startsWith("(")) {
 				String str;
 				str = each.replaceAll("\\D+", "");
-				byte gId = Byte.parseByte(str);
+				short gId = Short.parseShort(str);
 				each = arrayGenre[gId];
 			}
 
@@ -556,7 +591,6 @@ public class Music implements Analyzable {
 		String genre = ""; //Name of Genre
 		int count = 0;
 		if (!(localFiles.isEmpty())){
-			System.out.println("Lese ID3 Tags...");
 			for (Path file : localFiles) {
 				try {
 					String fileLocation = file.toAbsolutePath().toString(); //Get path to file
@@ -564,7 +598,6 @@ public class Music implements Analyzable {
 
 					if (mp3file.hasID3v2Tag()) {
 						AbstractID3v2 tagv2 = mp3file.getID3v2Tag();
-
 						//Fill ArrayList<String> with Artists and Genres
 						fileArtist.add(tagv2.getLeadArtist());
 						fileGenre.add(tagv2.getSongGenre());
@@ -574,7 +607,7 @@ public class Music implements Analyzable {
 						fileArtist.add(tagv1.getArtist()); //Fill List of Type String with artist
 
 						// Map Genre-ID zu Genre-Name
-						byte gId = tagv1.getGenre(); //Get Genre ID
+						short gId = tagv1.getGenre(); //Get Genre ID
 						try {
 							genre = arrayGenre[gId]; // Genre zur ID
 						} catch (ArrayIndexOutOfBoundsException e) {
@@ -635,9 +668,7 @@ public class Music implements Analyzable {
 	public void readBrowser(String searchUrl[]) {
 		for (Path db : browserFiles) {
 			try {
-				System.out.println("Scan Browser... ");
 				mostVisited = dbExtraction(db, MY_SEARCH_DELIEVERY_URLS);
-				System.out.println("Erzeuge Ergebnis...");
 				while (mostVisited.next()) {
 					String urlName = "";
 					urlName = mostVisited.getString("host");
@@ -653,7 +684,6 @@ public class Music implements Analyzable {
 				//Schließe ResultSet imd Statement
 				if (mostVisited != null) {
 					try {
-						System.out.println("hosts:" + mostVisited.getString("host"));
 						mostVisited.close();
 						mostVisited.getStatement().close();
 					} catch (SQLException e) {
@@ -710,8 +740,8 @@ public class Music implements Analyzable {
 				}
 				mostVisited = dbManager.querySqlStatement(sqlStatement);
 			}
-		} catch (ClassNotFoundException | SQLException e) {
-			// Deadlock auf DB
+		} catch (ClassNotFoundException | SQLException | NullPointerException e) {
+			// Deadlock auf DB | es kommt null auf die DB-Abfrage zurück
 		}
 		return mostVisited;
 	}

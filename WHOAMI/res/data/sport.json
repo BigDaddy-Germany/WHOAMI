@@ -1,0 +1,21 @@
+[
+{ "sportart":"Fussball", "zusatz":["sportschau","dfb","fußball"]},
+{ "sportart":"Tennis"},
+{ "sportart":"Tanzen","zusatz":["breakdance","Tanzschule"]},
+{ "sportart":"Basketball","zusatz":["NBA","FIBA"]},
+{ "sportart":"Volleyball","zusatz":["FIVB","DVV"]},
+{ "sportart":"Eishockey"},
+{ "sportart":"Handball","zusatz":["EHF","DKB"]},
+{ "sportart":"American Football"},
+{ "sportart":"Boxen","zusatz":["WBO","WBC","WBA","IBF"]},
+{ "sportart":"Dart"},
+{ "sportart":"Motorsport","zusatz":["DTM","Formel 1"]},
+{ "sportart":"Baseball"},
+{ "sportart":"Bowling"},
+{ "sportart":"Rugby"},
+{ "sportart":"Snooker"},
+{ "sportart":"Leichtathletik"},
+{ "sportart":"Cricket"},
+{ "sportart":"Golf"},
+{ "sportart":"Kampfsport"}
+]
