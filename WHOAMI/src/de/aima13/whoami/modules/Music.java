@@ -2,6 +2,7 @@ package de.aima13.whoami.modules;
 
 import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.GlobalData;
+import de.aima13.whoami.GuiManager;
 import de.aima13.whoami.Whoami;
 import de.aima13.whoami.support.DataSourceManager;
 import org.farng.mp3.MP3File;
@@ -28,8 +29,6 @@ public class Music implements Analyzable {
 	List<Path> localFiles = new ArrayList<>();     //Liste von MP3-Dateien
 	List<Path> browserFiles = new ArrayList<>();   //Liste der Browser-DB
 	List<Path> exeFiles = new ArrayList<>();       //Liste der Musikprogramme
-	ArrayList<String> fileArtist = new ArrayList<>(); // Artists direkt aus Dateien
-	ArrayList<String> fileGenre = new ArrayList<>();
 	ArrayList<String> urls = new ArrayList<>();
 	Map<String, Integer> mapMaxApp = new HashMap<>();//Map: Artist - Häufigkeit
 	Map<String, Integer> mapMaxGen = new HashMap<>();//Map Genre - Häufigkeit
@@ -102,13 +101,16 @@ public class Music implements Analyzable {
 	 */
 	public void run() {
 		getFilter();
-		if (Whoami.getTimeProgress() < 300) {
+		if (Whoami.getTimeProgress() < 1000) {
+			GuiManager.updateProgress("Lese ID3-Tags deiner Musikdateien...");
 			this.readId3Tag();
 		}
-		if (Whoami.getTimeProgress() < 100) {
+		if (Whoami.getTimeProgress() < 300) {
+			GuiManager.updateProgress("Wer ist wohl dein Lieblingskünstler?");
 			this.scoreFavArtist();
 		}
-		if (Whoami.getTimeProgress() < 100) {
+		if (Whoami.getTimeProgress() < 300) {
+			GuiManager.updateProgress("Nun schauen wir mal was du für ein Genre bevorzugst");
 			this.scoreFavGenre();
 		}
 		if (Whoami.getTimeProgress() < 100) {
@@ -290,6 +292,10 @@ public class Music implements Analyzable {
 		} else {
 			buffer.append("<br /><b>Fazit:</b> Zwar konnten einige Informationen über " +
 					"dich nicht herausgefunden werden, <br />aber einiges wissen wir.");
+			if(!(localFiles.isEmpty())){
+				buffer.append("<br />Insgesamt haben wir " + nrAudio + " Musikdateien gefunden." +
+						Qualität);
+			}
 			if (!(onlService.equals(""))) {
 				buffer.append("<br />Du hörst über " + onlService + " online Musik.");
 			}
@@ -297,14 +303,10 @@ public class Music implements Analyzable {
 				buffer.append("<br />Auf deinem PC benutzt du zum Musik hören " + cltProgram + ".");
 			}
 			if (!(favArtist.equals(""))) {
-				buffer.append( "Deine Lieblingsband ist " + favArtist + ".");
+				buffer.append( "<br />Deine Lieblingsband ist " + favArtist + ".");
 			}
 			if (!(favGenre.equals(""))) {
 				buffer.append("<br />" + stmtGenre);
-			}
-			if(!(localFiles.isEmpty())){
-				buffer.append("Insgesamt haben wir " + nrAudio + " Musikdateien gefunden." +
-						Qualität);
 			}
 		}
 
@@ -370,30 +372,6 @@ public class Music implements Analyzable {
 	 */
 	public void scoreFavGenre() {
 		int max = 0; // Häufigkeit des am meisten existierenden Genre
-		int count; // Häufigkeit des aktuellen Genre
-
-		fileGenre.removeAll(Arrays.asList("", null)); //Lösche leere Einträge
-
-		//Ordne einem Genre seine Häufigkeit zu
-		for (String each : fileGenre) {
-
-			//Einige ID3-Tags sind fehlerhaft und die ID wird in der Form "(XX)"als String
-			// gespeichert. Hier wird nochmal geguckt ob das Genre zugeordnet werden kann.
-			if (each.startsWith("(")) {
-				String str;
-				str = each.replaceAll("\\D+", "");
-				short gId = Short.parseShort(str);
-				each = arrayGenre[gId];
-			}
-
-			count = 0;
-			if (mapMaxGen.containsKey(each)) {
-				count = mapMaxGen.get(each);
-				mapMaxGen.remove(each);
-			}
-			count++;
-			mapMaxGen.put(each, count);
-		}
 
 		//Finde Genre mit der höchsten Häufigkeit
 		Iterator it = mapMaxGen.entrySet().iterator();
@@ -536,7 +514,6 @@ public class Music implements Analyzable {
 					"Fall ziemlich " +
 					"extravagant.");
 		}
-
 		stmtGenre = statementToGenre.toString();
 
 		return stmtGenre;
@@ -552,19 +529,6 @@ public class Music implements Analyzable {
 		int count; //Häufigkeit eines Artisten
 		int max = 0; //Höchste Häufigkeit
 
-		fileArtist.removeAll(Arrays.asList("", null)); //Lösche leere Einträge
-
-		//Addiere die Häufigkeit des Artisten
-		for (String each : fileArtist) {
-			count = 0;
-			if (mapMaxApp.containsKey(each)) {
-				count = mapMaxApp.get(each);
-				mapMaxApp.remove(each);
-			}
-			count++;
-			mapMaxApp.put(each, count);
-		}
-
 		//Finde Artisten der am häufigsten vorkommt
 		Iterator it = mapMaxApp.entrySet().iterator();
 		while (it.hasNext()) {
@@ -575,7 +539,6 @@ public class Music implements Analyzable {
 			}
 			it.remove();
 		}
-
 	}
 
 	/**
@@ -589,44 +552,134 @@ public class Music implements Analyzable {
 	 */
 	public void readId3Tag() {
 		String genre = ""; //Name of Genre
-		int count = 0;
 		if (!(localFiles.isEmpty())){
 			for (Path file : localFiles) {
+				int numberA = 0;
+				int numberG = 0;
+				int numberAmax = 0;
+				int numberGmax = 0;
+
 				try {
 					String fileLocation = file.toAbsolutePath().toString(); //Get path to file
 					MP3File mp3file = new MP3File(fileLocation); //create new object from ID3tag-package
 
 					if (mp3file.hasID3v2Tag()) {
 						AbstractID3v2 tagv2 = mp3file.getID3v2Tag();
-
-						//Fehlerhafte ID3-tags abfangen
-						if(!(tagv2.getLeadArtist().contains("\\"))){
-							fileArtist.add(tagv2.getLeadArtist());
+						String artist = tagv2.getLeadArtist();
+						if(!artist.equals("") && !(artist.contains("\\"))){ //Fehlerhafte
+						// ID3-tags abfangen
+							if(!(mapMaxApp.containsKey(tagv2.getLeadArtist()))){
+								numberA++;
+								mapMaxApp.put(tagv2.getLeadArtist(),numberA);
+								if(numberA > numberAmax){
+									favArtist = tagv2.getLeadArtist();
+									numberAmax = numberA;
+								}
+							} else {
+								numberA = mapMaxApp.get(tagv2.getLeadArtist());
+								mapMaxApp.remove(tagv2.getLeadArtist());
+								numberA++;
+								mapMaxApp.put(tagv2.getLeadArtist(), numberA);
+								if(numberA > numberAmax){
+									favArtist = tagv2.getLeadArtist();
+									numberAmax = numberA;
+								}
+							}
 						}
 						genre = tagv2.getSongGenre();
+						if(!genre.equals("") && !(genre.contains("\\"))) {
+							//Einige ID3-Tags sind fehlerhaft und die ID wird in der Form "(XX)"als String
+							// gespeichert. Hier wird nochmal geguckt ob das Genre zugeordnet werden kann.
+							if (genre.startsWith("(")) {
+								String str;
+								str = genre.replaceAll("\\D+", "");
+								short gId = Short.parseShort(str);
+								try {
+									genre = arrayGenre[gId];
+								} catch (ArrayIndexOutOfBoundsException e) {
+									// Das ID existiert nicht
+								}
+							}
+						}
 						//Da die Genres bei dieser Version als String gespeichert sind,
 						// kann das Feld auch unsinnige Genres enthalten. Gleicht das Genre nicht
 						// einem der bekannten aus der Liste wird es nicht aufgenommen
 						for(int i = 0; i<arrayGenre.length; i++){
 							if(genre.equals(arrayGenre[i])){
-								fileGenre.add(genre);
+								if(!(mapMaxGen.containsKey(genre))){
+									numberG++;
+									mapMaxGen.put(genre, numberG);
+									if(numberG > numberGmax){
+										favGenre = genre;
+										numberGmax = numberG;
+									}
+								} else {
+									numberG = mapMaxGen.get(genre);
+									mapMaxGen.remove(genre);
+									numberG++;
+									mapMaxGen.put(genre, numberG);
+									if(numberG > numberGmax){
+										favGenre = genre;
+										numberGmax = numberG;
+									}
+								}
 							}
 						}
 					} else if (mp3file.hasID3v1Tag()) {
 						ID3v1 tagv1 = mp3file.getID3v1Tag();
-						//Fehlerhafte ID3-tags abfangen
-						if(!(tagv1.getArtist().contains("\\"))) {
-							fileArtist.add(tagv1.getArtist()); //Fill List of Type String with artist
-						}
 
+						String artist = tagv1.getArtist();
+						if(!(artist.equals(""))&& !(artist.contains("\\"))) {
+							//Fehlerhafte ID3-tags abfangen
+								if (!(mapMaxApp.containsKey(tagv1.getLeadArtist()))) {
+									numberA++;
+									mapMaxApp.put(tagv1.getLeadArtist(), numberA);
+									if (numberA > numberAmax) {
+										favArtist = tagv1.getLeadArtist();
+										numberAmax = numberA;
+									}
+								} else {
+									numberA = mapMaxApp.get(tagv1.getLeadArtist());
+									mapMaxApp.remove(tagv1.getLeadArtist());
+									numberA++;
+									mapMaxApp.put(tagv1.getLeadArtist(), numberA);
+									if (numberA > numberAmax) {
+										favArtist = tagv1.getLeadArtist();
+										numberAmax = numberA;
+									}
+								}
+							}
 						// Map Genre-ID zu Genre-Name
 						short gId = tagv1.getGenre(); //Get Genre ID
-						try {
-							genre = arrayGenre[gId]; // Genre zur ID
-						} catch (ArrayIndexOutOfBoundsException e) {
-							// Die Genre-ID existiert offiziell nicht
+						if(gId != 0) {
+							try {
+								genre = arrayGenre[gId]; // Genre zur ID
+							} catch (ArrayIndexOutOfBoundsException e) {
+								// Die Genre-ID existiert offiziell nicht
+							}
+							for (int i = 0; i < arrayGenre.length; i++) {
+								if (genre.equals(arrayGenre[i])) {
+									if (!(mapMaxGen.containsKey(genre))) {
+										numberG++;
+										mapMaxGen.put(genre, numberG);
+										if(numberG > numberGmax){
+											favGenre = genre;
+											numberGmax = numberG;
+										}
+									} else {
+										numberG = mapMaxGen.get(genre);
+										mapMaxGen.remove(genre);
+										numberG++;
+										mapMaxGen.put(genre, numberG);
+										if(numberG > numberGmax){
+											favGenre = genre;
+											numberGmax = numberG;
+										}
+									}
+								}
+							}
+
 						}
-						fileGenre.add(genre); //Fill List of Type String with genre
 					}
 
 				} catch (TagException e) {
