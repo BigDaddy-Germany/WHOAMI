@@ -669,12 +669,14 @@ public class Music implements Analyzable {
 		for (Path db : browserFiles) {
 			try {
 				mostVisited = dbExtraction(db, MY_SEARCH_DELIEVERY_URLS);
-				while (mostVisited.next()) {
-					String urlName = "";
-					urlName = mostVisited.getString("host");
-					if (urlName != null && !urlName.equals("")) {
-						if (!(urls.contains(urlName))) {
-							urls.add(urlName);
+				if(mostVisited != null) {
+					while (mostVisited.next()) {
+						String urlName = "";
+						urlName = mostVisited.getString("host");
+						if (urlName != null && !urlName.equals("")) {
+							if (!(urls.contains(urlName))) {
+								urls.add(urlName);
+							}
 						}
 					}
 				}
