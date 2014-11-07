@@ -1,7 +1,6 @@
 package de.aima13.whoami;
 
 import de.aima13.whoami.support.Utilities;
-import org.apache.commons.lang3.text.WordUtils;
 import org.stringtemplate.v4.ST;
 
 import java.util.HashMap;
@@ -32,9 +31,6 @@ public class GlobalData implements Representable {
 	/*
 	 * Jedem Key können verschiedenen Vorschläge zugeordnet werden, wobei jedem Vorschlag
 	 * die Häufigkeit zugeordnet werden kann.
-	 * Sämtliche vorschläge werden in Großbuchstaben gespeichert und später Capitalized (erster
-	 * Buchstabe groß) ausgegeben, sodass es grundsätzlich besser aussieht und es keine Probleme
-	 * mit eventuell unterschiedlicher Groß-/Kleinschreibung gibt
 	 */
 	private Map<String, Map<String, Integer>> globalDataProposals = new HashMap<>();
 	private Map<String, String> globalDataResults;
@@ -182,8 +178,6 @@ public class GlobalData implements Representable {
 		if (!this.dataProposalsAllowed) {
 			throw new RuntimeException("No data proposals allowed after calculating the results!");
 		}
-		// Siehe Beschreibung oben - value to upper
-		value = value.toUpperCase();
 
 		// Prüfen, ob der Datensatz für diesen Key schon existiert, ansonsten anlegen und mit
 		// diesem Vorschlag initialisieren
@@ -254,7 +248,7 @@ public class GlobalData implements Representable {
 
 			// Gab es ein Ergebnis? Dann Wert speichern
 			if (bestProposal != null) {
-				dataResults.put(key, WordUtils.capitalizeFully(bestProposal.getKey()));
+				dataResults.put(key, bestProposal.getKey());
 			}
 		}
 

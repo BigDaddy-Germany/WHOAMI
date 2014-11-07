@@ -189,7 +189,7 @@ public class Studienrichtung implements Analyzable {
 		}
 
 		for (CourseVisitedEntry entry : courseResult) {
-			if (Whoami.getTimeProgress()>80){
+			if (Whoami.getTimeProgress()>95){
 				break;
 			}
 			for (Path p : dropboxFiles) {
@@ -251,7 +251,7 @@ public class Studienrichtung implements Analyzable {
 	private ArrayList<CourseVisitedEntry> getViewedCalenders() {
 		ArrayList<CourseVisitedEntry> result = new ArrayList<CourseVisitedEntry>();
 		for (Path dbPath : databaseFiles) {
-			if (Whoami.getTimeProgress()>60){
+			if (Whoami.getTimeProgress()>85){
 				break;
 			}
 			String fromTable = "";
