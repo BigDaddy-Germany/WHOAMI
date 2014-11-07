@@ -83,6 +83,14 @@
         </resources>
         <plugins>
             <plugin>
+                <groupId>com.zenjava</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>2.0</version>
+                <configuration>
+                    <mainClass>de.aima13.whoami.Whoami</mainClass>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.2</version>
@@ -101,6 +109,7 @@
                     <archive>
                         <manifest>
                             <mainClass>de.aima13.whoami.Whoami</mainClass>
+                            <addClasspath>true</addClasspath>
                         </manifest>
                     </archive>
                 </configuration>
@@ -128,7 +137,7 @@
                 <version>1.7.1</version>
                 <executions>
                     <execution>
-                        <id>l4j-clui</id>
+                        <id>l4j-gui</id>
                         <phase>package</phase>
                         <goals>
                             <goal>launch4j</goal>
@@ -136,7 +145,7 @@
                         <configuration>
                             <dontWrapJar>false</dontWrapJar>
                             <headerType>console</headerType>
-                            <jar>${project.build.directory}/${artifactId}-${version}.jar</jar>
+                            <jar>${project.build.directory}/${project.artifactId}-${project.version}.jar</jar>
                             <outfile>${project.build.directory}/WHOAMI-Scanner.exe</outfile>
                             <singleInstance>
                                 <mutexName>whoami_scanner</mutexName>
@@ -148,10 +157,8 @@
                             <manifest>launch4j/whoami.manifest</manifest>
                             <icon>launch4j/appicon.ico</icon>
                             <jre>
-                                <path>jre_bundled</path>
-                                <minVersion>1.7.0</minVersion>
-                                <jdkPreference>jreOnly</jdkPreference>
-                                <runtimeBits>64/32</runtimeBits>
+                                <minVersion>1.7.0_09</minVersion>
+                                <jdkPreference>preferJre</jdkPreference>
                                 <opts>
                                     <opt>-Dlaunch4j.exedir="%EXEDIR%"</opt>
                                 </opts>
