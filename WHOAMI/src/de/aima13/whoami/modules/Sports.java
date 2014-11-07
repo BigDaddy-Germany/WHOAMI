@@ -109,10 +109,10 @@ public class Sports implements Analyzable{
 				if(s.zusatz !=null) {
 					for (String addition : s.zusatz) {
 						sqlStatement += "OR url LIKE '%" + addition + "%' ";
-						sqlStatement += "OR title LIKE '%" + addition + "%'";
+						sqlStatement += "OR title LIKE '%" + addition + "%' ";
 					}
 				}
-				sqlStatement += " ;";
+				sqlStatement += ";";
 				ResultSet rs = dSm.querySqlStatement(sqlStatement);
 				if(rs != null){
 					while (rs.next()){
@@ -131,5 +131,9 @@ public class Sports implements Analyzable{
 	private class Sportart{
 		String sportart;
 		String [] zusatz;
+		@Override
+		public String toString(){
+			return sportart + " Extras:"+Arrays.toString(zusatz);
+		}
 	}
 }
