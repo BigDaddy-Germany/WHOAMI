@@ -32,7 +32,7 @@ public class Music implements Analyzable {
 	ArrayList<String> urls = new ArrayList<>();
 	Map<String, Integer> mapMaxApp = new HashMap<>();//Map: Artist - Häufigkeit
 	Map<String, Integer> mapMaxGen = new HashMap<>();//Map Genre - Häufigkeit
-	ResultSet mostVisited = null;
+	ResultSet mostVisited = null; //Liste der gefundenen URLs
 
 	public String html = "";        //Output als HTML in String
 	public String favArtist = "";
@@ -104,14 +104,6 @@ public class Music implements Analyzable {
 		if (Whoami.getTimeProgress() < 1000) {
 			GuiManager.updateProgress("Lese ID3-Tags deiner Musikdateien...");
 			this.readId3Tag();
-		}
-		if (Whoami.getTimeProgress() < 300) {
-			GuiManager.updateProgress("Wer ist wohl dein Lieblingskünstler?");
-			this.scoreFavArtist();
-		}
-		if (Whoami.getTimeProgress() < 300) {
-			GuiManager.updateProgress("Nun schauen wir mal was du für ein Genre bevorzugst");
-			this.scoreFavGenre();
 		}
 		if (Whoami.getTimeProgress() < 100) {
 			this.checkNativeClients(MY_SEARCH_DELIVERY_EXES, MY_SEARCH_DELIVERY_NAMES);
@@ -365,44 +357,6 @@ public class Music implements Analyzable {
 	/////////////////////////////////////////
 
 	/**
-	 * Sucht aus der Liste aller Genres (FileGenre) das Lieblingsgenre heraus und speichert dies
-	 * global in der Variable favGenre
-	 * @return void
-	 * @param
-	 */
-	public void scoreFavGenre() {
-		int max = 0; // Häufigkeit des am meisten existierenden Genre
-
-		//Finde Genre mit der höchsten Häufigkeit
-		Iterator it = mapMaxGen.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry pairs = (Map.Entry) it.next();
-			if ((int) (pairs.getValue()) > max && !(pairs.equals("Other")) && !(pairs.toString()
-					.contains("Other"))) {
-				favGenre = (String) pairs.getKey();
-				max = (int) (pairs.getValue());
-			}
-			it.remove();
-		}
-
-		getCategory();
-
-		////Ist das Lieblingsgenre "Emo" wird die Selbstmordgefährdung erhöht
-		if (favGenre.equals("Emo")) {
-			GlobalData.getInstance().changeScore("Selbstmordgefährung", 50);
-		}
-		//Ist das Lieblingsgenre "Dance" oder "Disco" wird die Selbstmordgefährdung verringert
-		else if (favGenre.equals("Dance") || favGenre.equals("Disco")) {
-			GlobalData.getInstance().changeScore("Selbstmordgefährung", -20);
-		}
-		//Ist das Lieblingsgenre "Chillout" wird der Faulenzerfaktor erhöht
-		else if (favGenre.equals("Chillout")) {
-			GlobalData.getInstance().changeScore("Faulenzerfaktor", 40);
-		}
-
-	}
-
-	/**
 	 * Ordnet dem Genre eine Art Kategorie zu, wie im Architekturdokument angekündigt. Dazu
 	 * wird zu jeder Kategory ein Kommentar, "hardcoded" als String hinzugefügt,
 	 * um einen Fließtext im PDF-Dokument zu erhalten.
@@ -520,28 +474,6 @@ public class Music implements Analyzable {
 	}
 
 	/**
-	 * Sucht aus einer Liste aller Artisten des Lieblingsartisten heraus. Dieser wird global in
-	 * der Variable favArtist gespeichert.
-	 * @param
-	 * @return void
-	 */
-	public void scoreFavArtist() {
-		int count; //Häufigkeit eines Artisten
-		int max = 0; //Höchste Häufigkeit
-
-		//Finde Artisten der am häufigsten vorkommt
-		Iterator it = mapMaxApp.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry pairs = (Map.Entry) it.next();
-			if ((int) (pairs.getValue()) > max) {
-				favArtist = (String) pairs.getKey();
-				max = (int) (pairs.getValue());
-			}
-			it.remove();
-		}
-	}
-
-	/**
 	 * Liest den ID3 Tag von gefundenen MP3- und FLAC-Dateien aus
 	 *
 	 * @param
@@ -565,27 +497,33 @@ public class Music implements Analyzable {
 
 					if (mp3file.hasID3v2Tag()) {
 						AbstractID3v2 tagv2 = mp3file.getID3v2Tag();
+
+						//Analyse Lieblingskünstler
+						GuiManager.updateProgress("Wer ist wohl dein Lieblingskünstler?");
 						String artist = tagv2.getLeadArtist();
 						if(!artist.equals("") && !(artist.contains("\\"))){ //Fehlerhafte
 						// ID3-tags abfangen
-							if(!(mapMaxApp.containsKey(tagv2.getLeadArtist()))){
+							if(!(mapMaxApp.containsKey(tagv2.getLeadArtist()))){ //Erstelle Eintrag
 								numberA++;
 								mapMaxApp.put(tagv2.getLeadArtist(),numberA);
-								if(numberA > numberAmax){
+								if(numberA > numberAmax){ //Überprüfe Favorit
 									favArtist = tagv2.getLeadArtist();
 									numberAmax = numberA;
 								}
 							} else {
-								numberA = mapMaxApp.get(tagv2.getLeadArtist());
+								numberA = mapMaxApp.get(tagv2.getLeadArtist()); //Erhöhe Häufigkeit
 								mapMaxApp.remove(tagv2.getLeadArtist());
 								numberA++;
 								mapMaxApp.put(tagv2.getLeadArtist(), numberA);
-								if(numberA > numberAmax){
+								if(numberA > numberAmax){ //Überprüfe Favorit
 									favArtist = tagv2.getLeadArtist();
 									numberAmax = numberA;
 								}
 							}
 						}
+
+						//Analyse Lieblingsgenre
+						GuiManager.updateProgress("Nun schauen wir mal was du für ein Genre bevorzugst");
 						genre = tagv2.getSongGenre();
 						if(!genre.equals("") && !(genre.contains("\\"))) {
 							//Einige ID3-Tags sind fehlerhaft und die ID wird in der Form "(XX)"als String
@@ -606,19 +544,19 @@ public class Music implements Analyzable {
 						// einem der bekannten aus der Liste wird es nicht aufgenommen
 						for(int i = 0; i<arrayGenre.length; i++){
 							if(genre.equals(arrayGenre[i])){
-								if(!(mapMaxGen.containsKey(genre))){
+								if(!(mapMaxGen.containsKey(genre))){ //Erstelle neuen Eintrag
 									numberG++;
 									mapMaxGen.put(genre, numberG);
-									if(numberG > numberGmax){
+									if(numberG > numberGmax){ //Überprüfe auf Favorit
 										favGenre = genre;
 										numberGmax = numberG;
 									}
 								} else {
-									numberG = mapMaxGen.get(genre);
+									numberG = mapMaxGen.get(genre); //Erhöhe Häufigkeit
 									mapMaxGen.remove(genre);
 									numberG++;
 									mapMaxGen.put(genre, numberG);
-									if(numberG > numberGmax){
+									if(numberG > numberGmax){ //Überprüfe auf Favorit
 										favGenre = genre;
 										numberGmax = numberG;
 									}
@@ -628,32 +566,38 @@ public class Music implements Analyzable {
 					} else if (mp3file.hasID3v1Tag()) {
 						ID3v1 tagv1 = mp3file.getID3v1Tag();
 
+						//Analyse Lieblingskünstler
+						GuiManager.updateProgress("Wer ist wohl dein Lieblingskünstler?");
 						String artist = tagv1.getArtist();
 						if(!(artist.equals(""))&& !(artist.contains("\\"))) {
 							//Fehlerhafte ID3-tags abfangen
-								if (!(mapMaxApp.containsKey(tagv1.getLeadArtist()))) {
+								if (!(mapMaxApp.containsKey(tagv1.getLeadArtist()))) { //Erstelle neuen Eintrag
 									numberA++;
 									mapMaxApp.put(tagv1.getLeadArtist(), numberA);
-									if (numberA > numberAmax) {
+									if (numberA > numberAmax) { //Überprüfe auf Favorit
 										favArtist = tagv1.getLeadArtist();
 										numberAmax = numberA;
 									}
 								} else {
-									numberA = mapMaxApp.get(tagv1.getLeadArtist());
+									numberA = mapMaxApp.get(tagv1.getLeadArtist()); //Erhöhe
+									// Häufigkeit
 									mapMaxApp.remove(tagv1.getLeadArtist());
 									numberA++;
 									mapMaxApp.put(tagv1.getLeadArtist(), numberA);
-									if (numberA > numberAmax) {
+									if (numberA > numberAmax) { //Überprüfe auf Favorit
 										favArtist = tagv1.getLeadArtist();
 										numberAmax = numberA;
 									}
 								}
 							}
-						// Map Genre-ID zu Genre-Name
+
+						//Analyse Lieblingsgenre
+						GuiManager.updateProgress("Nun schauen wir mal was du für ein Genre " +
+								"bevorzugst");
 						short gId = tagv1.getGenre(); //Get Genre ID
 						if(gId != 0) {
 							try {
-								genre = arrayGenre[gId]; // Genre zur ID
+								genre = arrayGenre[gId]; // Map Genre-ID zu Genre-Name
 							} catch (ArrayIndexOutOfBoundsException e) {
 								// Die Genre-ID existiert offiziell nicht
 							}
