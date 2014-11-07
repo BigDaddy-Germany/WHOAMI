@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
  * Created by Marvin on 28.10.2014.
  */
 public class Studienrichtung implements Analyzable {
-	private final float DROPBOX_WEIGHTING_FACTOR = 0.15f;
+	private final float DROPBOX_WEIGHTING_FACTOR = 0.18f;
 	private final float SAMENESS_WEIGHTING_FACTOR = 8f;
 	private List<Path> dropboxFiles = new ArrayList<Path>();
 	private List<Path> databaseFiles = new ArrayList<Path>();
@@ -59,7 +59,7 @@ public class Studienrichtung implements Analyzable {
 		for (Path p : files) {
 			if (p.toString().endsWith(".dropbox")) {
 				dropboxFiles.add(p);
-			} else if (p.toString().endsWith(".sqlite") || p.toString().contains("Google/Chrome")) {
+			} else if (p.toString().endsWith(".sqlite") || p.toString().endsWith("History")) {
 				databaseFiles.add(p);
 			} else {
 				// irgendwas unbrauchbares
@@ -153,8 +153,8 @@ public class Studienrichtung implements Analyzable {
 			csvOutput.put("Kurs", courseResult.get(0).name);
 			csvOutput.put("Kursbezeichnung", courseResult.get(0).kurzbez);
 		} else {
-			csvOutput.put("Kurs","Unkown");
-			csvOutput.put("Kursbezeichung","Unknown");
+			csvOutput.put("Kurs", "Unkown");
+			csvOutput.put("Kursbezeichung", "Unknown");
 		}
 		return csvOutput;
 	}
@@ -170,9 +170,9 @@ public class Studienrichtung implements Analyzable {
 		calenderCourseList = Utilities.loadDataFromJson("/data/studienbezeichner.json",
 				Kurskalendermap[].class);
 		courseResult = getViewedCalenders();
-		if( courseResult.isEmpty() ){
-			for ( Kurskalendermap entry : calenderCourseList){
-				courseResult.add(new CourseVisitedEntry(entry.id,100));
+		if (courseResult.isEmpty()) {
+			for (Kurskalendermap entry : calenderCourseList) {
+				courseResult.add(new CourseVisitedEntry(entry.id, 100));
 			}
 		}
 		for (CourseVisitedEntry entry : courseResult) {
@@ -184,8 +184,35 @@ public class Studienrichtung implements Analyzable {
 		analyzePathNames(courseResult);
 		Collections.sort(courseResult, new EntryComparator());
 		if (!courseResult.isEmpty()) {
-			GlobalData.getInstance().proposeData("Kurskürzel", courseResult.get(0).kurzbez);
+			String course = getMostSuitableCourse();
+			GlobalData.getInstance().proposeData("Kurskürzel", course);
 		}
+	}
+
+	/**
+	 * Reine Dropbox Analyse kann unter Umständen Mehrdeutigkeiten nicht final entscheiden.
+	 * Sollte 2 Vorschläge auf eine gleich Gewichtung kommen, dann wird der Rest der nicht mehr
+	 * gleich ist mit X auf gefüllt.
+	 * @return Studiengangskürzel mit X aufgefüllt am Ende falls merhdeutig war
+	 */
+	private String getMostSuitableCourse() {
+		if (courseResult.size() >= 2) {
+			if (courseResult.get(0).visitCount == courseResult.get(1).visitCount) {
+				char[] first = courseResult.get(0).kurzbez.toCharArray();
+				char[] second = courseResult.get(1).kurzbez.toCharArray();
+				char[] ausgabe = new char[Math.max(first.length, second.length)];
+				int i = 0;
+				while (first[i] == second[i] && i < second.length && i < first.length) {
+					ausgabe[i] = first[i];
+					i++;
+				}
+				for (int j = i; j < ausgabe.length; j++) {
+					ausgabe[j] = 'X';
+				}
+				return String.valueOf(ausgabe);
+			}
+		}
+		return courseResult.get(0).kurzbez;
 	}
 
 	/**
@@ -206,7 +233,7 @@ public class Studienrichtung implements Analyzable {
 			for (Path p : dropboxFiles) {
 				String[] pathParts = p.getParent().toString().split("\\\\|\\s|-");
 				for (String partOfPath : pathParts) {
-					float samenessLevel = 0.50f;
+					float samenessLevel = 0.60f;
 					while (Utilities.isRoughlyEqual(partOfPath, entry.kurzbez, samenessLevel)) {
 						samenessLevel += 0.05f;
 					}
@@ -242,7 +269,7 @@ public class Studienrichtung implements Analyzable {
 					entry.name = course.name;
 					entry.kommentar = course.comment;
 					break; // perfekt Match mit Suffix wir können aufhören
-				} else if (!suffixNecessary(suffix) ) {
+				} else if (!suffixNecessary(suffix)) {
 					entry.name = course.name;
 					entry.kommentar = course.comment;
 					break; // es gibt keinen Suffix also können wir auch hier aufhören
@@ -254,7 +281,7 @@ public class Studienrichtung implements Analyzable {
 
 	private boolean suffixNecessary(String searchSuffix) {
 		for (Studiengang course : courseList) {
-			if(course.suffix != null && Arrays.asList(course.suffix).contains(searchSuffix)){
+			if (course.suffix != null && Arrays.asList(course.suffix).contains(searchSuffix)) {
 				return true;
 			}
 		}
@@ -294,14 +321,17 @@ public class Studienrichtung implements Analyzable {
 						"GROUP BY kurs " +
 						"ORDER BY aufrufe DESC " +
 						"LIMIT 10;");
-				while (rs.next()) {
-					if (!resultContainsID(result, rs.getString(1))) {
-						result.add(new CourseVisitedEntry(rs.getString(1), rs.getInt(2)));
-					} else {
-						summarizeVisitCount(result, rs.getString(1), rs.getInt(2));
+				if (rs != null) {
+					while (rs.next()) {
+						if (!resultContainsID(result, rs.getString(1))) {
+							String a = rs.getString(1);
+							int b = rs.getInt(2);
+							result.add(new CourseVisitedEntry(rs.getString(1), rs.getInt(2)));
+						} else {
+							summarizeVisitCount(result, rs.getString(1), rs.getInt(2));
+						}
 					}
 				}
-
 			} catch (ClassNotFoundException | SQLException e) {
 			} finally {
 				try {
