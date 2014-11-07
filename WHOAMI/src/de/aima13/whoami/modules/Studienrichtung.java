@@ -183,13 +183,13 @@ public class Studienrichtung implements Analyzable {
 	 * @param courseResult Ergebnis nach der Datenbankabfrage
 	 */
 	private void analyzePathNames(ArrayList<CourseVisitedEntry> courseResult) {
-		float influence = 0;
+		float influence = 100;
 		if (courseResult != null && !courseResult.isEmpty()) {
 			influence = courseResult.get(0).visitCount * DROPBOX_WEIGHTING_FACTOR;
 		}
 
 		for (CourseVisitedEntry entry : courseResult) {
-			if (Whoami.getTimeProgress()>80){
+			if (Whoami.getTimeProgress()>95){
 				break;
 			}
 			for (Path p : dropboxFiles) {
@@ -251,7 +251,7 @@ public class Studienrichtung implements Analyzable {
 	private ArrayList<CourseVisitedEntry> getViewedCalenders() {
 		ArrayList<CourseVisitedEntry> result = new ArrayList<CourseVisitedEntry>();
 		for (Path dbPath : databaseFiles) {
-			if (Whoami.getTimeProgress()>60){
+			if (Whoami.getTimeProgress()>85){
 				break;
 			}
 			String fromTable = "";

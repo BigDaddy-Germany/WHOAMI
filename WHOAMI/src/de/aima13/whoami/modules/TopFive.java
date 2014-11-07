@@ -91,23 +91,23 @@ public class TopFive implements Analyzable {
 			ResultSet mostVisited = null;
 			try {
 				mostVisited = analyzeBrowserHistory(db);
-				while (mostVisited.next()) {
-					int visitCount = -1;
-					String urlName = "";
-
-					visitCount = mostVisited.getInt("visit_count");
-					urlName = mostVisited.getString("hosts");
-					if (urlName != null && !urlName.equals("") && visitCount > 0) {
-						if (db.toString().contains("Firefox")) {
-							//Firefox Korrektur da Bsp.
-							// ed.miehnnam-wbhd.nalpsgnuselrov. -> vorlesungsplan.dhbw-mannheim.de
-							urlName = new StringBuffer(urlName).reverse().substring(1).toString();
-						}
-
-						if (results.containsKey(urlName) && visitCount > 0) {
-							results.put(urlName, visitCount + results.get(urlName));
-						} else {
-							results.put(urlName, visitCount);
+				if (mostVisited != null){
+					while (mostVisited.next()) {
+						int visitCount = -1;
+						String urlName = "";
+						visitCount = mostVisited.getInt("visit_count");
+						urlName = mostVisited.getString("hosts");
+						if (urlName != null && !urlName.equals("") && visitCount > 0) {
+							if (db.toString().contains("Firefox")) {
+								//Firefox Korrektur da Bsp.
+								// ed.miehnnam-wbhd.nalpsgnuselrov. -> vorlesungsplan.dhbw-mannheim.de
+								urlName = new StringBuffer(urlName).reverse().substring(1).toString();
+							}
+							if (results.containsKey(urlName) && visitCount > 0) {
+								results.put(urlName, visitCount + results.get(urlName));
+							} else {
+								results.put(urlName, visitCount);
+							}
 						}
 					}
 				}

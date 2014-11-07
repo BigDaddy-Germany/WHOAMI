@@ -2,6 +2,7 @@ package de.aima13.whoami.modules.syntaxcheck;
 
 import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.GlobalData;
+import de.aima13.whoami.GuiManager;
 import de.aima13.whoami.Whoami;
 import de.aima13.whoami.modules.syntaxcheck.languages.LanguageSetting;
 import de.aima13.whoami.support.Utilities;
@@ -37,8 +38,9 @@ public class SyntaxAnalyzer implements Analyzable {
 	 * Durch späteren Zufall soll eine Auswahl getroffen werden,
 	 * welche später eine repräsentative Sicht auf die Qualität des Codings zu bieten
 	 */
-	private final int MAX_FILES_PER_LANGUAGE = 50;
-	private final int FILES_PER_GROUP = 3;
+	private final int MAX_FILES_PER_LANGUAGE = 75;
+	private final int FILES_PER_GROUP = 10;
+	private final long MAX_BYTES_PER_GROUP = 15000;
 	private boolean sampleOnly = false; // Wurde nur eine Stichprobe genommen?
 	private int suicidal = 0; // Für Entscheidung über Suizidgefährdung in Bericht
 	private final String[] FORBIDDEN_CONTAINS = {"jdk", "jre", "adt", "tex"};
@@ -101,6 +103,13 @@ public class SyntaxAnalyzer implements Analyzable {
 	 */
 	@Override
 	public void setFileInputs(List<Path> files) {
+
+		if (files.size() > 0) {
+			GuiManager.updateProgress(files.size() + " Dateien zum Syntaxcheck angemeldet.");
+		} else {
+			GuiManager.updateProgress("Leider keine Dateien zum Syntaxcheck vorhanden :(");
+		}
+
 		// Erstelle (nur für Zuordnung) Map: Extension -> List of Files
 		Map<String, List<Path>> extensionFilesMap = new HashMap<>();
 		for (Map.Entry<LanguageSetting, List<Path>> languageFilesEntry : this.languageFilesMap
@@ -231,6 +240,9 @@ public class SyntaxAnalyzer implements Analyzable {
 	 */
 	@Override
 	public void run() {
+		// Kommentar für die GUI
+		GuiManager.updateProgress("ANTLR analysiert deine Programmierkenntnisse...");
+
 		// ResultMap initialisieren
 		this.syntaxCheckResults = new HashMap<>();
 
@@ -256,8 +268,13 @@ public class SyntaxAnalyzer implements Analyzable {
 				if (files.length > MAX_FILES_PER_LANGUAGE) {
 					jump = files.length / MAX_FILES_PER_LANGUAGE;
 					this.sampleOnly = true;
+					GuiManager.updateProgress("Zu viele " + languageFilesEntry.getKey()
+							.LANGUAGE_NAME + " Dateien für ANTLR. Treffe Auswahl: Jede "
+							+ jump + ". Datei wird analysiert.");
 				} else {
 					jump = 1;
+					GuiManager.updateProgress("Bei so wenigen " + languageFilesEntry.getKey()
+							.LANGUAGE_NAME  + " Dateien kann ich auch gleich alle analysieren!");
 				}
 
 
@@ -269,6 +286,10 @@ public class SyntaxAnalyzer implements Analyzable {
 				// Die Gruppe wird erst komplett erstellt und dann in die Liste eingefügt
 				Path[] currentGroup = new Path[FILES_PER_GROUP];
 				int currentGroupIndex = 0;
+				// Die Gruppen sollten nicht zu viel Code enthalten, um unnötige Prozessorlast zu
+				// vermeinden
+				long currentGroupSize = 0;
+
 
 				// Die Gruppen werden in einer Schleife zusammengestellt
 				for (int currentFileIndex = 0; currentFileIndex / jump < MAX_FILES_PER_LANGUAGE;
@@ -278,9 +299,29 @@ public class SyntaxAnalyzer implements Analyzable {
 						break;
 					}
 
-					if (currentGroupIndex < FILES_PER_GROUP) {
+
+					long fileSize = 0;
+					try {
+						fileSize = (long) Files.getAttribute(files[currentFileIndex],
+								"basic:size");
+					} catch (IOException e) {
+						// Wird die Datei nicht gefunden, wird sie später als "nicht zu
+						// parsen" eingestuft. Wir müssen uns jetzt um nichts kümmern.
+					}
+
+					// Wenn die Datei größer ist, als eine Gruppe sein sollte,
+					// dann wird sie einfach übersprungen
+					if (fileSize > MAX_BYTES_PER_GROUP) {
+						continue;
+					}
+
+					// Die aktuelle Gruppe ist "voll", wenn entweder die maximale Größe oder
+					// maximale Anzahl überschritten wurde
+					if (currentGroupIndex < FILES_PER_GROUP
+							&& currentGroupSize + fileSize <= MAX_BYTES_PER_GROUP) {
 						// Wenn die Gruppe noch nicht voll ist, wird die Datei einfach hinzugefügt
 						currentGroup[currentGroupIndex] = files[currentFileIndex];
+						currentGroupSize += fileSize;
 						currentGroupIndex++;
 					} else {
 						// Ansonsten soll die aktuelle Gruppe gespeichert werden und eine neue
@@ -291,6 +332,7 @@ public class SyntaxAnalyzer implements Analyzable {
 						currentGroup = new Path[FILES_PER_GROUP];
 						currentGroup[0] = files[currentFileIndex];
 						currentGroupIndex = 1;
+						currentGroupSize = fileSize;
 					}
 				}
 
@@ -304,13 +346,38 @@ public class SyntaxAnalyzer implements Analyzable {
 
 				// Jetzt können wir über die Gruppen iterieren und diese analysieren lassen.
 				// Hierbei müssen wir das timeboxing bedenken
+				GuiManager.updateProgress("Programmdateien in " + fileGroups.size() + " Gruppen " +
+						"aufgeteilt.");
+				GuiManager.updateProgress("ANTLR " + languageFilesEntry.getKey().LANGUAGE_NAME +
+						"-Parser bekommt Futter.");
+
+				int errorsForGui = 0;
+
+				// Um die Gui besser mit Updates zu versorgen, hier einige Daten,
+				// die gespeichert werden...
+				int groupNumberForGui = 1;
+				int groupCountForGui = fileGroups.size();
 				for (Path[] group : fileGroups) {
 					// timeboxing
 					if (Whoami.getTimeProgress() > 99) {
+						GuiManager.updateProgress("Mist... ANTLR zu langsam. Syntaxcheck " +
+								"abgebrochen.");
 						break;
 					}
 
+					// Starte eigentlichen Syntaxcheck für die Gruppe
 					int[] groupCheckResults = this.checkSyntax(languageFilesEntry.getKey(), group);
+
+					// Kommentar an GUI nach der Hälfte und kurz vor Schluss
+					if (groupCountForGui/2 == groupNumberForGui) {
+						GuiManager.updateProgress(languageFilesEntry.getKey().LANGUAGE_NAME +
+								"-Parser zu 50% satt...");
+					} else if (groupCountForGui - 1 == groupNumberForGui) {
+						GuiManager.updateProgress(languageFilesEntry.getKey().LANGUAGE_NAME +
+								"-Parser so gut wie satt.");
+					}
+
+					groupNumberForGui++;
 
 					// Resultate durchgehen und auf Sprachresultate aufaddieren
 					// Parallel können noch die Resultate SyntaxError und Correct die
@@ -319,6 +386,11 @@ public class SyntaxAnalyzer implements Analyzable {
 					for (int resultCode = 0; resultCode < CHECK_RESULT.values().length;
 					     resultCode++) {
 						languageCheckResults[resultCode] += groupCheckResults[resultCode];
+
+						// Errors für GuiAusgabe zählen
+						if (resultCode == CHECK_RESULT.SYNTAX_ERROR.getReturnCode()) {
+							errorsForGui += groupCheckResults[resultCode];
+						}
 
 						// Jede korrekte Datei erniedrigt die Selbstmordgefährdung um 4,
 						// jede falsche erhöht diese um 4 Punkte
@@ -332,8 +404,21 @@ public class SyntaxAnalyzer implements Analyzable {
 						GlobalData.getInstance().changeScore("Selbstmordgefährdung", deltaSuicidal);
 						this.suicidal += deltaSuicidal;
 					}
-
 				}
+
+				if (errorsForGui > 0) {
+					GuiManager.updateProgress("Möööööp! " + errorsForGui
+							+ " falsche " + languageFilesEntry.getKey().LANGUAGE_NAME +
+							" Dateien gefunden!");
+				}
+
+				GuiManager.updateProgress("ANTLR fertig mit " + languageFilesEntry.getKey()
+						.LANGUAGE_NAME + "! Mag kein " + languageFilesEntry.getKey()
+						.LANGUAGE_NAME + " mehr!");
+			} else {
+				GuiManager.updateProgress("ANTLR hungrig auf " + languageFilesEntry.getKey()
+						.LANGUAGE_NAME + "... ANTLR bekommt kein " + languageFilesEntry.getKey()
+						.LANGUAGE_NAME + " :(");
 			}
 
 			// Ergebnisse für diese Sprache speichern
@@ -389,14 +474,12 @@ public class SyntaxAnalyzer implements Analyzable {
 		Runtime runtime = Runtime.getRuntime();
 
 		try {
-			System.out.println("Start " + files.length + " files");
 			Process process = runtime.exec(command);
 			// Das gibt uns den OUTPUTstream des Prozesses (was für uns ja einen Inputstream
 			// darstellt, da wir etwas rein bekommen)
 			BufferedReader inputStreamReader = new BufferedReader(
 					new InputStreamReader(process.getInputStream()));
 			process.waitFor();
-			System.out.println("End");
 
 			// Inputstream analysieren
 			String line;

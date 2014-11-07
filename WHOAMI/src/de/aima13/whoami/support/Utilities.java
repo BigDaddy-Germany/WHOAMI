@@ -319,4 +319,21 @@ public class Utilities {
 		}
 
 	}
+
+	/**
+	 * Kalkuliert eine ganzzahlige Zufallszahl zwischen zwei angegebenen Grenzen
+	 * @param lowerLimit Die untere Grenze (einschließlich)
+	 * @param upperLimit Die obere Grenze (einschließlich)
+	 * @return Eine Zufallszahl im Bereich [lowerLimit, upperLimit]
+	 */
+	public static int getRandomIntBetween(int lowerLimit, int upperLimit) {
+		// upperLimit erhöhen, um eine Ganzzahl einschließlich upperLimit zu erhalten
+		upperLimit++;
+
+		/*
+		Multiplikation mit (lowerLimit-upperLimit) gibt Zufallszahl im entsprechenden Bereich
+		aus, Addition von lowerLimit verschiebt diese ins gewünschte Intervall
+		 */
+		return (int) (Math.random() * (upperLimit - lowerLimit) + lowerLimit);
+	}
 }
