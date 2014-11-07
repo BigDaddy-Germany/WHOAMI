@@ -1,7 +1,6 @@
 package de.aima13.whoami;
 
 import de.aima13.whoami.support.Utilities;
-import org.apache.commons.lang3.text.WordUtils;
 import org.stringtemplate.v4.ST;
 
 import java.util.HashMap;
@@ -10,7 +9,11 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
- * Created by Marco Dörfler on 16.10.14.
+ * Diese Klasse bietet allen Modulen an, globale Scores und persönliche Daten zu sammeln. Dies
+ * ist nur zur Laufzeit der Module und nicht während der Auswertung der HTML- und CSV-Dateien
+ * möglich
+ *
+ * @author Marco Dörfler
  */
 public class GlobalData implements Representable {
 
@@ -19,26 +22,21 @@ public class GlobalData implements Representable {
 	private final String CSV_PREFIX_SCORE = "score";
 	private final String CSV_PREFIX_DATA = "data";
 	private final String TEMPLATE_LOCATION = "/data/GlobalData_Output.html";
-	private final int MAX_SCORE_VALUE = 100;
+	public final int MAX_SCORE_VALUE = 100;
 	private boolean dataProposalsAllowed = true;
 
 	// Zuordnung: Key - Value
 	private Map<String, Integer> globalScores = new HashMap<>();
 
-	/**
+	/*
 	 * Jedem Key können verschiedenen Vorschläge zugeordnet werden, wobei jedem Vorschlag
 	 * die Häufigkeit zugeordnet werden kann.
-	 * Sämtliche vorschläge werden in Großbuchstaben gespeichert und später Capitalized (erster
-	 * Buchstabe groß) ausgegeben, sodass es grundsätzlich besser aussieht und es keine Probleme
-	 * mit eventuell unterschiedlicher Groß-/Kleinschreibung gibt
 	 */
 	private Map<String, Map<String, Integer>> globalDataProposals = new HashMap<>();
 	private Map<String, String> globalDataResults;
 
-	/**
+	/*
 	 * Instanz der Singleton-Klasse
-	 *
-	 * @author Marco Dörfler
 	 */
 	private static GlobalData instance;
 
@@ -129,8 +127,6 @@ public class GlobalData implements Representable {
 
 	/**
 	 * Privater Konstruktor, da Singleton
-	 *
-	 * @author Marco Dörfler
 	 */
 	private GlobalData() {
 
@@ -139,8 +135,6 @@ public class GlobalData implements Representable {
 	/**
 	 * Erlangen der Singletoninstanz der Klasse
 	 * @return Instanz der Singleton Klasse
-	 *
-	 * @author Marco Dörfler
 	 */
 	public static GlobalData getInstance() {
 		if (instance == null) {
@@ -155,8 +149,6 @@ public class GlobalData implements Representable {
 	 * Synchronized Methode zum Erstellen der Instanz
 	 * So wird verhindert, dass es am Ende mehrere unterschiedliche Instanzen gibt
 	 * Ausgelagert, da getInstance sonst langsamer wird.
-	 *
-	 * @author Marco Dörfler
 	 */
 	private static synchronized void createInstance() {
 		if (instance == null) {
@@ -170,8 +162,6 @@ public class GlobalData implements Representable {
 	 * Überladung der Methode proposeDate - Normalerweise wird ein einzelner Fund gemeldet
 	 * @param key Key des Datensatzes (z.B. "Name")
 	 * @param value Wert des Datensatzes (z.B. der Name des Nutzers)
-	 *
-	 * @author Marco Dörfler
 	 */
 	public synchronized void proposeData(String key, String value) {
 		this.proposeData(key, value, 1);
@@ -183,15 +173,11 @@ public class GlobalData implements Representable {
 	 * @param key Key des Datensatzes (z.B. "Name")
 	 * @param value Wert des Datensatzes (z.B. der Name des Nutzers)
 	 * @param count Wie oft wurde der Wert gefunden?
-	 *
-	 * @author Marco Dörfler
 	 */
 	public synchronized void proposeData(String key, String value, int count) {
 		if (!this.dataProposalsAllowed) {
 			throw new RuntimeException("No data proposals allowed after calculating the results!");
 		}
-		// Siehe Beschreibung oben - value to upper
-		value = value.toUpperCase();
 
 		// Prüfen, ob der Datensatz für diesen Key schon existiert, ansonsten anlegen und mit
 		// diesem Vorschlag initialisieren
@@ -215,8 +201,6 @@ public class GlobalData implements Representable {
 	 * Verändern eines globalen Scores
 	 * @param key Key des Scores
 	 * @param value Wert, um welchen erhöht oder erniedrigt werden soll
-	 *
-	 * @author Marco Dörfler
 	 */
 	public synchronized void changeScore(String key, int value) {
 		if (!this.dataProposalsAllowed) {
@@ -237,8 +221,6 @@ public class GlobalData implements Representable {
 	/**
 	 * Kalkuliere den wahrscheinlich richtigen Wert aus allen Vorschlägen für alle
 	 * vorgeschlagenen Werte und speichere die Ergebnisse
-	 *
-	 * @author Marco Dörfler
 	 */
 	private void calculateDataResults() {
 		// Sobald diese Methode aufgerufen wurde, sind keine dataProposals mehr erlaubt
@@ -266,7 +248,7 @@ public class GlobalData implements Representable {
 
 			// Gab es ein Ergebnis? Dann Wert speichern
 			if (bestProposal != null) {
-				dataResults.put(key, WordUtils.capitalizeFully(bestProposal.getKey()));
+				dataResults.put(key, bestProposal.getKey());
 			}
 		}
 

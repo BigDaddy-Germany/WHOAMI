@@ -42,30 +42,33 @@ public class Food implements Analyzable {
 	@Override
 	public List<String> getFilter() {
 		List<String> searchList = new ArrayList<String>();
-		searchList.add("**" + "/" + "Rezepte/**.txt");
-		searchList.add("**" + "/" + "Rezepte/**.docx");
+		searchList.add("**Rezepte**.txt");
+		searchList.add("**Rezepte**.docx");
 
-		searchList.add("**" + "/" + "Rezept/**.txt");
-		searchList.add("**" + "/" + "Rezept/**.docx");
+		searchList.add("**Rezept**.txt");
+		searchList.add("**Rezept**.docx");
 
-		searchList.add("**" + "/" + "rezept/**.txt");
-		searchList.add("**" + "/" + "rezept/**.docx");
+		searchList.add("**rezept**.txt");
+		searchList.add("**rezept**.docx");
 
-		searchList.add("**" + "/" + "backen/**.txt");
-		searchList.add("**" + "/" + "backen/**.docx");
+		searchList.add("**backen**.txt");
+		searchList.add("**backen**.docx");
 
-		searchList.add("**" + "/" + "Kuchen/**.txt");
-		searchList.add("**" + "/" + "Kuchen/**.docx");
+		searchList.add("**Kuchen**.txt");
+		searchList.add("**Kuchen**.docx");
 
-		searchList.add("**" + "/" + "Pizza/**.txt");
-		searchList.add("**" + "/" + "Pizza/**.docx");
+		searchList.add("**Kochen**.txt");
+		searchList.add("**Kochen**.docx");
+
+		searchList.add("**Pizza**.txt");
+		searchList.add("**Pizza**.docx");
 
 
 		//places.sql gehört zu Firefox
 		searchList.add("**Firefox**places.sqlite");
 
 		//* hier weil History Datein gibt es zu viele und Chrome kann mehrere Benutzer verwalten
-		searchList.add("**Google" + "/" + "Chrome**History");
+		searchList.add("**Google/Chrome**History");
 
 
 		return searchList;
@@ -160,8 +163,6 @@ public class Food implements Analyzable {
 		myDbs = new ArrayList<Path>();
 		ArrayList<Path> myTrash = new ArrayList<>();
 		int foundDbs = 0;
-		boolean ffFound = false;
-		boolean chromeFound = false;
 		try {
 			for (Path curr : myFoodFiles) {
 				if (curr != null) {
@@ -176,11 +177,9 @@ public class Food implements Analyzable {
 					if (path.contains("places.sqlite")) {
 						foundDbs++;
 						myDbs.add(curr);
-						ffFound = true;
 					} else if (path.contains("History")) {
 						foundDbs++;
 						myDbs.add(curr);
-						chromeFound = true;
 					} else if (path.contains(".sqlite")) {
 						myTrash.add(curr);
 					}
@@ -216,9 +215,18 @@ public class Food implements Analyzable {
 		if (myFoodFiles != null && myFoodFiles.size() != 0) {
 
 			localRecipeHtml += "<p>" + myFoodFiles.size() + " Rezepte wurden auf diesem PC gefunden" +
-					".</p>\n";
+					".";
 			myCsvData.put("Anzahl Rezepte", "" + myFoodFiles.size());
 
+			if(myFoodFiles.size()>9 && myFoodFiles.size()<30){
+				localRecipeHtml+=" Das ist schon ganz ok, aber Luft nach oben bleibt noch.";
+			}else if(myFoodFiles.size()>30){
+				localRecipeHtml+=" Das ist ziemlich viel. Du solltest mal überlegen ein Buch " +
+						"zu verfassen";
+			}else{
+				localRecipeHtml+="Das ist nun wircklich noch Ausbaufähig.";
+			}
+			localRecipeHtml+="</p>\n";
 			//herausfinden welche Datei zuletzt erzeugt wurde
 			Path latestReciept = myFoodFiles.get(0);
 			int lengthScore = 0;
@@ -241,27 +249,32 @@ public class Food implements Analyzable {
 				try {
 					lengthScore += this.analyzeRecipeSize(curr);
 				} catch (IllegalArgumentException e) {
+
 					//tue nichts-->vor Allem nicht abstürzen
 				}
 			}
-			//Dateiendung wird hier mit ausgegeben
-			localRecipeHtml += "<p>Zuletzt hast du das Rezept:\"" + latestReciept.getName(latestReciept
-					.getNameCount()-1).toString()+ "\" bearbeitet.</p>\n";
-			myCsvData.put("Zuletzt geändertes Rezept",  latestReciept.getName(latestReciept
-					.getNameCount()-1).toString());
 
 			if(lengthScore>99){
-				localRecipeHtml+="<p>Deine Rezepte könnten ja fast ein ganzes Buch füllen. Respekt" +
-						".</p>";
-
+				localRecipeHtml+="<p> Die Gesamtlänge deiner Rezepte ergab einen Längenscore " +
+						"von: "+lengthScore +". Damit bist du an der Spitze!</p>";
 			}else{
-				localRecipeHtml+="<p>Ja son paar Rezepte hast du, aber ein Buch kannst du so noch " +
-						"nicht " +
-						"füllen." +
-						"</p>";
 			}
 			localRecipeHtml+="\n";
 			myCsvData.put("lokaler Rezeptscore",lengthScore+"");
+
+
+
+
+			//Dateiendung wird hier mit ausgegeben
+			String latestRecieptPath = latestReciept.toString().toLowerCase();
+			if(latestRecieptPath.endsWith(".docx") && latestRecieptPath.endsWith(".txt")) {
+				localRecipeHtml += "<p>Zuletzt hast du das Rezept:\"" + latestReciept.getName(latestReciept
+						.getNameCount() - 1).toString() + "\" bearbeitet.</p>\n";
+				myCsvData.put("Zuletzt geändertes Rezept", latestReciept.getName(latestReciept
+						.getNameCount() - 1).toString());
+			}
+
+
 		} else {
 			localRecipeHtml += "<p>Keine Rezepte gefunden. Mami kocht wohl immer noch am besten, " +
 					"was?</p>\n";
@@ -426,12 +439,11 @@ public class Food implements Analyzable {
 	 * leer sein)
 	 */
 	private ResultSet[] getViewCountAndUrl(String[] searchUrl) {
-		ResultSet[] results = new ResultSet[2];
-		String sqlStatement = "SELECT url,visit_count ";
+		ResultSet[] results;
+		List<ResultSet> resultList= new LinkedList<ResultSet>();
 		DataSourceManager dbManager = null;
-		int x = 0;
 		for (Path db : myDbs) {
-
+			String sqlStatement = "SELECT url,visit_count ";
 			if (db != null) {
 				String path = "";
 				try {
@@ -457,15 +469,22 @@ public class Food implements Analyzable {
 				}
 				if (dbManager != null) {
 					try {
-						results[x] = dbManager.querySqlStatement(sqlStatement);
-					} catch (Exception e) {
-						results[x] = null;
+						ResultSet rs = dbManager.querySqlStatement(sqlStatement);
+						if(rs !=null){
+							resultList.add(rs);
+						}
+					} catch (SQLException e) {
+						//anscheinend ist das SQL-Statement fehlerhaft oder die Datenbank hat in
+						// irgend einer Weise Fehler --> kann man nichts gegen machen
+						e=e;
 					}
 
 				}
-				x++;
 			}
 		}
+		//ab hier wird keine dynamische Datenstrucktur mehr benötigt
+		results=new ResultSet[resultList.size()];
+		results=resultList.toArray(results);
 		return results;
 	}
 
@@ -490,7 +509,6 @@ public class Food implements Analyzable {
 			size = 0;
 		}
 		if (ending.contains("docx")) {
-			//@Todo funktion mit % effizienter gestalten
 			for (long i = MINIMUM_DOCX_SIZE; i < size && i < MAXIMUM_FILE_SIZE;
 			     i += NEXT_RECIPE_POINT) {
 				vote++;

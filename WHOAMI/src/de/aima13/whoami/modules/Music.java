@@ -3,6 +3,7 @@ package de.aima13.whoami.modules;
 import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.GlobalData;
 import de.aima13.whoami.Whoami;
+import de.aima13.whoami.support.DataSourceManager;
 import org.farng.mp3.MP3File;
 import org.farng.mp3.TagException;
 import org.farng.mp3.id3.AbstractID3v2;
@@ -18,34 +19,41 @@ import java.util.*;
  * favourite Music, created 16.10.14.
  *
  * @author Inga Miadowicz
- * @version 1.0
+ * @version 1.1
  */
 
 public class Music implements Analyzable {
 
-	List<Path> musicDatabases = new ArrayList<>(); //Liste aller fürs Musikmodul wichtige Dateien
-	List<Path> localFiles = new ArrayList<>(); //Liste von MP3- und FLAC-Dateien
-	List<Path> browserFiles = new ArrayList<>(); //Liste der Browser-DB
-	List<Path> exeFiles = new ArrayList<>(); //Liste der Musikprogramme
-	ArrayList<String> FileArtist = new ArrayList<>();
-	ArrayList<String> FileGenre = new ArrayList<>();
+	List<Path> musicDatabases = new ArrayList<>(); //Liste aller Dateien fürs Musikmodul
+	List<Path> localFiles = new ArrayList<>();     //Liste von MP3-Dateien
+	List<Path> browserFiles = new ArrayList<>();   //Liste der Browser-DB
+	List<Path> exeFiles = new ArrayList<>();       //Liste der Musikprogramme
+	ArrayList<String> fileArtist = new ArrayList<>(); // Artists direkt aus Dateien
+	ArrayList<String> fileGenre = new ArrayList<>();
 	ArrayList<String> urls = new ArrayList<>();
 	Map<String, Integer> mapMaxApp = new HashMap<>();//Map: Artist - Häufigkeit
 	Map<String, Integer> mapMaxGen = new HashMap<>();//Map Genre - Häufigkeit
+	ResultSet mostVisited = null;
 
-	public String html = ""; //Output der HTML
+	public String html = "";        //Output als HTML in String
 	public String favArtist = "";
 	public String favGenre = "";
 	public String onlService = ""; //Genutzte Onlinedienste (siehe: MY_SEARCH_DELIVERY_URLS)
 	public String cltProgram = ""; //Installierte Programme
-	String stmtGenre = ""; //Kommentar zum Genre nach Kategorie
-	private boolean cancelledByTimeLimit = false;
+	String stmtGenre = "";         //Kommentar zum Genre nach Kategorie
+	String Qualität = "";          //Kommentar zu flac-Dateien
+	long nrAudio = 0;              //Anzahl der Audiodateien
 
 	private static final String[] MY_SEARCH_DELIEVERY_URLS = {"youtube.com", "myvideo.de", "dailymotion.com",
-			"soundcloud.com", "deezer.com"};
+			"soundcloud.com", "deezer.com", "spotify.com", "play.google.com"};
+	private static final String[] MY_SEARCH_DELIVERY_EXES = {"Deezer.exe", "spotify.exe",
+			"Amazon Music.exe", "SWYH.exe", "iTunes.exe", "napster.exe", "simfy.exe"};
+	private static final String[] MY_SEARCH_DELIVERY_NAMES = {"Deezer", "Spotify", "Amazon Music",
+			"Stream What You Hear", "iTunes", "napster", "simfy"};
+
 	private static final String TITLE = "Musikgeschmack";
 
-	String[] arrayGenre = {    // Position im Array ist Byte des id3Tag:
+	String[] arrayGenre = {    // Position im Array ist die ID des id3Tag:
 			// z.B. GenreID ist 3: Genre zu 3 ist "Dance"
 			// Quelle: http://id3.org/id3v2.3.0
 
@@ -85,22 +93,29 @@ public class Music implements Analyzable {
 	};
 
 	@Override
+	/**
+	 * Implementierung der Methode run() von Runnable. Hier wird die Reihenfolge der Analyse
+	 * festgelegt. Zusätzlich wird ein Time-boxing implementiert,
+	 * um ungewöhnlich lange Laufzweiten zu vermeiden.
+	 * @return void
+	 * @param
+	 */
 	public void run() {
-		/**
-		 * Implementierung der Methode run() von Runnable
-		 * @return void
-		 * @param
-		 */
-
 		getFilter();
-		readId3Tag();
-		checkNativeClients();
-		readBrowser(MY_SEARCH_DELIEVERY_URLS);
-
-		if (Whoami.getTimeProgress() >= 99) {
-			//Ausstieg wegen Timeboxing
-			cancelledByTimeLimit = true;
-			return;
+		if (Whoami.getTimeProgress() < 300) {
+			this.readId3Tag();
+		}
+		if (Whoami.getTimeProgress() < 100) {
+			this.scoreFavArtist();
+		}
+		if (Whoami.getTimeProgress() < 100) {
+			this.scoreFavGenre();
+		}
+		if (Whoami.getTimeProgress() < 100) {
+			this.checkNativeClients(MY_SEARCH_DELIVERY_EXES, MY_SEARCH_DELIVERY_NAMES);
+		}
+		if (Whoami.getTimeProgress() < 300) {
+			readBrowser(MY_SEARCH_DELIEVERY_URLS);
 		}
 	}
 
@@ -110,29 +125,30 @@ public class Music implements Analyzable {
 	///////////////////////////////////////////////////////////
 
 	@Override
+	/** Legt den Filter für den FileSearcher fest
+	 *  @param
+	 *  @return filterMusic
+	 */
 	public List<String> getFilter() {
-		/** Legt den Filter für den FileSearcher fest
-		 *
-		 *  @param
-		 *  @return filterMusic
-		 */
-
-		//a) local MP3-files. LATER ADD(.FLAC, .RM, .acc, .ogg, .wav?)
 		List<String> filterMusic = new ArrayList<>();
-		//Alle Dateien die mit ID3Tag kompatibel sind
+
+		// Audiodateien
 		filterMusic.add("**.mp3");
-		filterMusic.add("**.MP3");
-		filterMusic.add("**.mP3");
-		filterMusic.add("**.Mp3");
+		filterMusic.add("**.wav");
+		filterMusic.add("**.wma");
+		filterMusic.add("**.aac");
+		filterMusic.add("**.ogg");
+		filterMusic.add("**.flac");
+		filterMusic.add("**.rm");
+		filterMusic.add("**.M4a");
+		filterMusic.add("**.vox");
+		filterMusic.add("**.m4b");
 
-		//filterMusic.add("**.m4b");//Format für Hörbücher
-		//filterMusic.add("**.aax"); //Format für Hörbücher (Audible)
-
-		//b) Browser-history
+		// Browser-history
 		filterMusic.add("**Google/Chrome**History");
 		filterMusic.add("**Firefox**places.sqlite");
 
-		//c) installierte Programme
+		// installierte Programme
 		filterMusic.add("**spotify.exe");
 		filterMusic.add("**iTunes.exe");
 		filterMusic.add("**SWYH.exe");
@@ -141,16 +157,17 @@ public class Music implements Analyzable {
 		filterMusic.add("**Amazon*Music.exe");
 		filterMusic.add("**Deezer.exe");
 
-			return filterMusic;
+		return filterMusic;
 	}
 
 	@Override
+	/**
+	 * Ordnet musicDatabases für die Analyse des Musikgeschmacks
+	 * @param List<File> files
+	 * @return void
+	 */
 	public void setFileInputs(List<Path> files) throws Exception {
-		/**
-		 * Ordnet meine Suchergebnisse für die Analyse im Modul
-		 * @param List<File> files
-		 * @return void
-		 */
+		long count = 0;
 
 		//Überprüfe ob Dateien gefunden wurden
 		if (!(files == null)) {
@@ -160,24 +177,47 @@ public class Music implements Analyzable {
 					"Informationen zu Musik gefunden werden.");
 		}
 
+		//Benutzername wird an Globaldata übergeben
+		String username = System.getProperty("user.name");
+		GlobalData.getInstance().proposeData("Benutzername", username);
+
 		//Spalte die Liste in drei Unterlisten:
 		for (Path element : musicDatabases) {
-			if (element.toString().contains(".mp3") || element.toString().contains(".flac") ||
-					element.toString().contains(".FLAC") || element.toString().contains(".MP3")) {
-				localFiles.add(element); // Liste der lokalen Audiodateien von denen der ID3Tag
-				// ausgelesen wird
+			String path = element.toString();
+
+			if (element.toString().contains(".mp3") || element.toString().contains(".MP3")) {
+				localFiles.add(element);
+				count++;
+
+				//Kommentar zu ".flac-Dateien" abgeben
+				if(element.toString().endsWith(".flac")) {
+					Qualität = "Du bist ein richtiger Audiofan und legst wert auf die maximale " +
+							"Qualität deiner Musiksammlung! ";
+				}
+
+				//Entferne Musik zu PC-Spielen (aus Steam), Beispielmusik und
+				// Audiodateien die nicht auf Metadaten untersucht werden
+				if(element.toString().contains("Steam") || element.toString().contains("Kalimba" +
+						".mp3")	|| element.toString().contains("Sleep Away.mp3") || element.toString().contains("Maid with the Flaxen " +
+						"Hair.mp3") || element.toString().contains("$RJLQJ56.mp3") || element
+						.toString().contains("$IJLQJ56.mp3") || element.toString().endsWith("" +
+						".wav") || element.toString().endsWith(".wma") || element.toString()
+						.endsWith(".aac") || element.toString().endsWith(".ogg") || element.toString
+						().endsWith(".flac") || element.toString().endsWith(".rm") || element
+						.toString().endsWith(".M4a") || element.toString().endsWith(".vox") ||
+						element.toString().endsWith("m4b")) {
+					localFiles.remove(element);
+				}
 			} else if (element.toString().contains(".exe")) {
-				exeFiles.add(element); //Liste aller ausführbarer Musikprogramme
-			} else {
+				exeFiles.add(element);
+			} else if (path.contains(".sqlite") || (path.endsWith("\\History") && path.contains
+					(username))) {
 				browserFiles.add(element);
 			}
-
-			if (Whoami.getTimeProgress() >= 99) {
-				//Ausstieg wegen Timeboxing
-				cancelledByTimeLimit = true;
-				break;
-			}
 		}
+
+		musicDatabases.clear();
+		nrAudio = count;
 	}
 
 	///////////////////////////////////////////////////////
@@ -185,16 +225,16 @@ public class Music implements Analyzable {
 	/////////////////////////////////////////////////////
 
 	@Override
+	/**
+	 * Das Ergebnis der Analyse wird in html als String in diesem Modul zusammengefügt
+	 * @return String html
+	 * @param
+	 */
 	public String getHtml() {
-		/**
-		 * Das Ergebnis der Analyse wird in HTML-lesbaren Format umgesetzt
-		 *
-		 * @return String html
-		 * @param
-		 */
 		StringBuilder buffer = new StringBuilder();
-		buffer.append("<table>");
 
+		// Ergebnistabelle
+		buffer.append("<table>");
 		if (!(favArtist.equals(""))) {
 			buffer.append("<tr><td>Lieblingskünstler:</td>" +
 					"<td>" + favArtist + "</td></tr>");
@@ -217,29 +257,35 @@ public class Music implements Analyzable {
 					"<td>" + onlService + "</td>" +
 					"</tr>");
 		}
-
 		buffer.append("</table>");
 
 		// Abschlussfazit des Musikmoduls
-		if (musicDatabases.isEmpty()) {
+		if (favGenre.equals("") && onlService.equals("") && cltProgram.equals("") && favArtist
+				.equals("")) {
 			buffer.append("Es wurden keine Informationen gefunden um den scheinbar " +
 					"sehr geheimen Musikgeschmack des Users zu analysieren.");
 		} else if (!(onlService.equals("")) && !(favArtist.equals("")) && !(favGenre.equals(""))
 				&& !(cltProgram.equals(""))) {
 			buffer.append("<br /><b>Fazit:</b> Dein Computer enthält Informationen zu allem " +
-					"was wir gesucht haben.<br /> Musik scheint ein wichtiger Teil deines Lebens " +
-					"zu sein. <br />" + stmtGenre);
+					"was wir gesucht haben. <br />Musik scheint ein wichtiger Teil deines Lebens " +
+					"zu sein. <br />" + "Insgesamt haben wir " + nrAudio + " Musikdateien " +
+					"gefunden." + Qualität +  stmtGenre);
 		} else if (onlService.equals("") && cltProgram.equals("") && !(favGenre.equals(""))) {
 			buffer.append("<br /><b>Fazit:</b> Das Modul konnte weder online noch nativ " +
 					"herausfinden wie du Musik hörst. Du scheinst dies über einen nicht sehr " +
 					"verbreiteten Weg zu machen. Nichts desto trotz konnten wir deinen Geschmack " +
-					"analysieren:<br /> " + stmtGenre);
+					"analysieren: <br />" + "Insgesamt haben wir " + nrAudio + " Musikdateien " +
+					"gefunden." + Qualität + stmtGenre);
 		} else if (favGenre.equals("") && favArtist.equals("")) {
-			buffer.append("<br /><b>Fazit:</b> Es konnten keine Informationen zu deinem " +
-					"Musikgeschmack gefunden werden.");
+			buffer.append("<br /><b>Fazit:</b> Es konnten keine Informationen dazu gefunden " +
+					"werden was du hörst. Deine Lieblingsgenre und Lieblingkünstler bleiben eine " +
+					"offene Frage...");
 			if (!(onlService.equals("")) || !(cltProgram.equals(""))) {
-				buffer.append("Aber Musik hörst du über " + onlService + ", " + cltProgram + "" +
-						". Nur was bleibt eine offene Frage.");
+				buffer.append(" Aber Musik hörst du über " + onlService + ", " + cltProgram + ".");
+				if(nrAudio != 0){
+					buffer.append("Insgesamt haben wir zusätzlich " + nrAudio + " Musikdateien " +
+							"gefunden." + Qualität);
+				}
 			}
 		} else {
 			buffer.append("<br /><b>Fazit:</b> Zwar konnten einige Informationen über " +
@@ -251,12 +297,15 @@ public class Music implements Analyzable {
 				buffer.append("<br />Auf deinem PC benutzt du zum Musik hören " + cltProgram + ".");
 			}
 			if (!(favArtist.equals(""))) {
-				buffer.append("<br />Deine Lieblingsband ist " + favArtist + ".");
+				buffer.append( "Deine Lieblingsband ist " + favArtist + ".");
 			}
 			if (!(favGenre.equals(""))) {
 				buffer.append("<br />" + stmtGenre);
 			}
-
+			if(!(localFiles.isEmpty())){
+				buffer.append("Insgesamt haben wir " + nrAudio + " Musikdateien gefunden." +
+						Qualität);
+			}
 		}
 
 		html = buffer.toString();
@@ -265,43 +314,44 @@ public class Music implements Analyzable {
 	}
 
 	@Override
+	/**
+	 * Übergibt den Prefix ("Musikgeschmack") für den Output der PDF-Datei
+	 * @param
+	 * @return static final String TITLE
+	 */
 	public String getReportTitle() {
-		/**
-		 * @param
-		 * @return static final String TITLE
-		 */
 		return TITLE;
 	}
 
 	@Override
+	/**
+	 * Übergibt den Prefix ("Musikgeschmack") für den Output der CSV-Datei
+	 * @param
+	 * @return static final String TITLE
+	 */
 	public String getCsvPrefix() {
-		/**
-		 * @param
-		 * @return static final String TITLE
-		 */
 		return TITLE;
 	}
 
 	@Override
+	/**
+	 * Füllt die CSV-Datei mit den Analyseergebnissen
+	 * @return SortedMap<String, String> csvData
+	 * @param
+	 */
 	public SortedMap<String, String> getCsvContent() {
-		/**
-		 *
-		 * @return SortedMap<String, String> csvData
-		 * @param
-		 */
-
 		SortedMap<String, String> csvData = new TreeMap<>();
 
 		if (!(favArtist.equals(""))) {
 			csvData.put("Lieblingskünstler", favArtist);
 		}
-		if (!(favArtist.equals(""))) {
+		if (!(favGenre.equals(""))) {
 			csvData.put("Lieblingsgenre", favGenre);
 		}
-		if (!(favArtist.equals(""))) {
+		if (!(onlService.equals(""))) {
 			csvData.put("Onlineservices", onlService);
 		}
-		if (!(favArtist.equals(""))) {
+		if (!(cltProgram.equals(""))) {
 			csvData.put("Musikprogramme", cltProgram);
 		}
 		return csvData;
@@ -312,28 +362,27 @@ public class Music implements Analyzable {
 	///// Analysiere Audidateien /////////////
 	/////////////////////////////////////////
 
+	/**
+	 * Sucht aus der Liste aller Genres (FileGenre) das Lieblingsgenre heraus und speichert dies
+	 * global in der Variable favGenre
+	 * @return void
+	 * @param
+	 */
 	public void scoreFavGenre() {
-		/**
-		 * Sucht aus der Liste aller Genres das Lieblingsgenre heraus
-		 * @return void
-		 * @param
-		 */
-
 		int max = 0; // Häufigkeit des am meisten existierenden Genre
 		int count; // Häufigkeit des aktuellen Genre
 
-		FileGenre.removeAll(Arrays.asList("", null)); //Lösche leere Einträge
-
+		fileGenre.removeAll(Arrays.asList("", null)); //Lösche leere Einträge
 
 		//Ordne einem Genre seine Häufigkeit zu
-		for (String each : FileGenre) {
+		for (String each : fileGenre) {
 
-			//Einige ID3-Tags sind fehlerhaft und das Byte wird in der Form "(XX)"als String
+			//Einige ID3-Tags sind fehlerhaft und die ID wird in der Form "(XX)"als String
 			// gespeichert. Hier wird nochmal geguckt ob das Genre zugeordnet werden kann.
 			if (each.startsWith("(")) {
 				String str;
 				str = each.replaceAll("\\D+", "");
-				byte gId = Byte.parseByte(str);
+				short gId = Short.parseShort(str);
 				each = arrayGenre[gId];
 			}
 
@@ -344,21 +393,14 @@ public class Music implements Analyzable {
 			}
 			count++;
 			mapMaxGen.put(each, count);
-
-			if (Whoami.getTimeProgress() >= 99) {
-				//Ausstieg wegen Timeboxing
-				cancelledByTimeLimit = true;
-				return;
-			}
 		}
-
-		//System.out.println("Hörbuch: " + mapMaxGen.get("Hörbuch"));
 
 		//Finde Genre mit der höchsten Häufigkeit
 		Iterator it = mapMaxGen.entrySet().iterator();
 		while (it.hasNext()) {
 			Map.Entry pairs = (Map.Entry) it.next();
-			if ((int) (pairs.getValue()) > max || !(pairs.equals("Other"))) {
+			if ((int) (pairs.getValue()) > max && !(pairs.equals("Other")) && !(pairs.toString()
+					.contains("Other"))) {
 				favGenre = (String) pairs.getKey();
 				max = (int) (pairs.getValue());
 			}
@@ -382,15 +424,14 @@ public class Music implements Analyzable {
 
 	}
 
+	/**
+	 * Ordnet dem Genre eine Art Kategorie zu, wie im Architekturdokument angekündigt. Dazu
+	 * wird zu jeder Kategory ein Kommentar, "hardcoded" als String hinzugefügt,
+	 * um einen Fließtext im PDF-Dokument zu erhalten.
+	 * @return String stmtGenre
+	 * @param
+	 */
 	public String getCategory() {
-		/**
-		 * Ordnet dem Genre eine Art Kategorie zu und füllt die Variable statementToGenre,
-		 * damit im html-Output ein Kommentar zum Genre abgegeben werden kann.
-		 *
-		 * @return void
-		 * @param String stmtGenre
-		 */
-
 		StringBuilder statementToGenre = new StringBuilder();
 
 		if (favGenre.equals("Top 40") || favGenre.equals("House") || favGenre.equals("Drum & " +
@@ -402,10 +443,10 @@ public class Music implements Analyzable {
 		} else if (favGenre.equals("Dance") || favGenre.equals("Disco") || favGenre.equals("Dancehall")
 				|| favGenre.equals("Samba") || favGenre.equals("Tango") || favGenre.equals("Club") ||
 				favGenre.equals("Swing") || favGenre.equals("Latin") || favGenre.equals("Salsa")
-				|| favGenre.equals("Eurodance")) {
+				|| favGenre.equals("Eurodance") || favGenre.equals("Pop")) {
 			statementToGenre.append("Deinem Musikstil, " + favGenre + ", " +
-					"nach zu urteilen,<br />schwingst " +
-					"du gerne dein Tanzbein.");
+					"nach zu urteilen,<br />schwingst du zumindest gerne dein Tanzbein oder bist " +
+					"sogar eine richtige Dancing Queen! <3");
 		} else if (favGenre.equals("Techno") || favGenre.equals("Industrial") || favGenre.equals
 				("Acid Jazz") || favGenre.equals("Rave") || favGenre.equals("Psychedelic") ||
 				favGenre.equals("Dream") || favGenre.equals("Elecronic") || favGenre
@@ -426,8 +467,8 @@ public class Music implements Analyzable {
 				favGenre.equals("Sonata") || favGenre.equals("Opera") || favGenre.equals
 				("National Folk") || favGenre.equals("Avantgarde") || favGenre.equals("Baroque") ||
 				favGenre.equals("World Music") || favGenre.equals("Neoclassical")) {
-			statementToGenre.append("Dein Musikstil" + favGenre + "ist eher von traditioneller" +
-					" Natur.");
+			statementToGenre.append("Dein Musikstil" + favGenre + " ist eher von " +
+					"traditioneller Natur und verrät uns, dass du in der Zeit stehen geblieben bist.");
 		} else if (favGenre.equals("Christian Rap") || favGenre.equals("Pop-Folk") || favGenre
 				.equals("Christian Rock") || favGenre.equals("Contemporary Christian") ||
 				favGenre.equals("Christian Gangsta Rap") || favGenre.equals("Terror") || favGenre
@@ -446,7 +487,7 @@ public class Music implements Analyzable {
 				"Soul") || favGenre.equals("Thrash Metal") || favGenre.equals("Garage Rock") ||
 				favGenre.equals("Space Rock") || favGenre.equals("Industro-Goth") || favGenre
 				.equals("Garage") || favGenre.equals("Art Rock")) {
-			statementToGenre.append(favGenre + "? In dir steckt bestimmt ein Headbanger!");
+			statementToGenre.append(favGenre + "? In dir steckt bestimmt ein Headbanger! Yeah \\m/ !!!");
 		} else if (favGenre.equals("Chillout") || favGenre.equals("Reggea") || favGenre.equals
 				("Trip-Hop") || favGenre.equals("Hip-Hop")) {
 			statementToGenre.append("Deine Szene ist wahrscheinlich die Hip Hop Szene.<br />Du bist ein " +
@@ -466,7 +507,7 @@ public class Music implements Analyzable {
 				|| favGenre.equals("Polsk Punk") || favGenre.equals("Negerpunk") || favGenre
 				.equals("Post-Punk")) {
 			statementToGenre.append("Deine Musiklieblingsrichtung ist Punk oder zumindest eine" +
-					"Strömung des Punks.");
+					"Strömung des Punks. ");
 		} else if (favGenre.equals("Funk") || favGenre.equals("New Age") || favGenre.equals
 				("Grunge") || favGenre.equals("New Wave") || favGenre.equals("Rock & Roll") ||
 				favGenre.equals("BritPop") || favGenre.equals("Indie") || favGenre.equals("Porn " +
@@ -501,23 +542,20 @@ public class Music implements Analyzable {
 		return stmtGenre;
 	}
 
-
+	/**
+	 * Sucht aus einer Liste aller Artisten des Lieblingsartisten heraus. Dieser wird global in
+	 * der Variable favArtist gespeichert.
+	 * @param
+	 * @return void
+	 */
 	public void scoreFavArtist() {
-		/**
-		 * Sucht aus einer Liste aller Artisten des Lieblingsartisten heraus
-		 *
-		 * @param
-		 * @return void
-		 */
+		int count; //Häufigkeit eines Artisten
+		int max = 0; //Höchste Häufigkeit
 
-		int count; //counts frequency of artist
-		int max = 0; //highest frequency
+		fileArtist.removeAll(Arrays.asList("", null)); //Lösche leere Einträge
 
-		FileArtist.removeAll(Arrays.asList("", null)); //delete empty entries
-		Collections.sort(FileArtist); //sort list alphabetically
-
-		//hashes frequency to artist
-		for (String each : FileArtist) {
+		//Addiere die Häufigkeit des Artisten
+		for (String each : fileArtist) {
 			count = 0;
 			if (mapMaxApp.containsKey(each)) {
 				count = mapMaxApp.get(each);
@@ -525,15 +563,9 @@ public class Music implements Analyzable {
 			}
 			count++;
 			mapMaxApp.put(each, count);
-
-			if (Whoami.getTimeProgress() >= 99) {
-				//Ausstieg wegen Timeboxing
-				cancelledByTimeLimit = true;
-				return;
-			}
 		}
 
-		//Find artist with highest frequency
+		//Finde Artisten der am häufigsten vorkommt
 		Iterator it = mapMaxApp.entrySet().iterator();
 		while (it.hasNext()) {
 			Map.Entry pairs = (Map.Entry) it.next();
@@ -546,152 +578,93 @@ public class Music implements Analyzable {
 
 	}
 
+	/**
+	 * Liest den ID3 Tag von gefundenen MP3- und FLAC-Dateien aus
+	 *
+	 * @param
+	 * @return void
+	 * @remark benutzt Bibliothek "jid3lib-0.5.4.jar"
+	 * @exception org.farng.mp3.TagException, FileNotFoundException,
+	 * UnsupportedOperationException, IOException, Exception
+	 */
 	public void readId3Tag() {
-		/**
-		 * Liest den ID3 Tag von gefundenen MP3- und FLAC-Dateien aus
-		 *
-		 * @param ArrayList<File> localFiles
-		 * @return void
-		 * @remark benutzt Bibliothek "jid3lib-0.5.4.jar"
-		 * @exception org.farng.mp3.TagException, FileNotFoundException, UnsupportedOperationException
-		 */
-
 		String genre = ""; //Name of Genre
 		int count = 0;
+		if (!(localFiles.isEmpty())){
+			for (Path file : localFiles) {
+				try {
+					String fileLocation = file.toAbsolutePath().toString(); //Get path to file
+					MP3File mp3file = new MP3File(fileLocation); //create new object from ID3tag-package
 
-		for (Path file : localFiles) {
-			/*//Zähle Anzahl der Hörbücher und lösche sie
-			if(!(file.toString().endsWith(".mp3") || file.toString().endsWith(".MP3"))){
-				if (mapMaxGen.containsKey("Hörbuch")) {
-					count = mapMaxGen.get("Hörbuch");
-					mapMaxGen.remove("Hörbuch");
-				}
-				count++;
-				mapMaxGen.put("Hörbuch", count);
-				localFiles.remove(file);
-				break;
-			}*/
+					if (mp3file.hasID3v2Tag()) {
+						AbstractID3v2 tagv2 = mp3file.getID3v2Tag();
 
-			try {
-				String fileLocation = file.toAbsolutePath().toString(); //Get path to file
-				MP3File mp3file = new MP3File(fileLocation); //create new object from ID3tag-package
+						//Fehlerhafte ID3-tags abfangen
+						if(!(tagv2.getLeadArtist().contains("\\"))){
+							fileArtist.add(tagv2.getLeadArtist());
+						}
+						genre = tagv2.getSongGenre();
+						//Da die Genres bei dieser Version als String gespeichert sind,
+						// kann das Feld auch unsinnige Genres enthalten. Gleicht das Genre nicht
+						// einem der bekannten aus der Liste wird es nicht aufgenommen
+						for(int i = 0; i<arrayGenre.length; i++){
+							if(genre.equals(arrayGenre[i])){
+								fileGenre.add(genre);
+							}
+						}
+					} else if (mp3file.hasID3v1Tag()) {
+						ID3v1 tagv1 = mp3file.getID3v1Tag();
+						//Fehlerhafte ID3-tags abfangen
+						if(!(tagv1.getArtist().contains("\\"))) {
+							fileArtist.add(tagv1.getArtist()); //Fill List of Type String with artist
+						}
 
-				if (mp3file.hasID3v2Tag()) {
-					AbstractID3v2 tagv2 = mp3file.getID3v2Tag();
-
-					//Fill ArrayList<String> with Artists and Genres
-					FileArtist.add(tagv2.getLeadArtist());
-					FileGenre.add(tagv2.getSongGenre());
-
-				} else if (mp3file.hasID3v1Tag()) {
-					ID3v1 tagv1 = mp3file.getID3v1Tag();
-					FileArtist.add(tagv1.getArtist()); //Fill List of Type String with artist
-
-					//Have to map genreID to name of genre
-					byte gId = tagv1.getGenre(); //Get Genre ID
-
-					try {
-						genre = arrayGenre[gId]; //look up String to ID
-					} catch (ArrayIndexOutOfBoundsException e) {
-						//System.out.println("This Genre doesn't exist");
+						// Map Genre-ID zu Genre-Name
+						short gId = tagv1.getGenre(); //Get Genre ID
+						try {
+							genre = arrayGenre[gId]; // Genre zur ID
+						} catch (ArrayIndexOutOfBoundsException e) {
+							// Die Genre-ID existiert offiziell nicht
+						}
+						fileGenre.add(genre); //Fill List of Type String with genre
 					}
 
-					FileGenre.add(genre); //Fill List of Type String with genre
-
-					//System.out.println("Artists: " + FileArtist);
-					//System.out.println("Genre: " + FileGenre);
-
+				} catch (TagException e) {
+					//
+				} catch (FileNotFoundException e) {
+					//Dateipfad existiert nicht oder der Zugriff wurde verweigert
+				} catch (UnsupportedOperationException e) {
+					//MP3-File Objekt kann nicht gebildet werden
+				} catch (IOException e) {
+					//
+				} catch (Exception e) {
+					// ungültige Dateinamen, die nicht verarbeitet werden können
 				}
-			} catch (TagException e) {
-			} //bewusst ignoriert
-			catch (FileNotFoundException e) {
-			} catch (IOException e) {
-			} catch (UnsupportedOperationException e) {
-			} catch (Exception e) {
-			}
-
-			if (Whoami.getTimeProgress() >= 99) {
-				//Ausstieg wegen Timeboxing
-				cancelledByTimeLimit = true;
-				return;
 			}
 		}
-
-		scoreFavArtist(); //Call functions to find favArtist
-		scoreFavGenre();   //Call functions to find favGenre
-
 	}
-
 	///////////////////////////////////////////
 	///// Analysiere Musikprogramme //////////
 	/////////////////////////////////////////
 
-	public void checkNativeClients() {
-		/**
-		 * Überprüft welche Musikprogramme gefunden wurden
-		 *
-		 * @return void
-		 * @param
-		 */
-		String clients[] = new String[4];
-		int count = 0;
-
+	/**
+	 * Überprüft welche Musikprogramme gefunden wurden und speichert diese global als Liste in der
+	 * Variable cltProgram
+	 * @return void
+	 * @param
+	 */
+	public void checkNativeClients(String exes[], String names[]) {
 		for (Path currentExe : exeFiles) {
-			if (currentExe.toString().endsWith("spotify.exe")) {
-				clients[count] = "Spotify";
-				count++;
+			for(int i = 0; i < exes.length; i++) {
+				if (currentExe.toString().endsWith(exes[i])) {
+					if(cltProgram.equals("")){
+						cltProgram = names[i];
+					}
+					else if(!(cltProgram.contains(names[i]))){
+						cltProgram += ", " + names[i];
+					}
+				}
 			}
-			if (currentExe.toString().endsWith("iTunes.exe")) {
-				clients[count] = "iTunes";
-				count++;
-			}
-			if (currentExe.toString().endsWith("SWYH.exe")) {
-				clients[count] = "Stream What You Hear";
-				count++;
-			}
-			if (currentExe.toString().endsWith("simfy.exe")) {
-				clients[count] = "simfy";
-				count++;
-			}
-			if (currentExe.toString().endsWith("Amazon Music.exe")) {
-				clients[count] = "Amazon Music";
-				count++;
-			}
-			if (currentExe.toString().endsWith("napster.exe")) {
-				clients[count] = "napster";
-				count++;
-			}
-			if (currentExe.toString().endsWith("Deezer.exe")) {
-				clients[count] = "deezer";
-				count++;
-			}
-
-			if (Whoami.getTimeProgress() >= 99) {
-				//Ausstieg wegen Timeboxing
-				cancelledByTimeLimit = true;
-				return;
-			}
-		}
-
-		if (count == 0) {
-			cltProgram = "";
-		} else if (count == 1) {
-			cltProgram = clients[0];
-		} else if (count == 2) {
-			cltProgram = clients[0] + ", " + clients[1];
-		} else if (count == 3) {
-			cltProgram = clients[0] + ", " + clients[1] + ", " + clients[2];
-		} else if (count == 4) {
-			cltProgram = clients[0] + ", " + clients[1] + ", " + clients[2] + ", " + clients[3];
-		} else if (count == 5) {
-			cltProgram = clients[0] + ", " + clients[1] + ", " + clients[2] + ", " +
-					"" + clients[3] + ", " + clients[4];
-		} else if (count == 6) {
-			cltProgram = clients[0] + ", " + clients[1] + ", " + clients[2] + ", " +
-					"" + clients[3] + ", " + clients[4] + ", " + clients[5];
-		} else if (count == 7) {
-			cltProgram = clients[0] + ", " + clients[1] + ", " + clients[2] + ", " +
-					"" + clients[3] + ", " + clients[4] + ", " + clients[5] + ", " + clients[6];
 		}
 	}
 
@@ -699,156 +672,93 @@ public class Music implements Analyzable {
 	///// Analysiere Browserverlauf //////////
 	/////////////////////////////////////////
 
-
+	/**
+	 * Durchsucht den Browser-Verlauf auf bekannte Musikportale (MY_SEARCH_DELIEVERY_URLS)
+	 * @param searchUrl "final static String[] MY_SEARCH_DELIEVERY_URLS" wird übergeben
+	 * @return void
+	 * @exception java.sql.SQLException
+	 */
 	public void readBrowser(String searchUrl[]) {
-		/**
-		 * Durchsucht den Browser-Verlauf auf bekannte Musikportale
-		 *
-		 * @param String searchUrl[] Bekommt den final static String[] MY_SEARCH_DELIEVERY_URLS
-		 * @return void
-		 * @exception java.sql.SQLException, ClassNotFoundException, IndexOutOfBoundException,
-		 * NullPointerException, Exception
-		 */
-
-		dbExtraction();
-		Connection connection = null;
-		ResultSet resultSet = null;
-		Statement statement = null;
-
-		try {
-			//Zusammenfügen des SQL-Statements aus der WhiteListe der Onlineseiten
-			String sqlStatement = "SELECT * FROM urls WHERE url LIKE '%" + searchUrl[0] + "%'";
-			for (int i = 1; i < searchUrl.length; i++) {
-				sqlStatement += "OR url LIKE '%" + searchUrl[i] + "%' ";
-			}
-
-			//Datenbankabfrage Chrome
-			Class.forName("org.sqlite.JDBC");
-			connection = DriverManager.getConnection("jdbc:sqlite:" + urls.get(0));
-			statement = connection.createStatement();
-
+		for (Path db : browserFiles) {
 			try {
-				resultSet = statement.executeQuery(sqlStatement);
+				mostVisited = dbExtraction(db, MY_SEARCH_DELIEVERY_URLS);
+				if(mostVisited != null) {
+					while (mostVisited.next()) {
+						String urlName = "";
+						urlName = mostVisited.getString("host");
+						if (urlName != null && !urlName.equals("")) {
+							if (!(urls.contains(urlName))) {
+								urls.add(urlName);
+							}
+						}
+					}
+				}
 			} catch (SQLException e) {
-				//System.out.println("database file ist busy. Have to Close Browser to get acces.");
-			}
-
-			//Die Liste urls wird jetzt für alle passenden URLs der history genutzt
-			urls.clear();
-
-			try {
-				while (resultSet.next()) {
-					if (!(resultSet.getString("url").contains("google"))) {
-						urls.add(resultSet.getString("url"));
-					}
-				}
-
-				// Füge den String onlServices als Aufzählung zusammen
-				for (int i = 1; i < urls.size(); i++) {
-					String curr = urls.get(i);
-					if (curr.contains("youtube.com") && !(onlService.contains("youtube.com"))) {
-						if (onlService.isEmpty()) {
-							onlService += "youtube.com";
-						} else {
-							onlService += ", youtube.com";
-						}
-					}
-					if (curr.contains("myvideo.de") && !(onlService.contains("myvideo.de"))) {
-						if (onlService.isEmpty()) {
-							onlService += "myvideo.de";
-						} else {
-							onlService += ", myvideo.de";
-						}
-					}
-					if (curr.contains("soundcloud.com") && !(onlService.contains("soundcloud.com"))) {
-						if (onlService.isEmpty()) {
-							onlService += "soundcloud.com";
-						} else {
-							onlService += ", soundcloud.com";
-						}
-					}
-					if (curr.contains("dailymotion.com") && !(onlService.contains("dailymotion.com"))) {
-						if (onlService.isEmpty()) {
-							onlService += "dailymotion.com";
-						} else {
-							onlService += ", dailymotion.com";
-						}
-					}
-					if (curr.contains("deezer.com") && !(onlService.contains("deezer.com"))) {
-						if (onlService.isEmpty()) {
-							onlService += "deezer.com";
-						} else {
-							onlService += ", deezer.com";
-						}
-					}
-
-					if (Whoami.getTimeProgress() >= 99) {
-						//Ausstieg wegen Timeboxing
-						cancelledByTimeLimit = true;
-						return;
-					}
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
+				//Ergebnis ist leer
 			} finally {
-				try {
-					resultSet.close();
-					statement.close();
-					connection.close();
-				} catch (NullPointerException e) {
-				} catch (Exception e) {
-				}
-			}
-		} catch (ClassNotFoundException e) {
-		} catch (SQLException e) {
-		} catch (IndexOutOfBoundsException e) {
-		}
-	}
-
-
-	private void dbExtraction() {
-		/**
-		 *
-		 * @param
-		 * @retrun void
-		 * @exception Exception
-		 */
-
-		//Benutzername wird an Globaldata übergeben
-		String username = System.getProperty("user.name");
-		GlobalData.getInstance().proposeData("Benutzername", username);
-
-		//Richtige Datenbank hinzufügen
-		int foundDbs = 0;
-		try {
-			for (Path curr : browserFiles) {
-				if (curr != null) {
-					String path = "";
+				//Schließe ResultSet imd Statement
+				if (mostVisited != null) {
 					try {
-						path = curr.toString();
-					} catch (Exception e) {
+						mostVisited.close();
+						mostVisited.getStatement().close();
+					} catch (SQLException e) {
+						//Keine DB
 					}
-
-					//Unterscheidung zwischen Firefox und Chrome Datenbank
-					if (path.contains(".sqlite")) {
-						urls.add(path);
-						foundDbs++;
-					} else if (path.endsWith("\\History") && path.contains(username)) {
-						urls.add(path);
-						foundDbs++;
-					}
-					if (foundDbs > 1) {
-						break;
-					}
-				}
-
-				if (Whoami.getTimeProgress() >= 99) {
-					//Ausstieg wegen Timeboxing
-					cancelledByTimeLimit = true;
-					return;
 				}
 			}
-		} catch (Exception e) {
+		}
+
+		// Füge den String onlServices als Aufzählung zusammen
+		for (int i = 0; i < urls.size(); i++) {
+			for(int j = 0; j < searchUrl.length; j++){
+				if(urls.get(i).contains(searchUrl[j]) && !(onlService.contains(searchUrl[j]))){
+					if (onlService.isEmpty()) {
+						onlService += searchUrl[j]; // erster Dienst
+					} else {
+						onlService += ", " + searchUrl[j]; // weitere Dienste werden mit Komma
+						// angehangen
+					}
+				}
+			}
 		}
 	}
+
+	/**
+	 * Durchsucht den Browser-Verlauf auf bekannte Musikportale (MY_SEARCH_DELIEVERY_URLS)
+	 * @param sqliteDb
+	 * @param searchUrl "final static String[] MY_SEARCH_DELIEVERY_URLS" wird übergeben
+	 * @return mostVisited Ergebnisliste aller gefundener URLs/Hosts
+	 */
+	private ResultSet dbExtraction(Path sqliteDb, String searchUrl[]) {
+		DataSourceManager dbManager;
+		try {
+			dbManager = new DataSourceManager(sqliteDb);
+
+			//Kontruktion des SQL-Statements für Firefox
+			if (sqliteDb.toString().contains("Firefox")) {
+				String sqlStatement = "SELECT host " +
+						"FROM moz_hosts " +
+						"WHERE host LIKE '" + searchUrl[0] + "'";
+				for (int i = 1; i < searchUrl.length; i++) {
+					sqlStatement += " OR host LIKE '" + searchUrl[i] + "'";
+				}
+				mostVisited = dbManager.querySqlStatement(sqlStatement);
+			}
+
+			//Kontruktion des SQL-Statements für Chrome
+			else if (sqliteDb.toString().contains("Chrome")) {
+				String sqlStatement = "SELECT url AS host " +
+						"FROM urls " +
+						"WHERE host LIKE '%" + searchUrl[0] + "%'";
+				for (int i = 1; i < searchUrl.length; i++) {
+					sqlStatement += " OR host LIKE '%" + searchUrl[i] + "%'";
+				}
+				mostVisited = dbManager.querySqlStatement(sqlStatement);
+			}
+		} catch (ClassNotFoundException | SQLException | NullPointerException e) {
+			// Deadlock auf DB | es kommt null auf die DB-Abfrage zurück
+		}
+		return mostVisited;
+	}
+
 }

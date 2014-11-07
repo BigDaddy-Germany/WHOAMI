@@ -1,0 +1,31 @@
+<!-- Template für Programmierer Modul -->
+$if(isProgrammer)$
+    Du bist wohl ein fleißiger $topLanguage$ Programmierer.
+    $if(moreWebLanguage)$ Deine Domäne insgesamt scheint wohl eher das Web zu seien. Du designst wohl
+    viele schicke Hochglanzoberflächen und dein Backend ist wahrscheinlich eher Kraut und Rüben. Zum
+    Glück valdieren wir kein HTML.
+    $endif$
+    $if(moreNativeLanguage)$Damit gehörst du wohl zu den wahren Programmierern, die Bits und Bytes
+    dieser Welt sind deine Domäne. Projektmanagement siehst du lästiges Übel, du programmierst
+    manchmal bis tief in die Nacht und verfluchst den Wikinger, der den Build zerstört hat.
+    <!-- eventuell mit Datum -->
+    $endif$
+    <b>Deine Gesamtstatistik:</b>
+    <table border="1">
+        <tr>
+            <th>Programmier-/Skriptsprache</th>
+            <th>Anzahl</th>
+        </tr>
+        $programm:{p|
+        <tr>
+            <td>$p.extension$</td>
+            <td>$p.counter$</td>
+        </tr>
+        }$
+    </table>
+$else$
+    Nach unserem Scanvorgang konnten wir nur zu folgendem Resultat kommen: Entweder du hast deine
+Quelltexte sehr gut vor uns versteckt, oder du programmierst überhaupt nicht. <br />
+    Beides stimmt uns sehr traurig... Such' dir doch am besten ein schönes C-Tutorial aus dem
+Internet und bereichere deinen Geist.
+$endif$
