@@ -484,6 +484,8 @@ public class Music implements Analyzable {
 	 */
 	public void readId3Tag() {
 		String genre = ""; //Name of Genre
+		GuiManager.updateProgress("Wer ist wohl dein Lieblingskünstler und was hörst du für " +
+				"Musik?");
 		if (!(localFiles.isEmpty())){
 			for (Path file : localFiles) {
 				int numberA = 0;
@@ -499,7 +501,6 @@ public class Music implements Analyzable {
 						AbstractID3v2 tagv2 = mp3file.getID3v2Tag();
 
 						//Analyse Lieblingskünstler
-						GuiManager.updateProgress("Wer ist wohl dein Lieblingskünstler?");
 						String artist = tagv2.getLeadArtist();
 						if(!artist.equals("") && !(artist.contains("\\"))){ //Fehlerhafte
 						// ID3-tags abfangen
@@ -523,7 +524,6 @@ public class Music implements Analyzable {
 						}
 
 						//Analyse Lieblingsgenre
-						GuiManager.updateProgress("Nun schauen wir mal was du für ein Genre bevorzugst");
 						genre = tagv2.getSongGenre();
 						if(!genre.equals("") && !(genre.contains("\\"))) {
 							//Einige ID3-Tags sind fehlerhaft und die ID wird in der Form "(XX)"als String
@@ -567,7 +567,6 @@ public class Music implements Analyzable {
 						ID3v1 tagv1 = mp3file.getID3v1Tag();
 
 						//Analyse Lieblingskünstler
-						GuiManager.updateProgress("Wer ist wohl dein Lieblingskünstler?");
 						String artist = tagv1.getArtist();
 						if(!(artist.equals(""))&& !(artist.contains("\\"))) {
 							//Fehlerhafte ID3-tags abfangen
@@ -592,8 +591,6 @@ public class Music implements Analyzable {
 							}
 
 						//Analyse Lieblingsgenre
-						GuiManager.updateProgress("Nun schauen wir mal was du für ein Genre " +
-								"bevorzugst");
 						short gId = tagv1.getGenre(); //Get Genre ID
 						if(gId != 0) {
 							try {
