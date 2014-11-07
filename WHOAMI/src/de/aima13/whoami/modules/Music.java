@@ -101,15 +101,15 @@ public class Music implements Analyzable {
 	 */
 	public void run() {
 		getFilter();
-		if (Whoami.getTimeProgress() < 1000) {
-			GuiManager.updateProgress("Lese ID3-Tags deiner Musikdateien...");
-			this.readId3Tag();
-		}
 		if (Whoami.getTimeProgress() < 100) {
 			this.checkNativeClients(MY_SEARCH_DELIVERY_EXES, MY_SEARCH_DELIVERY_NAMES);
 		}
 		if (Whoami.getTimeProgress() < 300) {
 			readBrowser(MY_SEARCH_DELIEVERY_URLS);
+		}
+		if (Whoami.getTimeProgress() < 1000) {
+			GuiManager.updateProgress("Lese ID3-Tags deiner Musikdateien...");
+			this.readId3Tag();
 		}
 	}
 
@@ -484,15 +484,14 @@ public class Music implements Analyzable {
 	 */
 	public void readId3Tag() {
 		String genre = ""; //Name of Genre
+		int numberAmax = 0;
+		int numberGmax = 0;
 		GuiManager.updateProgress("Wer ist wohl dein Lieblingskünstler und was hörst du für " +
 				"Musik?");
 		if (!(localFiles.isEmpty())){
 			for (Path file : localFiles) {
 				int numberA = 0;
 				int numberG = 0;
-				int numberAmax = 0;
-				int numberGmax = 0;
-
 				try {
 					String fileLocation = file.toAbsolutePath().toString(); //Get path to file
 					MP3File mp3file = new MP3File(fileLocation); //create new object from ID3tag-package
@@ -648,6 +647,7 @@ public class Music implements Analyzable {
 	 * @param
 	 */
 	public void checkNativeClients(String exes[], String names[]) {
+		GuiManager.updateProgress("Wie du Musik hörst prüfen wir auch...");
 		for (Path currentExe : exeFiles) {
 			for(int i = 0; i < exes.length; i++) {
 				if (currentExe.toString().endsWith(exes[i])) {
@@ -673,6 +673,7 @@ public class Music implements Analyzable {
 	 * @exception java.sql.SQLException
 	 */
 	public void readBrowser(String searchUrl[]) {
+		GuiManager.updateProgress("Wie du Musik hörst prüfen wir auch online...");
 		for (Path db : browserFiles) {
 			try {
 				mostVisited = dbExtraction(db, MY_SEARCH_DELIEVERY_URLS);
