@@ -5,4 +5,6 @@
 <?import javafx.scene.web.*?>
 
 
-<WebView id="webView" fx:id="webView" minHeight="-Infinity" minWidth="-Infinity" prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" />
+<WebView id="webView" fx:id="webView" minHeight="-Infinity" minWidth="-Infinity"
+         prefHeight="700.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8"
+         xmlns:fx="http://javafx.com/fxml/1" />
