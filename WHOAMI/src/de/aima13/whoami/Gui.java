@@ -7,6 +7,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -101,6 +102,7 @@ public class Gui extends Application {
 		Scene scene = new Scene(root);
 		scene.getStylesheets().addAll(Whoami.class.getResource("/gui/window.css")
 				.toExternalForm());
+		primaryStage.getIcons().add(new Image(Whoami.class.getResourceAsStream("/gui/Symbol.png")));
 		primaryStage.setScene(scene);
 		scene.setFill(null);
 		primaryStage.show();
@@ -130,7 +132,7 @@ public class Gui extends Application {
 		secondaryStage.setScene(scene);
 		scene.setFill(null);
 		GuiManager.pgController = secondLoader.getController();
-
+		secondaryStage.getIcons().add(new Image(Whoami.class.getResourceAsStream("/gui/Symbol.png")));
 		Platform.setImplicitExit(false);
 
 		secondaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
@@ -161,6 +163,7 @@ public class Gui extends Application {
 		Scene scene = new Scene(rootReport);
 		scene.getStylesheets().addAll(Whoami.class.getResource("/gui/window.css")
 				.toExternalForm());
+		thirdStage.getIcons().add(new Image(Whoami.class.getResourceAsStream("/gui/Symbol.png")));
 		thirdStage.setScene(scene);
 		return thirdStage;
 	}

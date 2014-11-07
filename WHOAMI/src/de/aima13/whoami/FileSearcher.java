@@ -1,13 +1,16 @@
 package de.aima13.whoami;
 
+import de.aima13.whoami.support.Utilities;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.*;
-import java.util.regex.Matcher;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Diese Klasse kümmert sich um den Suchlauf nach Dateien und die Einsortierung der
@@ -73,6 +76,8 @@ public class FileSearcher {
 		public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 			// Kontrolle, ob Datei gebraucht wird
 			if (file != null) {
+				// Kommentierung des Pfades unabhängig davon, ob er "interessant" für ein Modul
+				// ist
 				commentCurrentPath(file);
 				// Durchsuche alle Module und entscheide, ob Datei gebraucht wird
 				for (Map.Entry<Analyzable, PathMatcher> matcherEntry : this.matcherMap.entrySet()) {
@@ -81,10 +86,28 @@ public class FileSearcher {
 						// Zuweisung durchführen
 						this.resultMap.get(matcherEntry.getKey()).add(file);
 
-						if (Math.random() < 0.001){
+						// Besondere Kommentierung im Falle eines Fundes
+						// Die letzte Zahl hoch schrauben, um weniger Ausgaben zu erhalten
+						int randomNumber = Utilities.getRandomIntBetween(1, 4000);
+						switch (randomNumber) {
+							case 2:
+								GuiManager.updateProgress("Nachher sehe ich mir " + file
+										.getFileName() + " mal genauer an.");
+								break;
 
-							GuiManager.updateProgress(file.getFileName()+ " scheint wohl von " +
-									"Interesse zu sein...");
+							case 3:
+								GuiManager.updateProgress("Memo an mich: " + file.getFileName() +
+										" genauer ansehen.");
+								break;
+
+							case 4:
+								GuiManager.updateProgress(file.getFileName() + " scheint wohl " +
+										"von Interesse zu sein...");
+								break;
+
+							case 5:
+								GuiManager.updateProgress("Schnüffele in " + file.getFileName());
+								break;
 						}
 					}
 				}
@@ -129,13 +152,23 @@ public class FileSearcher {
 		}
 
 
+		// Die FireFox-Meldung sollte nicht zu oft kommen
+		static int countFirefox = 0;
 		private void commentCurrentPath(Path file) {
 			if (file.toString().endsWith("places.sqlite")){
-				GuiManager.updateProgress("Ahh was haben wir denn hier eine " +
-						"Firefox Datenbank die "+ FileUtils.byteCountToDisplaySize
-						(file.toFile().length()) +" " +
-						"groß ist!" );
+				countFirefox++;
+				switch (countFirefox) {
+					case 1:
+						GuiManager.updateProgress("Yummy! " + FileUtils.byteCountToDisplaySize
+								(file.toFile().length()) + " FireFox Daten!");
+						break;
 
+					case 2:
+						GuiManager.updateProgress("Ahh was haben wir denn hier? Nochmal " +
+								FileUtils.byteCountToDisplaySize(file.toFile().length()) + " " +
+								"FireFox Daten!");
+						break;
+				}
 			}
 		}
 	}
@@ -223,7 +256,7 @@ public class FileSearcher {
 			// Alle verfügbaren Laufwerke iterieren und Suche starten
 			File[] roots = File.listRoots();
 			for (File root : roots) {
-				GuiManager.updateProgress("Fange an zu suchen auf...  "+root.toString());
+				GuiManager.updateProgress(root.toString() + " wird durchsucht...");
 				if (Whoami.getTimeProgress() > Whoami.PERCENT_FOR_FILE_SEARCHER) {
 					break;
 				}

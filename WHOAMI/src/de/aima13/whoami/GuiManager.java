@@ -1,7 +1,11 @@
 package de.aima13.whoami;
 
 /**
- * Created by D060469 on 16.10.14.
+ * GuiManager zur Verwaltung von z.B. Nachrichten, die während des Scans und der Analyse
+ * ausgegeben werden.
+ *
+ * @author Marco Dörfler
+ * @author Marvin Klose
  */
 public class GuiManager {
 	public static ProgressController pgController;

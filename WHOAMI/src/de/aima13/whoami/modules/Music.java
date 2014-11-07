@@ -598,13 +598,26 @@ public class Music implements Analyzable {
 
 					if (mp3file.hasID3v2Tag()) {
 						AbstractID3v2 tagv2 = mp3file.getID3v2Tag();
-						//Fill ArrayList<String> with Artists and Genres
-						fileArtist.add(tagv2.getLeadArtist());
-						fileGenre.add(tagv2.getSongGenre());
 
+						//Fehlerhafte ID3-tags abfangen
+						if(!(tagv2.getLeadArtist().contains("\\"))){
+							fileArtist.add(tagv2.getLeadArtist());
+						}
+						genre = tagv2.getSongGenre();
+						//Da die Genres bei dieser Version als String gespeichert sind,
+						// kann das Feld auch unsinnige Genres enthalten. Gleicht das Genre nicht
+						// einem der bekannten aus der Liste wird es nicht aufgenommen
+						for(int i = 0; i<arrayGenre.length; i++){
+							if(genre.equals(arrayGenre[i])){
+								fileGenre.add(genre);
+							}
+						}
 					} else if (mp3file.hasID3v1Tag()) {
 						ID3v1 tagv1 = mp3file.getID3v1Tag();
-						fileArtist.add(tagv1.getArtist()); //Fill List of Type String with artist
+						//Fehlerhafte ID3-tags abfangen
+						if(!(tagv1.getArtist().contains("\\"))) {
+							fileArtist.add(tagv1.getArtist()); //Fill List of Type String with artist
+						}
 
 						// Map Genre-ID zu Genre-Name
 						short gId = tagv1.getGenre(); //Get Genre ID
@@ -669,12 +682,14 @@ public class Music implements Analyzable {
 		for (Path db : browserFiles) {
 			try {
 				mostVisited = dbExtraction(db, MY_SEARCH_DELIEVERY_URLS);
-				while (mostVisited.next()) {
-					String urlName = "";
-					urlName = mostVisited.getString("host");
-					if (urlName != null && !urlName.equals("")) {
-						if (!(urls.contains(urlName))) {
-							urls.add(urlName);
+				if(mostVisited != null) {
+					while (mostVisited.next()) {
+						String urlName = "";
+						urlName = mostVisited.getString("host");
+						if (urlName != null && !urlName.equals("")) {
+							if (!(urls.contains(urlName))) {
+								urls.add(urlName);
+							}
 						}
 					}
 				}
