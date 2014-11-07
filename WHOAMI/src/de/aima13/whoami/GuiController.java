@@ -46,7 +46,7 @@ public class GuiController implements Initializable {
 	 */
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		agbArea.setText(Utilities.getResourceAsString("/EULA.txt"));
+		agbArea.setText(Utilities.getResourceAsString("/gui/EULA.txt"));
 	}
 
 	@FXML
