@@ -32,26 +32,36 @@ public class CsvCreator {
 	 *
 	 * @param representables Liste alle zu präsentierenden CSV Werte
 	 */
-	public static boolean saveCsv(List<Representable> representables) {
+	public static boolean saveCsv(Map<Representable, String[]> representables) {
 		SortedMap<String, String> completeCsvContent = new TreeMap<>();
 
 		// CSV Werte aus allen Representables ziehen
-		for (Representable representable : representables) {
+		for (Map.Entry<Representable, String[]> representableCsvEntry : representables.entrySet()) {
+			Representable representable = representableCsvEntry.getKey();
+
 			SortedMap<String, String> moduleCsvContent = representable.getCsvContent();
 
 			if (moduleCsvContent != null) {
 				// Header werden mit Prefix versehen -> keine Namensgleichheit
-				String prefix = representable.getCsvPrefix();
+				String prefix = representable.getCsvPrefix() + " ";
 				// Wenn das Modul noch keinen Prefix zurückgibt, wird der Klassenname genutzt
 				if (representable.getCsvPrefix() == null) {
 					prefix = representable.getClass().getSimpleName();
 				}
 
-				for (Map.Entry<String, String> moduleCsvCol : moduleCsvContent.entrySet()) {
-					// Titel mit Prefix versehen und Spalte hinzufügen
-					completeCsvContent.put(prefix + PREFIX_SEPERATOR + moduleCsvCol.getKey()
-							.replace(" ", "-"),
-							moduleCsvCol.getValue());
+				// Es sollen genau die vorgesehenen Spalten verwendet werden
+				for (String csvColName : representableCsvEntry.getValue()) {
+					String csvColValue;
+					// Sollte das Modul hierzu keinen Eintrag haben, wird ein Platzhalter eingefügt
+					if (moduleCsvContent.containsKey(csvColName)) {
+						csvColValue = moduleCsvContent.get(csvColName);
+					} else {
+						csvColValue = "-";
+					}
+					completeCsvContent.put(
+							prefix + csvColName,
+							csvColValue
+					);
 				}
 			}
 		}
