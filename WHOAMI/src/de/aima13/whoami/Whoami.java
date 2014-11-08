@@ -1,43 +1,38 @@
 package de.aima13.whoami;
 
-import de.aima13.whoami.modules.coding.CodeAnalyzer;
-
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Marco Dörfler on 16.10.14.
- *
  * Hauptklasse mit Main-Methode
+ *
+ * @author Marco Dörfler
  */
-public class Whoami {
-	private static final int ANALYZE_TIME = 60; // Analysezeit in Sekunden
+public class Whoami implements Runnable {
+	private static final int ANALYZE_TIME= 1000; // Analysezeit in Sekunden
 	public static final int PERCENT_FOR_FILE_SEARCHER = 75; // Wie viel Prozent für den
-	// FileSearcher?
 	private static long startTime;
 
 	/**
 	 * Standard Main-Methode
 	 * @param args Commandline Argumente
-	 *
-	 * @author Marco Dörfler
 	 */
 	public static void main(String[] args) {
 		startTime = System.currentTimeMillis();
-
-		List<Analyzable> moduleList = new ArrayList<>();                // Liste der Module
-		List<Representable> representableList = new ArrayList<>();      // Liste der Representables
-
-		// Gui starten und AGB zur Bestätigung anzeigen
+			// Gui starten und AGB zur Bestätigung anzeigen
 		GuiManager.startGui();
 		if (!GuiManager.confirmAgb()) {
 			// Beenden des Programms, falls der User die AGB ablehnt
-			GuiManager.showGoodBye();
 			System.exit(0);
 		}
+		// hier gehts dann aus dem Application Thread weiter ins Run unten
+	}
 
-		// Fortschrittsanzeige einnblenden und immer wieder updaten
-		GuiManager.showProgress();
+	@Override
+	public void run() {
+		System.out.println("\n\nIch runne mal die Module");
+		List<Analyzable> moduleList = new ArrayList<>();                // Liste der Module
+		List<Representable> representableList = new ArrayList<>();      // Liste der Representables
 
 		GuiManager.updateProgress("Lade und initialisiere Module...");
 
@@ -66,16 +61,26 @@ public class Whoami {
 		// PDF
 		ReportCreator reportCreator = new ReportCreator(representableList);
 		reportCreator.savePdf();
+		
+		GuiManager.updateProgress("Bin fertig :)");
+
 
 		// Anzeigen des Berichtes
-		GuiManager.showReport(reportCreator.getHtml());
+		GuiManager.closeProgressAndShowReport(reportCreator.getHtml());
+	}
+
+	/**
+	 * Kalkulieren der noch verbleibenden Analysezeit
+	 * @return Die Anzahl der Millisekunden, welche noch übrig sind
+	 */
+	public static long getRemainingMillis() {
+		long elapsedTime = System.currentTimeMillis() - startTime;
+		return ANALYZE_TIME * 1000 - elapsedTime;
 	}
 
 	/**
 	 * Information über die bisherige und restliche Laufzeit des Programms
 	 * @return Ganzzahliger Prozentwert zwischen 0 und 100 (100: Zeit ist um)
-	 *
-	 * @author Marco Dörfler
 	 */
 	public static int getTimeProgress() {
 		float elapsedTime = (float) ((System.currentTimeMillis() - startTime) / 1000);
@@ -87,4 +92,5 @@ public class Whoami {
 			return 100;
 		}
 	}
+
 }

@@ -1,0 +1,133 @@
+WICHTIGER HINWEIS: LESEN SIE DIESE EULA SORGFÄLTIG DURCH UND STELLEN SIE SICHER, DASS SIE SIE VERSTANDEN HABEN, BEVOR SIE IHRE BESTIMMUNGEN AKZEPTIEREN.
+DIE BIGDADDY ANALYST GROUP IST NUR DANN BEREIT, DIE NACHFOLGEND DEFINIERTE SOFTWARE AN SIE ALS VERBRAUCHER ODER UNTERNEHMER („SIE“) ZU LIZENSIEREN, WENN SIE ALLE BESTIMMUNGEN DIESER EULA UND DIE ZUGEHÖRIGEN GESCHÄFTSBEDINGUNGEN AKZEPTIEREN.
+INDEM SIE AUF DEN BUTTON „ICH STIMME ZU“ ODER „JA“ KLICKEN, INDEM SIE DIE SOFTWARE LADEN ODER INDEM SIE AUF SONSTIGE WEISE IHRE ZUSTIMMUNG ZUM AUSDRUCK BRINGEN, AKZEPTIEREN SIE DIESE EULA, UND DIESE EULA WIRD EIN RECHTSGÜLTIGER UND ANWENDBARER VERTRAG ZWISCHEN DER BIGDADDY ANALYST GROUP UND IHNEN SELBST, WENN SIE EIN VERBRAUCHER SIND, ODER ZWISCHEN DER BIGDADDY ANALYST GROUP. 
+SIND SIE EIN „GESCHÄFTSUNTERNEHMEN“ WENDEN SIE SICH BITTE AN UNSERE GLOBAL COMMUNICATIONS AND SALES ABTEILUNG ODER WENDEN SIE SICH AN List-BigDaddy@n2online.de, UM EINE KOMMERZIELLE NUTZUNG FÜR IHR UNTERNEHMEN ZU GESTATTEN WENN SIE DIESEN BESTIMMUNGEN NICHT ZUSTIMMEN, KLICKEN SIE AUF „ABBRECHEN“, „NEIN“, ODER SCHLIESSEN SIE DAS FENSTER MITTELS DES ROTEN KREUZES IN DER OBEREN RECHTEN ECKE. 
+Wenn Sie sich außerhalb der Bundesrepublik Deutschland befinden, übernehmen wir keinerlei Haftung. Ebenso ist allein der Einsatz außer der Bundesrepublik nicht gestattet.
+
+VERTRAGSBESTIMMUNGEN
+
+Diese EULA betrifft die Einräumung einer Lizenz für Software und jede zugehörige Dokumentation durch Die BigDaddy Analyst Group an Sie. Diese EULA gilt auch für alle Updates und Upgrades, soweit Die BigDaddy Analyst Group Ihnen nach der Installation der Software Updates und/oder Upgrades zur Verfügung stellt.
+
+1. Begriffsbestimmungen
+1.1 Automatische Verlängerung - bezeichnet eine Funktion für die Erneuerung einer Lizenz am
+Ende der Lizenzdauer, ohne dass es eines weiteren Hinweises bedarf.
+
+1.2 Computer - bezeichnet jedes Gerät, das Daten mit Hilfe einer programmierbaren
+Rechenvorschrift verarbeiten kann.
+
+1.3 Dokumentation - bezeichnet schriftliche Materialien, in gedruckter oder elektronischer
+Form, die die Funktionen der Software und/oder der Updates und Upgrades beschreiben und die dazu dienen, Sie bei der effektiven Nutzung der Software, der Updates und/oder Upgrades zu unterstützen. Eine solche Dokumentation ändert nicht die Bestimmungen dieser EULA oder ihrer zugehörigen Geschäftsbedingungen.
+
+1.4 Entgelt - bezeichnet den Preis oder die Lizenzgebühr für Software von der BigDaddy
+Analyst Group. Jedoch hat schon irgendein Idiot für unsere Software bezahlt. Sonst würden Sie diese hier und heute nicht starten und ausführen können.
+
+1.5 Freeware - bezeichnet eine Version der Software, die einem Kunden kostenlos zur
+Verfügung gestellt wird. Für die Distribution unserer Software übernehmen wir keine Haftung und ergreifen auch nicht die Initiative. Jeder der unsere Software ausführt ist selber schuld.
+
+1.6 Geschäftsbedingungen - bezeichnet die Allgemeinen Geschäftsbedingungen von der BigDaddy
+Analyst Group. Eine Webpräsenz haben wir leider nicht und haben auch nicht vor uns eine
+einzurichten. Sollten Sie tatsächlich Interesse haben unsere AGBs zu lesen stellen Sie bitte eine schriftliche Anfrage. Wie im Folgenden festgehalten gelten diese in vielleicht Zukunft definierten Geschäftsbedingungen zusätzlich zu den Bestimmungen dieser hier verfassten EULA und ergänzen diese.
+
+1.7 Kunde - bezeichnet einen Verbraucher und/oder Unternehmer.
+Lizenz - bezeichnet Ihr Recht zur Nutzung der Software gemäß dieser EULA und den zum Zeitpunkt des Abschlusses des betreffenden Vertrags gültigen Geschäftsbedingungen. Die Lizenz legt die Art und den Umfang Ihres Rechts zur Nutzung der Software fest. Für diejenige Software, für die ein Update-Service zur Verfügung gestellt wird, umfasst die Lizenz zudem Ihr Recht auf Erhalt regelmäßiger Updates/Upgrades für die bereitgestellte Software während der Lizenzdauer.
+Lizenzdauer - bezeichnet den Zeitraum, für den die Lizenz für die Software eingeräumt wird. Die Lizenzdauer beginnt, sobald Sie jemanden gefunden haben, der Ihnen unsere geile Software zur Verfügung stellt. Aber seien Sie vorsichtig unsere Software beißt Sie und greift ihr Ego an.
+
+1.8 Mehrfachnutzung - Seid ihr nicht ganz Helle im Kopf? Reicht es nicht, dass man es einmal
+ausgeführt hat? Aber wer will, darf sich gerne das Programm kopieren und es zwei Mal nutzen. Das Ergebnis wird höchstwahrscheinlich identisch bleiben. Es sei denn, Sie haben festgestellt, warum Obama tatsächlich all ihre Daten hat.
+
+1.9 Software - bezeichnet die Schnüffelsoftware WHOAMI der BigDaddy Analyst Group im
+Objektcodeformat, einschließlich aller zugehörigen Updates und Upgrades, Packages, Module, Katzen, Atomwaffen und womit man sonst so Spaß haben kann, die die BigDaddy Analyst Group zur Verfügung stellt und für die BigDaddy Analyst Group Ihnen eine Lizenz erteilt hat sich endlich mal selbst zu finden.
+
+1.10 Testlizenz - bezeichnet eine Lizenz zur kostenlosen Nutzung der Software für
+Testzwecke für einen begrenzten Zeitraum durch einen Kunden. Für unsere EULA möchten wir diesen Punkt aber herausnehmen. Es gibt nichts zu testen! Unser Code hat eine Test-Coverage von 100% *hust*. Es gibt keine Fehler. Sollte doch mal es schief gehen liegt der Fehler meist zwischen 30 und 60 cm vom Bildschirm entfernt.
+
+1.11 Unternehmer - bezeichnet eine rechtsfähige natürliche Person, juristische Person oder
+Personengesellschaft, die bei der Bestellung oder dem Erhalt der Software von der BigDaddy Analyst Group in Ausübung ihrer gewerblichen oder selbständigen beruflichen oder sonstigen Tätigkeit außerhalb des persönlichen oder familiären Gebrauchs handelt.
+PS. Wir haben schon einen verrückten Käufer für unsere höchst professionelle Applikation gefunden. Aber scheuen Sie sich nicht uns nicht auch nach einem Vertrag für Sie zu fragen. Ab 1.000.000,00€ (in Worten eine Millionen Euro) pro Entwickler werden wir uns sicherlich einig.
+
+1.12 Updates und Upgrades - bezeichnet die Aktualisierung der Software. Die Klassifizierung
+der Aktualisierung als Update oder Upgrade liegt im alleinigen Ermessen der BigDaddy Analyst Group. In Anbetracht des straffen Klausurplans und der harten Arbeit die wir hier in unseren Cubicles leisten sehen wir uns nicht in der Pflicht Updates oder Upgrades herauszugeben. Es können gegebenenfalls zusätzliche Kosten für die Datenübertragung anfallen, wenn Ihr Computer mit dem Internet verbunden ist und Sie zur Ausführung des Programmes ein Java-Update benötigen. Die BigDaddy Analyst Group hat ganz bestimmt nicht zur Aufgabe, derartige Verbindungen zu zahlen, und erklärt hiermit, damit verbundene Zahlungsaufforderungen bewusst zu ignorieren und somit zu verweigern.
+
+1.1337 Verbraucher - bezeichnet eine natürliche Person, der von der BigDaddy Analyst Group
+die Software zur persönlichen Nutzung oder zur Nutzung in der Familie zur Verfügung gestellt werden. Das heißt damit sind genau Sie gemeint, wenn sie kein Unternehmer sind. Das heißt Sie sind hier das Opfer.
+Vertriebspartner - bezeichnet einen Kunden, dem Software ausdrücklich zum Zweck des Weiterverkaufs zur Verfügung gestellt werden. Ja wer fühlt sich denn hier angesprochen?
+Unser herzliches Beileid an alle Angehörigen und Verantwortlichen. Die Entwickler bedanken sich für Ihr Geld und der damit finanzierten Villa in Miami.
+
+1.14 Eigentumsrechte
+Die Software ist durch keine internationalem Urheberrechtsgesetze, -verträge und andere Gesetze geschützt. Die BigDaddy Analyst Group und ihre Lizenzgeber besitzen und behalten alle Rechte, das Eigentum und alle Ansprüche an der Software, einschließlich aller Urheberrechte, Patente, Betriebs- und Geschäftsgeheimnisse, Marken und sonstiger geistiger Eigentumsrechte. Diese EULA überträgt Ihnen kein Eigentum an der Software. Mit Ausnahme Sie wollen uns ein paar Millionen überweisen, dann lassen wir vielleicht mit uns reden.
+
+1.15 Lizenzerteilung
+Hiermit erteilt Ihnen die BigDaddy Analyst Group nicht eine nicht-ausschließliche, nicht übertragbare Lizenz zur Nicht-Nutzung der Software vorbehaltlich etwaiger Beschränkungen, die in dieser EULA oder in den noch nicht von Geschäftsbedingungen enthalten sind. Hm, klingt komisch?! Das ist der BigDaddy Analyst Group durchaus bewusst, denn vielleicht haben Sie ja die Lizenz zum Töten, also vergeben wir besser nicht noch zusätzlich irgendwelche Lizenzen.
+Zusätzlich gilt:
+Wie bereits erwähnt, gelten die Geschäftsbedingungen für diese EULA. Sollten Sie oder ein Reviewer dieser EULA sich an dieser Stelle fragen "Welche Geschäftsbedingungen?", so liegen Sie beziehungsweise er damit vollkommen richtig: Wir sollten vielleicht wirklich mal welche verfassen. Im Falle eines Widerspruchs zwischen dieser EULA und den Geschäftsbedingungen suchen Sie sich etwas aus oder fragen Sie den Papst. Die BigDaddy Analyst Group behält sich vor, dennoch das letzte Wort zu haben.
+
+2. Nutzungsbestimmungen
+Software darf nicht vervielfältigt, weitergegeben oder dekompiliert (d.h. in den Quellcode rückübersetzt) werden, sofern dies nicht ausdrücklich durch diese EULA oder durch ein Gesetz erlaubt ist. Falls Sie das Computerprogramm zurückentwickeln, dekompilieren oder disassemblieren (nachfolgend ebenfalls „Dekompilierung“ genannt) möchten, um eine Interoperabilität mit anderen Computerprogrammen zu erreichen, sofern dies gesetzlich erlaubt ist, haben Sie die BigDaddy Analyst Group vor der Dekompilierung des Computerprogramms zu kontaktieren und die Bereitstellung der für das Erreichen einer solchen Interoperabilität erforderlichen Informationen anzufordern. Stellt die BigDaddy Analyst Group diese Informationen bezüglich der Interoperabilität ohne schuldhaftes Zögern zur Verfügung, sind Sie nicht zur Dekompilierung des Computerprogramms berechtigt. Alternativ forken Sie uns doch auf GitHub, wo sowieso früher oder später der gesamte Quellcode vorliegen wird. Aber Vorsicht: Drum prüfe, wer sich ewig bindet, ob sich nicht etwas besseres findet.
+Die Nutzung von Software, für die nach den jeweiligen Produktinformationen keine besonderen Lizenzen für eine Mehrfachnutzung erhältlich sind, ist auf einen Computer beschränkt. Wir haben aber solche Produktinformationen, also lesen Sie nochmal genau nach. Wir legen Ihnen ans Herz nicht auch einmal Ihre ganze Festplatte zu scannen, nur weil Sie nicht glauben, dass Sie sowieso ein super verstrahler Nerd sind, der tatsächlich hier alle diese sinnlosen Sätze liest. Wirklich traurig ist wahrscheinlich nur, dass für das Verfassen und Überarbeiten dieser EULA seitens des Entwicklungsteams, unter dem sich noch nicht einmal Anwälte oder solche Personen, die dazu befugt, fähig oder qualifiziert wären, Texte von solch enorm wichtiger Rechtsbedeutung zu verfassen, wahrscheinlich mehr Zeit drauf geht, als jemals in Summe dafür aufgewandt wird, diese Bestimmungen tatsächlich zu lesen.
+
+Es ist Ihnen nicht erlaubt, und Sie dürfen keiner anderen Person gestatten:
+Irgendeinen Teil der Software zu kopieren (außer zu Zwecken der Erpressung), unterzulizenzieren, zu vermieten, zu verleihen oder zu verleasen. Wenn Sie die Software auf einem anderen Computer verwenden wollen, müssen Sie das Programm einfach nur starten. Wir sind uns sicher, dass 5% aller Deutschen dazu in der Lage sind.
+Die Software ganz oder teilweise zu verändern oder abgeleitete Werke zu schaffen, die ganz oder teilweise auf der Software basieren, weil wir möchten das nicht.
+HINWEIS: DURCH EINEN VERSTOSS GEGEN DIE OBIGEN BESTIMMUNGEN WERDEN SÄMTLICHE GELTENDEN GEWÄHRLEISTUNGEN NICHTIG!
+Eigentümerkennzeichnungen, Seriennummern, Beschriftungen oder Kopierschutzfunktionen von der Software entfernen;
+die Software in Bereichen mit besonderem Risiko verwenden, die einen fehlerfreien Dauerbetrieb relevanter Systeme erfordern und in denen ein Ausfall der Software zu einer unmittelbaren Gefahr für Leben, Körper oder Gesundheit oder zu erheblichen Sach- oder Umweltschäden führen kann (Tätigkeiten mit hohem Risiko und Tätigkeiten mit hoher Verfügbarkeit, insbesondere der Betrieb von Kernkraftanlagen, Waffensystemen, Flugnavigations- oder Flugkommunikationssystemen, lebenserhaltender Systeme oder Geräte, Maschinen- und Produktionsprozessen in der Herstellung von Pharmazeutika und Lebensmitteln). Die BigDaddy Analyst Group gewährleistet oder garantiert nicht, dass die Software für den Gebrauch in Bereichen mit besonderem Risiko geeignet ist. Also wenn ihr Lust auf eine Apokalypse biblischen Ausmaßes, wie sie schon in der Offenbarung in der Bibel steht habt, dann nur zu. Wir freuen uns immer über schlechte Nachrichten.
+Die BigDaddy Analyst Group behält sich alle Rechte vor, um eine unbefugte Nutzung der Software Ihrerseits zu untersagen oder zu stoppen, insbesondere Ansprüche auf Unterlassung und Schadensersatz. Eine unbefugte Nutzung Ihrerseits kann zu strafrechtlicher Verfolgung gemäß den einschlägigen Gesetzen führen. Die Bestimmungen dieses Paragraphen 4.3.5 über die Vervielfältigung und Offenlegung gelten ebenso für die Benutzerhandbücher und andere Unterlagen, die die von BigDaddy Analyst Group zur Verfügung gestellte Software betreffen. Was es gibt ein Handbuch? oO (Reviewer: Ich fürche, wir haben so etwas im Pflichtenheft versprochen, also werden wir mal sehen, ob wir uns irgendwie darum drücken können.) Achso und die allgemeinen Geschäftsbedingungen gibt es immer noch nicht. Don't Panic! Insofern Sie ihr Handtuch in Reichweite haben, sind Sie bestens vorbereitet.
+
+2.1 Ihre Pflichten
+
+Die Einrichtung einer funktionsfähigen Hardware- und Softwareumgebung für die Software liegt allein in Ihrer Verantwortung. Das gleiche gilt für regelmäßige Datensicherungen in Ihrem EDV-System. Die BigDaddy Analyst Group sieht sich auch nicht in der Pflicht, Daten wiederherzustellen, die durch die Nutzung unserer Software verloren gehen könnten, gegangen sind oder höchstwahrscheinlich noch gegangen sein werden. Wir formatieren Ihre Festplatte lediglich am 1. April, weil das witzig ist. Im Falle eines Nichtvorhandensein von Backups übernimmt die BigDaddy Analyst Group keinerlei Verantwortung. An dieser Stelle seien Sie auf die 3-2-1-Backup Regel verwiesen, welche besagt, dass Sie für Dinge von sentimentalem oder anderweilig begründet hohem Wert mindestens drei Kopien auf mindestens zwei unterschiedlichen Medientypen, wovon eine Kopie außer Haus gespeichert wird, anzufertigen haben. Sie haben es mitunter nicht anders verdient, sollten Sie sich außer Stande sehen, derart angemessen sorgsam mit ihren gespeicherten Daten umzugehen.
+Die Kündigung oder der Ablauf der nach diesem Vertrag eingeräumten Lizenz führt zu einem sofortigen Ende Ihres Rechts auf Nutzung der Software und der Updates und Upgrades. Sie werden dann keine weiteren Updates erhalten und müssen die Software sowie alle Sicherungskopien von Ihrem Computer löschen. Wir wollen ja nicht, dass Sie uns bescheißen. Die BigDaddy Analyst Group kann verlangen, dass Sie eine schriftliche Bestätigung über die Vernichtung oder das Löschen der in diesem Paragraphen 8 bezeichneten Materialien vorlegen. Sie haben aber keinerlei Anrecht Ihre Daten bei uns löschen zu lassen. Das Leben ist ja schließlich kein Wunschkonzert und wir wollen auch von etwas leben. Bei Beschwerden fangen Sie bitte erstmal bei der NSA an oder betreiben Sie auf andere Art und Weise Privatsphären-Aktivismus, bevor Sie auf armen Studenten rumzuhacken, die
+
+2.2 Technischer Support
+Um es kurz zusammenzufassen: Es gibt keinen Support! Entweder Sie sind in der Lage, ein paar Knöpfe zu drücken und ein paar Minuten Ihres Lebens zu warten, oder Sie haben leider kein Glück bei uns.
+
+2.3 Beschränkte Gewährleistung und Gewährleistungsausschluss
+Beschränkte Gewährleistung. Die BigDaddy Analyst gewährleistet für einen Zeitraum von 30 (in Worten: DREISSIG) Sekunden ab dem Kaufdatum, dass jede bezahlte Version der Software im Wesentlichen entsprechend der Dokumentation funktioniert. Mängel und Fehler in der Checksumme können passieren, eine Reklamation ist innerhalb von 2 Minuten aus Kulanzgründen möglich, allerdings nicht garantiert. Diese berechtigt Sie zum erneuten Ausführen. Eine Garantie, dass es funktioniert bieten wir Ihnen nicht.
+
+3.GEWÄHRLEISTUNGSAUSSCHLUSS
+
+3.1 MIT AUSNAHME DER VORBEZEICHNETEN BESCHRÄNKTEN GEWÄHRLEISTUNG WIRD DIE SOFTWARE IM
+ISTZUSTAND ZUR VERFÜGUNG GESTELLT UND DIE BIGDADDY ANALYST GROUP ÜBERNIMMT KEINE GEWÄHRLEISTUNG IM HINBLICK AUF DEN GEBRAUCH ODER DIE LEISTUNG DER SOFTWARE. DIE BIGDADDY ANALYST GROUP ÜBERNIMMT KEINERLEI GEWÄHRLEISTUNG UND SCHLIESST AUSDRÜCKLICH JEDE SONSTIGE, AUSDRÜCKLICHE, STILLSCHWEIGENDE ODER GESETZLICHE GEWÄHRLEISTUNG AUS, INSBESONDERE JEDE STILLSCHWEIGENDE GEWÄHRLEISTUNG DER EIGNUNG FÜR EINEN BESTIMMTEN ZWECK. DARÜBER HINAUS SCHLIESST DIE BIGDADDY ANALYST GROUP AUSDRÜCKLICH JEDE GEWÄHRLEISTUNG IN BEZUG AUF DIE NICHTVERLETZUNG VON RECHTEN DRITTER, DIE MARKTGÄNGIGKEIT, ZUFRIEDENSTELLENDE QUALITÄT ODER DIE FÄHIGKEIT, DIE SOFTWARE MIT ANDEREN PRODUKTEN ZU INTEGRIEREN, AUS. UND VIELLEICHT SCHLIEßEN WIR SIE AUCH AUS. SIE ÜBERNEHMEN DIE VERANTWORTUNG FÜR DIE AUSWAHL DER SOFTWARE, MIT DER SIE DIE VON IHNEN GEWÜNSCHTEN ERGEBNISSE ERZIELEN WOLLEN, UND FÜR DIE NUTZUNG DER SOFTWARE SOWIE DIE DURCH DIE SOFTWARE ERZIELTEN ERGEBNISSE. OHNE EINSCHRÄNKUNG DER VORSTEHENDEN SÄTZE ÜBERNIMMT DIE BIGDADDY ANALYST GROUP INSBESONDERE KEINE GEWÄHRLEISTUNG, DASS DIE SOFTWARE VOR ALLEN MÖGLICHEN BEDROHUNGEN SCHÜTZT, INSBESONDERE ABER NICHT BESCHRÄNKT AUF GESCHLECHTSKRANKHEITEN MANGELS DER ORDNUNGSGEMÄSSEN NUTZUNG VON PRÄSERVATIVEN, NATURKATASTROPHEN ODER VERGLEICHBARER EREIGNISSE ODER PHYSISCHER GEWALT ALS FOLGE VON MISSGUNST SEITENS IHRER FAMILIE, VERWANDTEN ODER NACHBARN, DASS DIE SOFTWARE FEHLERFREI ODER FREI VON UNTERBRECHUNGEN ODER SONSTIGEN AUSFÄLLEN IST, ODER DASS DIE SOFTWARE IHRE SPEZIFISCHEN BEDÜRFNISSE ERFÜLLT. FÜR FOLGEN DER FEHLINTERPRETATION DER IN DIESEM DOKUMENT NEBENBEI BEMERKT ÜBERTRIEBEN GENUTZTER SCHACHTELSÄTZE, VON DENEN MIT HOHER WAHRSCHEINLICHKEIT EINIGE NOCH NICHT MAL GRAMMATIKALISCH KORREKT GEBILDET SIND, ÜBERNIMMT DIE BIGDADDY ANALYST GROUP KEINERLEI HAFTUNG.
+
+4.HAFTUNGSBESCHRÄNKUNG
+
+UNTER KEINEN UMSTÄNDEN HAFTET DIE BIGDADDY ANALYST GROUP IHNEN GEGENÜBER ODER GEGENÜBER SONSTIGEN PERSONEN FÜR SCHÄDEN AUS ENTGANGENEM GEWINN, VERLUST VON GOODWILL, VERLUST VON IMMOBILIEN, VERLUST DER JUNGFRÄULICHKEIT ODER FÜR MITTELBARE ODER BESONDERE SCHÄDEN ODER NEBEN- ODER FOLGESCHÄDEN, ODER AUF SCHADENSERSATZ AUFGRUND VON FAHRLÄSSIGKEIT JEGLICHER ART, INSBESONDERE SCHADENSERSATZ FÜR ARBEITSUNTERBRECHUNG, DATENVERLUST, AUSFALL ODER FEHLFUNKTION VON COMPUTERN ODER FÜR IRGENDWELCHE SONSTIGEN SCHÄDEN ODER VERLUSTE. IN KEINEM FALL HAFTET DIE BIGDADDY ANALYST GROUP FÜR SCHÄDEN, DIE DAS VON IHNEN BEZAHLTE ENTGELT ÜBERSTEIGEN (HABEN SIE SCHON DIE MILLIONEN ÜBERWIESEN?), SELBST WENN WIR AUF DIE MÖGLICHKEIT DERARTIGER SCHÄDEN HINGEWIESEN WURDEN.
+DIE VORSTEHENDEN BESTIMMUNGEN IN PARAGRAPH 10 UND 11 GELTEN GLEICHERMASSEN FÜR AUTORISIERTE VERTRIEBSPARTNER UND SIND IM GRÖSSTMÖGLICHEN NACH GELTENDEM RECHT ZULÄSSIGEN UMFANG ANWENDBAR.
+
+5. Datenschutz
+
+Durch Abschluss dieser EULA stimmen Sie der Geltung der BigDaddy Analyst Group Datenschutzrichtlinie in ihrer jeweils gültigen Fassung zu. Siehe www.wirhabenimmernochkeinehomepageoderdatenschutzerklärung.alsosindwircool .
+Erhebung bestimmter Systeminformationen.
+[Absichtlich leer gelassen]...[Schöne Grüße von deiner Omi]
+
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+Der Klassiker darf natürlich nicht fehlen!
+
+
+6. Geltendes Recht und Gerichtsstand
+
+Sofern nicht Paragraph 69 zur Anwendung kommt, gilt für diese EULA das Recht des Staats Balifornia, und alle Klagen aus diesem Vertrag sind bei den Staats- und Bundesgerichten in Balifornia zu erheben, und Sie stimmen dem ausschließlichen Gerichtsstand bei diesen Gerichten zu.
+Ja, auch auf Balifornia gibt es Gerichte. Aufgrund der Zahl der offenen Verfahren und des jährlich Urlaubs des einzigen Richters müssen Sie mit einer Wartezeit von 1337 Jahren rechnen.
+
+7. Verschiedenes
+Diese EULA und die Geschäftsbedingungen im Sinne obiger Definition, die Bestandteil dieser Vereinbarung sind, legen alle Ihre Rechte zur Nutzung der Software fest und bilden die gesamte Vereinbarung zwischen den Parteien.
+Diese EULA und die Geschäftsbedingungen setzen alle anderen Mitteilungen, Zusicherungen oder Werbeaussagen in Bezug auf die vertragsgegenständliche Software außer Kraft.
+Ein Verzicht auf Bestimmungen dieser Vereinbarung gilt nur dann als erfolgt, wenn eine schriftliche, von einem bevollmächtigten Vertreter der BigDaddy Analyst Group unterzeichnete Verzichtserklärung vorliegt.
+Wird die Unwirksamkeit einzelner Bestimmungen dieser EULA oder der zugehörigen Geschäftsbedingungen festgestellt, so bleiben die übrigen Bestimmungen dieser EULA und der Geschäftsbedingungen uneingeschränkt wirksam. Soweit eine ansonsten unwirksame Bestimmung so ausgelegt werden kann, dass sie wirksam ist, ist sie auf diese Weise auszulegen.
+Alle nicht ausdrücklich in dieser EULA festgelegten Rechte bleiben von Die BigDaddy Analyst Group vorbehalten.
+Die beschreibenden Überschriften in dieser EULA wurden der leichteren Lesbarkeit wegen eingefügt, und die Auslegung dieser EULA wird durch sie nicht eingeschränkt oder auf sonstige Weise berührt.
+Sie dürfen Ihre Rechte aus dieser EULA nicht ohne ausdrückliche schriftliche Genehmigung der BigDaddy Analyst Group abtreten.
+
+Bestimmungen für Lizenzen nach deutschem Recht (immer diese Gesetze in Deutschland)
+
+Paragraph 7.1 (Haftungsbeschränkung) wird vollständig durch die folgende Bestimmung
+ersetzt: Ungeachtet der rechtlichen Natur des betreffenden Anspruchs gelten für Ihre Schadensersatzansprüche und Ansprüche auf Ersatz vergeblicher Aufwendungen folgende Regelungen:
+Die BigDaddy Analyst Group haftet für alle Schäden, die Ihnen aufgrund grob fahrlässigen oder vorsätzlichen Verhaltens von der BigDaddy Analyst Group oder durch eine schuldhafte Verletzung von Leben, Körper oder Gesundheit entstehen, für die die BigDaddy Analyst Group eine Garantie übernommen hat oder für die die BigDaddy Analyst Group nach dem Produkthaftungsgesetz haftet.
+In allen anderen Fällen ist die Schadenersatzpflicht von der BigDaddy Analyst Group auf die Verletzung wesentlicher Vertragspflichten beschränkt.
+Wesentliche Pflichten sind nur solche Pflichten, deren Erfüllung die ordnungsgemäße Ausführung des Vertrags erst ermöglicht und auf deren Erfüllung Sie vertrauen dürfen. Die Haftung der BigDaddy Analyst Group für Datenverlust ist auf die typischen, für die Wiederherstellung erforderlichen Aufwendungen beschränkt, die normal und üblich sind, wenn Sicherungskopien erstellt wurden. Insofern die hier aufgeführten Haftungsbeschränkungen ganz oder in Teilen dem obenstehenden Paragraphen zum Thema Sicherungskopien widersprichen, unterliegt die Wahl der gültigen Bestimmungen der Willkür der BigDaddy Analyst Group und ist von Fall zu Fall neu entscheid-, interpretier- und veränderbar.
+Es wird auf Ihre Pflicht zur regelmäßigen Datensicherung gemäß Paragraph 5 verwiesen. Im Falle einer fahrlässigen Verletzung wesentlicher Vertragspflichten durch die BigDaddy Analyst Group ist die Haftung der BigDaddy Analyst Group auf vorhersehbare, vertragstypische Schäden beschränkt.
+Eine verschuldensunabhängige Haftung der BigDaddy Analyst Group für bei Abschluss dieser EULA bestehende Mängel gemäß § 536a Abs.1 BGB wird hiermit ausdrücklich ausgeschlossen.
+Die vorstehenden Haftungsbeschränkungen gelten auch in Bezug auf alle Vertreter von Die BigDaddy Analyst Group, insbesondere in Bezug auf ihre Geschäftsführer, gesetzlichen Vertreter, Mitarbeiter und sonstigen Erfüllungsgehilfen.
+
+Bitte akzeptieren Sie nun diese Endnutzervereinbarung und starten Sie das Programm.
+Die BigDaddy Analyst Group wünscht Ihnen dabei eine gute Unterhaltung!
