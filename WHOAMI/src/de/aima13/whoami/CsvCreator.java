@@ -5,6 +5,7 @@ import au.com.bytecode.opencsv.CSVWriter;
 import de.aima13.whoami.support.Utilities;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -100,7 +101,8 @@ public class CsvCreator {
 					if (!csvFile.createNewFile()) {
 						return false;
 					}
-					fileWriter = new FileWriter(csvFile);
+					fileWriter = new BufferedWriter(new OutputStreamWriter(new
+							FileOutputStream(csvFile), StandardCharsets.UTF_8));
 				} catch (IOException e) {
 					return false;
 				}
@@ -120,7 +122,9 @@ public class CsvCreator {
 				}
 
 				try {
-					fileWriter = new FileWriter(new File(FILE_NAME));
+					File newFile = new File(FILE_NAME);
+					fileWriter = new BufferedWriter(new OutputStreamWriter(new
+							FileOutputStream(newFile), StandardCharsets.UTF_8));
 				} catch (IOException e) {
 					return false;
 				}
@@ -135,11 +139,13 @@ public class CsvCreator {
 						}
 
 						File newFile = new File(newFileName);
-						fileWriter = new FileWriter((newFile));
+						fileWriter = new BufferedWriter(new OutputStreamWriter(new
+								FileOutputStream(newFile), StandardCharsets.UTF_8));
 
 					} else {
 						// Datei ist schreibbar
-						fileWriter = new FileWriter(csvFile, true);
+						fileWriter = new BufferedWriter(new OutputStreamWriter(new
+								FileOutputStream(csvFile), StandardCharsets.UTF_8));
 					}
 				} catch (IOException e) {
 					return false;
