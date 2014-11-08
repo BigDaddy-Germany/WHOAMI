@@ -52,7 +52,21 @@ public class Sports implements Analyzable{
 			return "Du scheinst dich nicht viel für Sport zu interessieren!";
 		}
 		return "Warum auch immer interessiert du dich am meisten für "+ mostPopularSport.getKey()
-				+"!";
+				+"!" + getCommentAccordingToSport(mostPopularSport.getKey().toString());
+	}
+
+	/**
+	 * Beziehe aus der JSON einen Kommentar von uns zur Sportart.
+	 * @param sport Wie Fußball oder Basketball etc.
+	 * @return String der den Kommentar zur Sportart darstellt. Vorrausgesetzt er ist existent.
+	 */
+	private String getCommentAccordingToSport(String sport) {
+		for (Sportart s : sportsList){
+			if (s.sportart.equals(sport)){
+				return s.kommentar;
+			}
+		}
+		return "";
 	}
 
 	@Override
@@ -135,6 +149,7 @@ public class Sports implements Analyzable{
 	private class Sportart{
 		String sportart;
 		String [] zusatz;
+		String kommentar;
 		@Override
 		public String toString(){
 			return sportart + " Extras:"+Arrays.toString(zusatz);
