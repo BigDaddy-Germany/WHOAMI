@@ -437,7 +437,8 @@ public class Music implements Analyzable {
 				"Soul") || favGenre.equals("Thrash Metal") || favGenre.equals("Garage Rock") ||
 				favGenre.equals("Space Rock") || favGenre.equals("Industro-Goth") || favGenre
 				.equals("Garage") || favGenre.equals("Art Rock")) {
-			statementToGenre.append(favGenre + "? In dir steckt bestimmt ein Headbanger! Yeah \\m/ !!!");
+			statementToGenre.append(" " + favGenre + "? In dir steckt bestimmt ein Headbanger! " +
+					"Yeah" + "\\m/ !!!");
 		} else if (favGenre.equals("Chillout") || favGenre.equals("Reggea") || favGenre.equals
 				("Trip-Hop") || favGenre.equals("Hip-Hop")) {
 			statementToGenre.append("<br />Deine Szene ist wahrscheinlich die Hip Hop Szene.<br />Du bist ein " +
