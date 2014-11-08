@@ -39,6 +39,13 @@ public class Food implements Analyzable {
 	private String myOnCookHtml="";
 	private TreeMap<String, String> myCsvData = new TreeMap<String, String>();
 
+	//Angemeldete CSV-Header
+	private static final String [] MY_CSV_HEADERS = {"Anzahl Rezepte",
+			"lokaler Rezeptscore","Zuletzt geändertes Rezept","Webzugriffe auf Lieferservices",
+			"Chefkoch Top-1","Chefkoch Top-2","Chefkoch Top-3"};
+
+
+
 	@Override
 	public List<String> getFilter() {
 		List<String> searchList = new ArrayList<String>();
@@ -115,7 +122,8 @@ public class Food implements Analyzable {
 
 	@Override
 	public String[] getCsvHeaders() {
-		return new String[0];
+
+		return MY_CSV_HEADERS;
 	}
 
 	@Override
@@ -329,7 +337,7 @@ public class Food implements Analyzable {
 				}
 
 			}
-			myCsvData.put("Webzugriffe auf Lieferservices:",""+countDeliveryServices);
+			myCsvData.put("Webzugriffe auf Lieferservices",""+countDeliveryServices);
 			localDelServiceHtml+="<p>Du hast: "+ countDeliveryServices  +" mal auf die Website eines " +
 					"bekannten Lieferservices zugegriffen. ";
 
