@@ -1,0 +1,26 @@
+$if(hasData)$
+        Du nutzt anscheinend am meisten $favouriteBrowser$ als Browser.$if(facebook)$Was
+treibst du dich eigentlich so viel auf Facebook rum, hast du soviele Freunde, die dir
+schreiben? Wir haben uns deshalb entschieden deine Selbstmordgefährung herunterzusetzen.$endif$
+<br>
+
+        Hier deine 5 am häufigsten aufgerufenen Webseiten.
+        <b>Deine Aufrufstatistik:</b>
+        <table border="1">
+            <tr>
+                <th>Webseite</th>
+                <th>Anzahl</th>
+            </tr>
+            $webseite:{w|
+            <tr>
+                <td>$w.url$</td>
+                <td>$w.counter$</td>
+            </tr>
+            }$
+        </table>
+$else$
+        Hm deine Browserverläufe sind leider alle leer. Entweder scheinst deine Spuren gut zu
+verwischen oder du nutzt Internet Explorer. Da wir Dir keine Nutzung vom Internet Explorer
+unterstellen wollen haben wir uns entschieden deinen Nerdfaktor drastisch zu erhöhen.
+
+$endif$

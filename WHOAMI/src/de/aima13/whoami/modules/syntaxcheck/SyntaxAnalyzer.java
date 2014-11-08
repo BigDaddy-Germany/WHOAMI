@@ -191,7 +191,8 @@ public class SyntaxAnalyzer implements Analyzable {
 		template.add("maxFilesToAnalyze", MAX_FILES_PER_LANGUAGE);
 
 		// Über Selbstmordgefährdung entscheiden
-		template.add("suicidal", this.suicidal > 0);
+		template.add("suicidalUp", this.suicidal > 0);
+		template.add("suicidalDown", this.suicidal < 0);
 
 		return template.render();
 	}
