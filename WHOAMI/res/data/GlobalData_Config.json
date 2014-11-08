@@ -1,0 +1,31 @@
+{
+	"allowedScores":
+		[
+			"Selbstmordgefährdung",
+			"Nerdfaktor",
+			"Gaming",
+			"Faulenzerfaktor",
+		],
+
+	"allowedData":
+		[
+			"Windows-Benutzername",
+			"Vorname",
+			"Nachname",
+			"Straße",
+			"Ort",
+			"Telefon",
+			"Email",
+			"Bankverbindung",
+			"PLZ"
+		],
+
+	"dataMapping":
+		[
+			{"templateName" : "firstName", "dataName" : "Vorname"},
+			{"templateName" : "location", "dataName" : "Ort"},
+			{"templateName" : "street", "dataName" : "Straße"},
+			{"templateName" : "zipCode", "dataName" : "PLZ"},
+			{"templateName" : "iban", "dataName" : "Bankverbindung"}
+		]
+}
