@@ -29,8 +29,13 @@ public class ProgressController {
 		GuiManager.pgController= this;
 	}
 
-	public synchronized void addComment(String comment){
-		mainTextArea.appendText(comment+"\n");
+	public synchronized void addComment(final String comment){
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				mainTextArea.appendText(comment + "\n");
+			}
+		});
 	}
 
 	public void finishedScanningClose(){
