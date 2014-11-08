@@ -458,20 +458,22 @@ public class SyntaxAnalyzer implements Analyzable {
 		int[] resultArray = new int[CHECK_RESULT.values().length];
 
 		// Zusammenbauen des Commands
+		List<String> commandParts = new ArrayList<>();
 		// Teil eins: Ort der Java-Installation
-		String command = System.getProperty("java.home") + File.separator + "bin" + File
-				.separator + "java.exe ";
+		commandParts.add(System.getProperty("java.home") + File.separator + "bin" + File
+				.separator + "java.exe ");
 		// Teil zwei: Classpath
-		command += "-cp \"" + System.getProperty("java.class.path") + "\" ";
+		commandParts.add("-cp");
+		commandParts.add(System.getProperty("java.class.path"));
 
 		// Teil drei: Name der Klasse
-		command += AntlrLauncher.class.getName() + " ";
+		commandParts.add(AntlrLauncher.class.getName());
 
 		// Teil vier: Argumente (erst die Sprache, dann alle Dateien
-		command += languageSetting.getClass().getSimpleName() + " ";
+		commandParts.add(languageSetting.getClass().getSimpleName());
 		for (Path file : files) {
 			if (file != null) {
-				command += "\"" + file.toString() + "\" ";
+				commandParts.add(file.toString());
 			}
 		}
 
@@ -479,7 +481,7 @@ public class SyntaxAnalyzer implements Analyzable {
 		Runtime runtime = Runtime.getRuntime();
 
 		try {
-			Process process = runtime.exec(command);
+			Process process = new ProcessBuilder(commandParts).start();
 			// Das gibt uns den OUTPUTstream des Prozesses (was für uns ja einen Inputstream
 			// darstellt, da wir etwas rein bekommen)
 			BufferedReader inputStreamReader = new BufferedReader(
