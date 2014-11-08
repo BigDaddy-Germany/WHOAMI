@@ -26,6 +26,8 @@ public class Games implements Analyzable {
 	private GameEntry resultFirstCreatedGame;
 	private GameEntry resultLastCreatedGame;
 	private GameEntry resultLastModifiedGame;
+	private int resultGamingScore;
+	private int resultScoreLevel;
 	static boolean cancelledByTimeLimit = false;
 	private GamesComments gamesComments;
 	private GameThreshold resultThreshold;
@@ -110,6 +112,19 @@ public class Games implements Analyzable {
 						+ " installiert. " + gamesComments.lastCreated + " ");
 			}
 		}
+		html.append("Dein daraus errechneter Gaming-Score von " + resultGamingScore + " beeinflusst"
+				+ " deinen Nerdfaktor ");
+		switch (resultGamingScore) {
+			case 0:
+				html.append("definitiv negativ.");
+				break;
+			case 1:
+				html.append("nicht, denn ein paar Spiele sind total normal und gesund.");
+				break;
+			default:
+				html.append("definitiv positiv - du bist ordentlich am Zocken!");
+				break;
+		}
 
 		//Liste weiterer Spiele
 		if (gameList.size() >= 5) {
@@ -139,7 +154,7 @@ public class Games implements Analyzable {
 
 	@Override
 	public String getReportTitle() {
-		return "Freizeitgestaltung";
+		return "Computerspiele";
 	}
 
 	@Override
@@ -149,7 +164,7 @@ public class Games implements Analyzable {
 
 	@Override
 	public String[] getCsvHeaders() {
-		return new String[0];
+		return new String[]{"Anzahl", "ÄltesteInstallation", "LetzteInstallation", "LetztesUpdate"};
 	}
 
 	@Override
@@ -222,7 +237,13 @@ public class Games implements Analyzable {
 		} else {
 			score = 0;
 		}
+		resultScoreLevel = scoreLevel; //:TODO: ersetzen durch member?
+		resultGamingScore = score;
 		GlobalData.getInstance().changeScore("Gaming", score - 50); //Scoreänderung -50 bis +50
+
+		//Nerdfaktor je nach Spielelevel erhöhen
+		int nerdChange = (scoreLevel - 1) * 11;
+		GlobalData.getInstance().changeScore("Nerdfaktor", nerdChange);
 
 
 		//Installationsdaten behandeln
