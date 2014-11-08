@@ -48,6 +48,9 @@ public class Sports implements Analyzable{
 	@Override
 	public String getHtml() {
 		Map.Entry mostPopularSport = Utilities.getHighestEntry(sportPopularity);
+		if((Integer)mostPopularSport.getValue()<25){
+			return "Du scheinst dich nicht viel für Sport zu interessieren!";
+		}
 		return "Warum auch immer interessiert du dich am meisten für "+ mostPopularSport.getKey()
 				+"!";
 	}
