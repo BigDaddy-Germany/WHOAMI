@@ -105,6 +105,11 @@ public class GlobalData implements Representable {
 	}
 
 	@Override
+	public String[] getCsvHeaders() {
+		return new String[0];
+	}
+
+	@Override
 	public SortedMap<String, String> getCsvContent() {
 		// Wenn Werte noch nicht kalkuliert wurden, berechne diese jetzt
 		if (this.globalDataResults == null) {

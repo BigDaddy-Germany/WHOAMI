@@ -70,6 +70,10 @@ public class TopFive implements Analyzable {
 		return "Web";
 	}
 
+	@Override
+	public String[] getCsvHeaders() {
+		return new String[0];
+	}
 
 
 	@Override

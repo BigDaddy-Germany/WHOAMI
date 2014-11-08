@@ -156,6 +156,11 @@ public class CodeStatistics implements Analyzable {
 		return CSV_PREFIX;
 	}
 
+	@Override
+	public String[] getCsvHeaders() {
+		return new String[0];
+	}
+
 
 	/**
 	 * Iteriere über die Statistiken und füge sie in die Ergebnis-Map für die CSV Datei ein
