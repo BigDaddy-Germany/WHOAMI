@@ -24,6 +24,7 @@ public class Studienrichtung implements Analyzable {
 	private Studiengang[] courseList;
 	private Kurskalendermap[] calenderCourseList;
 	private ArrayList<CourseVisitedEntry> courseResult = new ArrayList<CourseVisitedEntry>();
+	private boolean foundOnlineCalender = true;
 
 	/**
 	 * Das Modul interessiert sich für die Chrome und Firefox History zum Abgleich,
@@ -80,8 +81,11 @@ public class Studienrichtung implements Analyzable {
 		String courseName = "";
 		String lastCommentOnClass = "";
 		String graduation = "";
-
-		if (courseResult.size() > 0) {
+		if (!foundOnlineCalender){
+			html.append("Sag mal kommst du überhaupt pünktlich zu deinen Vorlesungen? Oder löscht" +
+					" du einfach nur deinen Verlauf?");
+		}
+		if (courseResult.size() > 0 && courseResult.get(0).visitCount > 100) {
 			courseToken = courseResult.get(0).kurzbez;
 			courseName = courseResult.get(0).name;
 			lastCommentOnClass = courseResult.get(0).kommentar;
@@ -94,7 +98,7 @@ public class Studienrichtung implements Analyzable {
 			}
 
 			html.append("Du studierst also auch an der DHBW Mannheim. Gefällt dir die Rahmsoße genau " +
-					"so gut wir uns? Immerhin siegt durch Autoload endlich die Faulheit! ");
+					"so gut wie uns? Immerhin siegt durch Autoload endlich die Faulheit! ");
 
 			if (courseToken.startsWith("T")) {
 				html.append("Immerhin bist du auch an der Fakultät Technik! ");
@@ -143,7 +147,7 @@ public class Studienrichtung implements Analyzable {
 
 	@Override
 	public String[] getCsvHeaders() {
-		return new String[0];
+		return new String[]{"Kurs", "Kursbezeichung"};
 	}
 
 	/**
@@ -176,6 +180,7 @@ public class Studienrichtung implements Analyzable {
 				Kurskalendermap[].class);
 		courseResult = getViewedCalenders();
 		if (courseResult.isEmpty()) {
+			foundOnlineCalender = false;
 			for (Kurskalendermap entry : calenderCourseList) {
 				courseResult.add(new CourseVisitedEntry(entry.id, 100));
 			}

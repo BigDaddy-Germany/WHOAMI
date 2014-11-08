@@ -5,6 +5,7 @@
 			"Nerdfaktor",
 			"Gaming",
 			"Faulenzerfaktor",
+
 		],
 
 	"allowedData":
@@ -17,7 +18,8 @@
 			"Telefon",
 			"Email",
 			"Bankverbindung",
-			"PLZ"
+			"PLZ",
+			"Kurskürzel",
 		],
 
 	"dataMapping":
