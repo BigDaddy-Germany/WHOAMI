@@ -191,7 +191,8 @@ public class SyntaxAnalyzer implements Analyzable {
 		template.add("maxFilesToAnalyze", MAX_FILES_PER_LANGUAGE);
 
 		// Über Selbstmordgefährdung entscheiden
-		template.add("suicidal", this.suicidal > 0);
+		template.add("suicidalUp", this.suicidal > 0);
+		template.add("suicidalDown", this.suicidal < 0);
 
 		return template.render();
 	}
@@ -206,9 +207,30 @@ public class SyntaxAnalyzer implements Analyzable {
 		return CSV_PREFIX;
 	}
 
+	/**
+	 * Kalkulieren der möglichen CSV-Header Spalten. Das sind alle Sprachen x alle möglichen
+	 * CheckResults außer CANT_PARSE
+	 * @return Ein Array der Spaltennamen
+	 */
 	@Override
 	public String[] getCsvHeaders() {
-		return new String[0];
+		List<String> csvHeaders = new ArrayList<>();
+
+		CHECK_RESULT[] checkResults = CHECK_RESULT.values();
+
+		for (Map.Entry<LanguageSetting, List<Path>> languageSetting :  this.languageFilesMap
+				.entrySet()) {
+
+			String langName = languageSetting.getKey().LANGUAGE_NAME;
+
+			for (CHECK_RESULT checkResult : checkResults) {
+				if (checkResult != CHECK_RESULT.CANT_PARSE) {
+					csvHeaders.add(langName + " " + checkResult.toString());
+				}
+			}
+		}
+
+		return csvHeaders.toArray(new String[csvHeaders.size()]);
 	}
 
 
@@ -229,7 +251,7 @@ public class SyntaxAnalyzer implements Analyzable {
 				// Wenn das Ergebnis nicht "Parsen nicht möglich" ist, Eintrag einfügen
 				if (checkResultEntry.getKey() != CHECK_RESULT.CANT_PARSE) {
 					// Prefix ist die Sprache
-					csvContent.put(syntaxCheckResult.getKey().LANGUAGE_NAME + "-" +
+					csvContent.put(syntaxCheckResult.getKey().LANGUAGE_NAME + " " +
 							checkResultEntry.getKey().toString(), checkResultEntry.getValue().toString());
 				}
 			}
