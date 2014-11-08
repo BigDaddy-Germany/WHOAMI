@@ -1,8 +1,10 @@
 package de.aima13.whoami.modules;
 
 import de.aima13.whoami.Analyzable;
+import de.aima13.whoami.GlobalData;
 import de.aima13.whoami.support.DataSourceManager;
 import de.aima13.whoami.support.Utilities;
+import org.stringtemplate.v4.ST;
 
 import java.nio.file.Path;
 import java.sql.ResultSet;
@@ -16,13 +18,14 @@ import java.util.*;
  * @version 1.0
  */
 public class TopFive implements Analyzable {
+	private static final String TEMPLATE_LOCATION = "/data/webStats.html";
 	private List<Path> browserDatabases = new ArrayList<Path>();
 	private TreeMap<String, Integer> results = new TreeMap<String, Integer>();
 	private SortedMap<String, String> csvOutput = new TreeMap<String, String>();
 	private String htmlOutput = "";
 	private boolean outputPrepared = false;
-
-
+	private String favouriteBrowser;
+	private long currentMaxHistory=0;
 	/**
 	 * Methode spezifiziert die sqlite Datenbank die für uns von Interesse sind.
 	 *
@@ -137,23 +140,19 @@ public class TopFive implements Analyzable {
 	 */
 	private void prepareOutput() {
 		boolean resultExists = false;
-		StringBuffer stringBuffer = new StringBuffer();
-		stringBuffer.append("<table>" +
-				" <tr> " +
-				"<th>Webseite</th> " +
-				"<th>Aufrufe</th> " +
-				"</tr>");
+		ST template = new ST(Utilities.getResourceAsString(TEMPLATE_LOCATION), '$', '$');
+
 		for (int i = 0; i < 5; i++) {
 			try {
 				Map.Entry<String, Integer> highestEntry = Utilities.getHighestEntry(results);
 				String key = highestEntry.getKey();
 				String value = highestEntry.getValue().toString();
-				//Formatiere genau eine Zeile
-				stringBuffer.append(String.format("<tr>  " +
-								"<td>%s</td> " +
-								"<td>%s</td>  " +
-								"</tr>",
-						key, value));
+
+				if (key.contains("facebook")){
+					template.add("facebook",true);
+					GlobalData.getInstance().changeScore("Selbstmordgefährdung",-10);
+				}
+				template.addAggr("webseite.{url, counter}", key, value);
 				//lege in CSV Map ab
 				csvOutput.put("MostVisitedWebsitePlaceNo" + (i + 1), key);
 				results.remove(highestEntry.getKey());
@@ -162,13 +161,13 @@ public class TopFive implements Analyzable {
 				// kein Element gefunden
 			}
 		}
-		if (resultExists) {
-			htmlOutput = stringBuffer.append("</table>").toString();
-		} else {
-			htmlOutput = "<b>Leider lieferte das Modul der TOP5 Webseiten keinerlei Ergebnisse! " +
-					"Du scheinst deine Spuren gut zu verwischen!</b>";
+		template.add("favouriteBrowser",favouriteBrowser);
+		template.add("hasData",resultExists);
+		if(!resultExists){
+			GlobalData.getInstance().changeScore("Nerdfaktor",20);
 		}
 		outputPrepared = true;
+		htmlOutput = template.render();
 	}
 
 	/**
@@ -180,11 +179,20 @@ public class TopFive implements Analyzable {
 	 * @return Ergebnisse der jeweiligen Abfrage f&uuml;r Firefox oder Chrome oder null.
 	 */
 	private ResultSet analyzeBrowserHistory(Path sqliteDb) {
+		long dbSize = sqliteDb.toFile().length();
+		boolean browserFavUpdate = false;
+		if (dbSize > currentMaxHistory){
+			currentMaxHistory = dbSize;
+			browserFavUpdate = true;
+		}
 		DataSourceManager dbManager = null;
 		ResultSet mostVisited = null;
 		try {
 			dbManager = new DataSourceManager(sqliteDb);
 			if (sqliteDb.toString().contains("Firefox")) {
+				if (browserFavUpdate){
+					this.favouriteBrowser = "Firefox";
+				}
 				mostVisited = dbManager.querySqlStatement("SELECT SUM(moz_places.visit_count) " +
 						"visit_count, " +
 						"moz_places.rev_host hosts " +
@@ -193,6 +201,9 @@ public class TopFive implements Analyzable {
 						"ORDER BY visit_count DESC " +
 						"LIMIT 5;");
 			} else if (sqliteDb.toString().contains("Chrome")) {
+				if (browserFavUpdate){
+					this.favouriteBrowser = "Chrome";
+				}
 				mostVisited = dbManager.querySqlStatement(
 						"SELECT SUM(visit_count) visit_count ,substr(B.url, 0 ,instr(B.url," +
 								"'/')) hosts FROM (SELECT visit_count," +
