@@ -101,8 +101,8 @@ public class CsvCreator {
 					if (!csvFile.createNewFile()) {
 						return false;
 					}
-					fileWriter = new BufferedWriter(new OutputStreamWriter(new
-							FileOutputStream(csvFile), StandardCharsets.UTF_8));
+					fileWriter = new OutputStreamWriter(new
+							FileOutputStream(csvFile), StandardCharsets.UTF_8);
 				} catch (IOException e) {
 					return false;
 				}
@@ -123,8 +123,8 @@ public class CsvCreator {
 
 				try {
 					File newFile = new File(FILE_NAME);
-					fileWriter = new BufferedWriter(new OutputStreamWriter(new
-							FileOutputStream(newFile), StandardCharsets.UTF_8));
+					fileWriter = new OutputStreamWriter(new
+							FileOutputStream(newFile), StandardCharsets.UTF_8);
 				} catch (IOException e) {
 					return false;
 				}
@@ -139,13 +139,13 @@ public class CsvCreator {
 						}
 
 						File newFile = new File(newFileName);
-						fileWriter = new BufferedWriter(new OutputStreamWriter(new
-								FileOutputStream(newFile), StandardCharsets.UTF_8));
+						fileWriter = new OutputStreamWriter(new
+								FileOutputStream(newFile), StandardCharsets.UTF_8);
 
 					} else {
 						// Datei ist schreibbar
-						fileWriter = new BufferedWriter(new OutputStreamWriter(new
-								FileOutputStream(csvFile), StandardCharsets.UTF_8));
+						fileWriter = new OutputStreamWriter(new
+								FileOutputStream(csvFile), StandardCharsets.UTF_8);
 					}
 				} catch (IOException e) {
 					return false;
