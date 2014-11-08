@@ -112,8 +112,9 @@ public class Sports implements Analyzable{
 		try {
 			DataSourceManager dSm = new DataSourceManager(sqliteDB);
 			for (Sportart s : sportsList){
-				String sqlStatement  = "SELECT count(*) FROM " + fromTable+ " where title LIKE '%"+
-						s.sportart+"%' or url LIKE '%"+s.sportart+"%'";
+				String sqlStatement  = "SELECT sum(visit_count) FROM " + fromTable+ " where title" +
+						" LIKE '%"+
+						s.sportart+"%' OR url LIKE '%"+s.sportart+"%' ";
 				if(s.zusatz !=null) {
 					for (String addition : s.zusatz) {
 						sqlStatement += "OR url LIKE '%" + addition + "%' ";

@@ -383,8 +383,9 @@ public class Food implements Analyzable {
 
 							if (chefKochReciepts.containsKey(cookingRecipe)) {
 								clicksOnRecipe += chefKochReciepts.get(cookingRecipe);
+							}else {
+								chefKochReciepts.put(cookingRecipe, clicksOnRecipe);
 							}
-							chefKochReciepts.put(cookingRecipe, clicksOnRecipe);
 
 						} else if (currUrl.toLowerCase().contains("thestonerscookbook")) {
 							clientIsStoner = true;
@@ -418,7 +419,7 @@ public class Food implements Analyzable {
 
 		//Chefkoch Rezepte auswerten
 
-		if (chefKochReciepts.size() > 3) {
+		if (chefKochReciepts.size() > 2) {
 			localOnCookHtml += "<p>";
 			//ersten drei Top-Hits ausgeben(sortiert nach visit_count):
 			for (int i = 1; i < 4; i++) {
