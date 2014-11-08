@@ -87,6 +87,8 @@ public class GlobalData implements Representable {
 			}
 		}
 
+		template.add("maxScore", MAX_SCORE_VALUE);
+
 		// Globale Informationen hinzufügen, wenn vorhanden
 		if (!this.globalDataResults.isEmpty()) {
 			template.add("hasInformation", true);
