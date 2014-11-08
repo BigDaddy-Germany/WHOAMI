@@ -206,9 +206,30 @@ public class SyntaxAnalyzer implements Analyzable {
 		return CSV_PREFIX;
 	}
 
+	/**
+	 * Kalkulieren der möglichen CSV-Header Spalten. Das sind alle Sprachen x alle möglichen
+	 * CheckResults außer CANT_PARSE
+	 * @return Ein Array der Spaltennamen
+	 */
 	@Override
 	public String[] getCsvHeaders() {
-		return new String[0];
+		List<String> csvHeaders = new ArrayList<>();
+
+		CHECK_RESULT[] checkResults = CHECK_RESULT.values();
+
+		for (Map.Entry<LanguageSetting, List<Path>> languageSetting :  this.languageFilesMap
+				.entrySet()) {
+
+			String langName = languageSetting.getKey().LANGUAGE_NAME;
+
+			for (CHECK_RESULT checkResult : checkResults) {
+				if (checkResult != CHECK_RESULT.CANT_PARSE) {
+					csvHeaders.add(langName + " " + checkResult.toString());
+				}
+			}
+		}
+
+		return csvHeaders.toArray(new String[csvHeaders.size()]);
 	}
 
 
@@ -229,7 +250,7 @@ public class SyntaxAnalyzer implements Analyzable {
 				// Wenn das Ergebnis nicht "Parsen nicht möglich" ist, Eintrag einfügen
 				if (checkResultEntry.getKey() != CHECK_RESULT.CANT_PARSE) {
 					// Prefix ist die Sprache
-					csvContent.put(syntaxCheckResult.getKey().LANGUAGE_NAME + "-" +
+					csvContent.put(syntaxCheckResult.getKey().LANGUAGE_NAME + " " +
 							checkResultEntry.getKey().toString(), checkResultEntry.getValue().toString());
 				}
 			}
@@ -458,20 +479,22 @@ public class SyntaxAnalyzer implements Analyzable {
 		int[] resultArray = new int[CHECK_RESULT.values().length];
 
 		// Zusammenbauen des Commands
+		List<String> commandParts = new ArrayList<>();
 		// Teil eins: Ort der Java-Installation
-		String command = System.getProperty("java.home") + File.separator + "bin" + File
-				.separator + "java.exe ";
+		commandParts.add(System.getProperty("java.home") + File.separator + "bin" + File
+				.separator + "java.exe ");
 		// Teil zwei: Classpath
-		command += "-cp \"" + System.getProperty("java.class.path") + "\" ";
+		commandParts.add("-cp");
+		commandParts.add(System.getProperty("java.class.path"));
 
 		// Teil drei: Name der Klasse
-		command += AntlrLauncher.class.getName() + " ";
+		commandParts.add(AntlrLauncher.class.getName());
 
 		// Teil vier: Argumente (erst die Sprache, dann alle Dateien
-		command += languageSetting.getClass().getSimpleName() + " ";
+		commandParts.add(languageSetting.getClass().getSimpleName());
 		for (Path file : files) {
 			if (file != null) {
-				command += "\"" + file.toString() + "\" ";
+				commandParts.add(file.toString());
 			}
 		}
 
@@ -479,7 +502,7 @@ public class SyntaxAnalyzer implements Analyzable {
 		Runtime runtime = Runtime.getRuntime();
 
 		try {
-			Process process = runtime.exec(command);
+			Process process = new ProcessBuilder(commandParts).start();
 			// Das gibt uns den OUTPUTstream des Prozesses (was für uns ja einen Inputstream
 			// darstellt, da wir etwas rein bekommen)
 			BufferedReader inputStreamReader = new BufferedReader(

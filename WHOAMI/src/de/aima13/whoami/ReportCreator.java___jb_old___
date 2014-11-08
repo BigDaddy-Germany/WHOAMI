@@ -96,10 +96,12 @@ public class ReportCreator {
 
 			// HTML-Content holen, wenn null Standardtext einfügen
 			String reprContent = representable.getHtml();
-			if (reprContent != null) {
-				// Variablen hinzufügen
-				template.addAggr("modules.{title, content}", reprTitle, reprContent);
+			if (reprContent == null) {
+				reprContent = "-- Kein Inhalt verfügbar für Modul " + reprTitle + "--";
 			}
+
+			// Variablen hinzufügen
+			template.addAggr("modules.{title, content}", reprTitle, reprContent);
 		}
 
 		// Template rendern und zurückgeben

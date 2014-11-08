@@ -23,10 +23,10 @@ $if(street && location && zipCode)$
     Wenn nicht nicht würden wir dich glatt morgen Abend mal in der $street$, $zipCode$ $location$
     besuchen kommen. Oder wir schicken dir die Waschmaschine die du mit der Endnutzervereinbarung
     akzeptiert hast.
-$endif$
-$if(iban)$
-    Achso, das Geld für die Waschmaschine ziehen wir dann von folgendem Konto ein $iban$, das Sepa
-    Mandata stand ja in der Eula.
+    $if(iban)$
+        Achso, das Geld für die Waschmaschine ziehen wir dann von folgendem Konto ein $iban$, das
+        Sepa Mandata stand ja in der Eula.
+    $endif$
 $endif$
 $if(hasInformation)$
     Na ja wir weichen vom Thema ab. Mal schauen was wir noch so interessantes haben.
