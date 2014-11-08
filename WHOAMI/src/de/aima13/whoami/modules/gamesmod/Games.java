@@ -139,7 +139,7 @@ public class Games implements Analyzable {
 
 	@Override
 	public String getReportTitle() {
-		return "Freizeitgestaltung";
+		return "Computerspiele";
 	}
 
 	@Override
@@ -149,7 +149,7 @@ public class Games implements Analyzable {
 
 	@Override
 	public String[] getCsvHeaders() {
-		return new String[0];
+		return new String[]{"Anzahl", "ÄltesteInstallation", "LetzteInstallation", "LetztesUpdate"};
 	}
 
 	@Override

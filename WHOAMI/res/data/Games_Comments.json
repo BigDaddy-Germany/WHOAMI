@@ -1,7 +1,7 @@
 {
 	"gameThresholds":
 	[
-		{"limit":0,"comment":"Du hast anscheinend kein einziges Spiel auf deinem Rechner... Nein, Minesweeper zählt nicht. Naja, das ist wahrscheinlich ein Firmenlaptop und du passt in den Vorlesungen immer gut auf. Oder surfst auf Facebook und 9gag, aber das hat mit reaktionsförderndem kreativen Spielen nicht viel zu tun, sondern dreht sich eher um Illusionen sozialer Akzeptanz und Belustigung für Leute mit kurzen Aufmerksamkeitsspannen :P"},
+		{"limit":0,"comment":"Du hast anscheinend kein einziges Spiel auf deinem Rechner... Nein, Minesweeper zählt nicht. Naja, dann passt du wohl in den Vorlesungen immer gut auf. Oder surfst auf Facebook, 9gag, ... ja, das ist wesentlich wahrscheinlicher man genauer drüber nachdenkt."},
 		{"limit":10,"comment":"Immerhin ein paar hast du installiert. Das sind zwar wenige, aber dafür sind sie bestimmt weise gewählt."},
 		{"limit":50,"comment":"Das ist eine ganz schöne Sammlung auf deinem Rechner! Alles schon durchgespielt?"},
 		{"limit":150,"comment":"Allerhand wie viele Spiele du installiert hast. Die hast du aber garantiert noch nicht alle fertig? Wahrscheinlich bist du Sammler und kannst Schnäppchen nicht widerstehen..."},
