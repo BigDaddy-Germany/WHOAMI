@@ -23,7 +23,7 @@ public class CsvCreator {
 
 	private static final String FILE_NAME = "WHOAMI_Analyze_Results.csv"; // Name der CSV Datei
 	private static final File csvFile = new File(FILE_NAME); // File Datei der CSV Datei
-	private static final String PREFIX_SEPERATOR = "_"; // Seperator zw. Modulname und Header
+	private static final String PREFIX_SEPERATOR = " "; // Seperator zw. Modulname und Header
 
 	private static final char CSV_SEPERATOR = ';'; // Separator der CSV Datei
 	private static final char CSV_QUOTECHAR = '"'; // Feldbegrenzer der CSV Datei
@@ -44,7 +44,7 @@ public class CsvCreator {
 
 			if (moduleCsvContent != null) {
 				// Header werden mit Prefix versehen -> keine Namensgleichheit
-				String prefix = representable.getCsvPrefix() + " ";
+				String prefix = representable.getCsvPrefix() + PREFIX_SEPERATOR;
 				// Wenn das Modul noch keinen Prefix zurückgibt, wird der Klassenname genutzt
 				if (representable.getCsvPrefix() == null) {
 					prefix = representable.getClass().getSimpleName();
