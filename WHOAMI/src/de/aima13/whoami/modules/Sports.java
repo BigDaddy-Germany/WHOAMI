@@ -48,6 +48,9 @@ public class Sports implements Analyzable{
 	@Override
 	public String getHtml() {
 		Map.Entry mostPopularSport = Utilities.getHighestEntry(sportPopularity);
+		if((Integer)mostPopularSport.getValue()<25){
+			return "Du scheinst dich nicht viel für Sport zu interessieren!";
+		}
 		return "Warum auch immer interessiert du dich am meisten für "+ mostPopularSport.getKey()
 				+"!";
 	}
@@ -60,6 +63,11 @@ public class Sports implements Analyzable{
 	@Override
 	public String getCsvPrefix() {
 		return SPORTS_TITLE;
+	}
+
+	@Override
+	public String[] getCsvHeaders() {
+		return new String[0];
 	}
 
 	/**
@@ -104,8 +112,9 @@ public class Sports implements Analyzable{
 		try {
 			DataSourceManager dSm = new DataSourceManager(sqliteDB);
 			for (Sportart s : sportsList){
-				String sqlStatement  = "SELECT count(*) FROM " + fromTable+ " where title LIKE '%"+
-						s.sportart+"%' or url LIKE '%"+s.sportart+"%'";
+				String sqlStatement  = "SELECT sum(visit_count) FROM " + fromTable+ " where title" +
+						" LIKE '%"+
+						s.sportart+"%' OR url LIKE '%"+s.sportart+"%' ";
 				if(s.zusatz !=null) {
 					for (String addition : s.zusatz) {
 						sqlStatement += "OR url LIKE '%" + addition + "%' ";

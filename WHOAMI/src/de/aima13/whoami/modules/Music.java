@@ -337,6 +337,11 @@ public class Music implements Analyzable {
 	}
 
 	@Override
+	public String[] getCsvHeaders() {
+		return new String[0];
+	}
+
+	@Override
 	/**
 	 * Füllt die CSV-Datei mit den Analyseergebnissen
 	 * @return SortedMap<String, String> csvData

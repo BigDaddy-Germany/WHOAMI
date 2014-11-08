@@ -73,7 +73,7 @@
     </dependencies>
 
     <build>
-        <defaultGoal>clean package</defaultGoal>
+        <defaultGoal>clean jfx:jar</defaultGoal>
         <sourceDirectory>${basedir}/src</sourceDirectory>
         <resources>
             <resource>
@@ -82,6 +82,24 @@
             </resource>
         </resources>
         <plugins>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>unpack-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <excludeScope>system</excludeScope>
+                            <excludeGroupIds>org.springframework.jmx</excludeGroupIds>
+                            <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>com.zenjava</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>

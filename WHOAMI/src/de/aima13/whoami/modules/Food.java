@@ -114,6 +114,11 @@ public class Food implements Analyzable {
 	}
 
 	@Override
+	public String[] getCsvHeaders() {
+		return new String[0];
+	}
+
+	@Override
 	public SortedMap<String, String> getCsvContent() {
 
 		return myCsvData;
@@ -132,7 +137,9 @@ public class Food implements Analyzable {
 		url = urlParts[urlParts.length - 1];
 		//jetzt noch Bindestriche und .html entfernen
 		url = url.replace('-', ' ');
-		url = url.substring(0, url.length() - 5);
+		if(url.length()>5) {
+			url = url.substring(0, url.length() - 5);
+		}
 		return url;
 	}
 
@@ -376,8 +383,9 @@ public class Food implements Analyzable {
 
 							if (chefKochReciepts.containsKey(cookingRecipe)) {
 								clicksOnRecipe += chefKochReciepts.get(cookingRecipe);
+							}else {
+								chefKochReciepts.put(cookingRecipe, clicksOnRecipe);
 							}
-							chefKochReciepts.put(cookingRecipe, clicksOnRecipe);
 
 						} else if (currUrl.toLowerCase().contains("thestonerscookbook")) {
 							clientIsStoner = true;
@@ -393,9 +401,10 @@ public class Food implements Analyzable {
 		if(clientIsStoner){
 			localOnCookHtml+="<p><font color=#00C000>Tja du hast wohl den grünen Gaumen oder " +
 					"bist öfters in den Niederlanden. ;)</font></p>\n";
-			myCsvData.put("Niederländer","ja");
+
+			//myCsvData.put("Niederländer","ja");
 		}else{
-			myCsvData.put("Niederländer","nein");
+			//myCsvData.put("Niederländer","nein");
 		}
 		localOnCookHtml+="<p>"+ countCookingSiteAccess +" Zugriffe auf Online-Kochbücher detektiert. ";
 		myCsvData.put("Zugriffe auf Online-Kochseiten",""+countCookingSiteAccess);
@@ -410,7 +419,7 @@ public class Food implements Analyzable {
 
 		//Chefkoch Rezepte auswerten
 
-		if (chefKochReciepts.size() > 3) {
+		if (chefKochReciepts.size() > 2) {
 			localOnCookHtml += "<p>";
 			//ersten drei Top-Hits ausgeben(sortiert nach visit_count):
 			for (int i = 1; i < 4; i++) {
