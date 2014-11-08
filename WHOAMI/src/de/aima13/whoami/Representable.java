@@ -28,6 +28,14 @@ public interface Representable {
 	public String getCsvPrefix();
 
 	/**
+	 * Funktion zur Anmeldung des Moduls. Hier muss es die Header später zurückgegebenen
+	 * CSV-Spalten angeben. Nicht angegebene Spalten werden später ignoriert. Zu viel angegebene
+	 * Spalten werden mit einem Platzhalter gefüllt.
+	 * @return Array der Namen der Header-Spalten
+	 */
+	public String[] getCsvHeaders();
+
+	/**
 	 * Rückgabe des beigesteuerten Teils der CSV-Datei
 	 * @return Teil der CSV als Key-Value Paare (SortedMap)
 	 */

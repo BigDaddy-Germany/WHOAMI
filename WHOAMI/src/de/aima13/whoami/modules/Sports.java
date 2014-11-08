@@ -65,6 +65,11 @@ public class Sports implements Analyzable{
 		return SPORTS_TITLE;
 	}
 
+	@Override
+	public String[] getCsvHeaders() {
+		return new String[0];
+	}
+
 	/**
 	 * @return TreeMap die den Inhalt für die CSV-Datei bereitstellt.
 	 */
