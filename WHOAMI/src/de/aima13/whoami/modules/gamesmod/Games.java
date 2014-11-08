@@ -222,7 +222,7 @@ public class Games implements Analyzable {
 		} else {
 			score = 0;
 		}
-		GlobalData.getInstance().changeScore("GamingScore", score - 50); //Scoreänderung -50 bis +50
+		GlobalData.getInstance().changeScore("Gaming", score - 50); //Scoreänderung -50 bis +50
 
 
 		//Installationsdaten behandeln

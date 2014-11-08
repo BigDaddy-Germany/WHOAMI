@@ -10,6 +10,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <mainClass>de.aima13.whoami.Whoami</mainClass>
     </properties>
 
     <dependencies>
@@ -73,7 +74,7 @@
     </dependencies>
 
     <build>
-        <defaultGoal>clean jfx:jar</defaultGoal>
+        <defaultGoal>clean package launch4j:launch4j</defaultGoal>
         <sourceDirectory>${basedir}/src</sourceDirectory>
         <resources>
             <resource>
@@ -82,32 +83,6 @@
             </resource>
         </resources>
         <plugins>
-            <plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.6</version>
-                <executions>
-                    <execution>
-                        <id>unpack-dependencies</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <excludeScope>system</excludeScope>
-                            <excludeGroupIds>org.springframework.jmx</excludeGroupIds>
-                            <outputDirectory>${project.build.directory}/classes</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>com.zenjava</groupId>
-                <artifactId>javafx-maven-plugin</artifactId>
-                <version>2.0</version>
-                <configuration>
-                    <mainClass>de.aima13.whoami.Whoami</mainClass>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -126,7 +101,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>de.aima13.whoami.Whoami</mainClass>
+                            <mainClass>${mainClass}</mainClass>
                             <addClasspath>true</addClasspath>
                         </manifest>
                     </archive>
@@ -150,9 +125,81 @@
                 </executions>
             </plugin>
             <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>unpack-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <excludeScope>system</excludeScope>
+                            <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.zenjava</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>2.0</version>
+                <configuration>
+                    <mainClass>${mainClass}</mainClass>
+                    <jfxAppOutputDir>${project.build.directory}</jfxAppOutputDir>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>javafx</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>com.akathist.maven.plugins.launch4j</groupId>
                 <artifactId>launch4j-maven-plugin</artifactId>
                 <version>1.7.1</version>
+                <configuration>
+                    <dontWrapJar>false</dontWrapJar>
+                    <headerType>console</headerType>
+                    <jar>${project.build.directory}/${project.artifactId}-${project.version}-jfx.jar</jar>
+                    <outfile>${project.build.directory}/WHOAMI-Scanner.exe</outfile>
+                    <singleInstance>
+                        <mutexName>whoami_scanner</mutexName>
+                    </singleInstance>
+                    <chdir>.</chdir>
+                    <priority>normal</priority>
+                    <downloadUrl>http://java.com/download</downloadUrl>
+                    <stayAlive>false</stayAlive>
+                    <manifest>launch4j/whoami.manifest</manifest>
+                    <icon>launch4j/appicon.ico</icon>
+                    <jre>
+                        <minVersion>1.7.0_09</minVersion>
+                        <jdkPreference>preferJre</jdkPreference>
+                        <opts>
+                            <opt>-Dlaunch4j.exedir="%EXEDIR%"</opt>
+                        </opts>
+                    </jre>
+                    <versionInfo>
+                        <fileVersion>1.0.0.0</fileVersion>
+                        <txtFileVersion>1.0.0.0</txtFileVersion>
+                        <fileDescription>WHOAMI-Scanner - Wissenschaftlich herausragend
+                            objektive Analyse meiner Identitaet
+                        </fileDescription>
+                        <copyright>BigDaddy Analyst Group 2014</copyright>
+                        <productVersion>0.9.0.0</productVersion>
+                        <txtProductVersion>0.9.0.0</txtProductVersion>
+                        <productName>WHOAMI-Scanner</productName>
+                        <companyName>BigDaddy Analyst Group</companyName>
+                        <internalName>WHOAMI-Scanner</internalName>
+                        <originalFilename>WHOAMI-Scanner.exe</originalFilename>
+                    </versionInfo>
+                </configuration>
+                <!--
                 <executions>
                     <execution>
                         <id>l4j-gui</id>
@@ -160,44 +207,9 @@
                         <goals>
                             <goal>launch4j</goal>
                         </goals>
-                        <configuration>
-                            <dontWrapJar>false</dontWrapJar>
-                            <headerType>console</headerType>
-                            <jar>${project.build.directory}/${project.artifactId}-${project.version}.jar</jar>
-                            <outfile>${project.build.directory}/WHOAMI-Scanner.exe</outfile>
-                            <singleInstance>
-                                <mutexName>whoami_scanner</mutexName>
-                            </singleInstance>
-                            <chdir>.</chdir>
-                            <priority>normal</priority>
-                            <downloadUrl>http://java.com/download</downloadUrl>
-                            <stayAlive>false</stayAlive>
-                            <manifest>launch4j/whoami.manifest</manifest>
-                            <icon>launch4j/appicon.ico</icon>
-                            <jre>
-                                <minVersion>1.7.0_09</minVersion>
-                                <jdkPreference>preferJre</jdkPreference>
-                                <opts>
-                                    <opt>-Dlaunch4j.exedir="%EXEDIR%"</opt>
-                                </opts>
-                            </jre>
-                            <versionInfo>
-                                <fileVersion>1.0.0.0</fileVersion>
-                                <txtFileVersion>1.0.0.0</txtFileVersion>
-                                <fileDescription>WHOAMI-Scanner - Wissenschaftlich herausragend
-                                    objektive Analyse meiner Identitaet
-                                </fileDescription>
-                                <copyright>BigDaddy Analyst Group 2014</copyright>
-                                <productVersion>0.9.0.0</productVersion>
-                                <txtProductVersion>0.9.0.0</txtProductVersion>
-                                <productName>WHOAMI-Scanner</productName>
-                                <companyName>BigDaddy Analyst Group</companyName>
-                                <internalName>WHOAMI-Scanner</internalName>
-                                <originalFilename>WHOAMI-Scanner.exe</originalFilename>
-                            </versionInfo>
-                        </configuration>
                     </execution>
                 </executions>
+                -->
             </plugin>
         </plugins>
     </build>

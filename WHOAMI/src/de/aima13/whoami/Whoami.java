@@ -1,7 +1,6 @@
 package de.aima13.whoami;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Hauptklasse mit Main-Methode
@@ -12,6 +11,7 @@ public class Whoami implements Runnable {
 	private static final int ANALYZE_TIME= 1000; // Analysezeit in Sekunden
 	public static final int PERCENT_FOR_FILE_SEARCHER = 75; // Wie viel Prozent für den
 	private static long startTime;
+	private Map<Representable, String[]> csvHeaderMap = new HashMap<>();
 
 	/**
 	 * Standard Main-Methode
@@ -39,24 +39,40 @@ public class Whoami implements Runnable {
 		// Module laden
 		moduleList = ModuleManager.getModuleList();
 
+
 		GuiManager.updateProgress("Scanne Dateisystem...");
 		FileSearcher.startSearch(moduleList);
 
 		// Instanz der Singletonklasse GlobalData holen
 		GlobalData globalData = GlobalData.getInstance();
 
-		GuiManager.updateProgress("Analysiere gefundene Dateien...");
-		SlaveDriver.startModules(moduleList);
 
+		// Die Liste der Representables ist alles, was im Bericht auftaucht. Das sind alle Module
+		// und die GlobalData Klasse
 		// Stelle persönliche Daten an den Anfang der Liste
-		representableList = new ArrayList<>();
 		representableList.add(globalData);
 		representableList.addAll(moduleList);
+
+
+		/*
+		CSV Header der Module werden abgefragt, bevor die Module gestartet werden,
+		sodass sie die CSV-Einträge nicht von den gefundenen Dateien abhängig machen können. Dies
+		sorgt für eine einheitliche CSV-Datei und bewirkt, dass neue Zeilen später einfachher
+		angehängt werden können.
+		*/
+		List<String> csvHeaderList = new ArrayList<>();
+		for (Representable representable : representableList) {
+			this.csvHeaderMap.put(representable, representable.getCsvHeaders());
+		}
+
+
+		GuiManager.updateProgress("Analysiere gefundene Dateien...");
+		SlaveDriver.startModules(moduleList);
 
 		// Starte Speichervorgang
 
 		// CSV
-		CsvCreator.saveCsv(representableList);
+		CsvCreator.saveCsv(this.csvHeaderMap);
 
 		// PDF
 		ReportCreator reportCreator = new ReportCreator(representableList);
