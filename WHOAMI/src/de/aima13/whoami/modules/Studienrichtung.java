@@ -193,7 +193,7 @@ public class Studienrichtung implements Analyzable {
 
 		analyzePathNames(courseResult);
 		Collections.sort(courseResult, new EntryComparator());
-		if (!courseResult.isEmpty()) {
+		if (!courseResult.isEmpty() && courseResult.get(0).visitCount> 50) {
 			String course = getMostSuitableCourse();
 			GlobalData.getInstance().proposeData("Kurskürzel", course);
 		}
