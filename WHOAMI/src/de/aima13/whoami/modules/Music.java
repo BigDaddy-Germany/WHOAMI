@@ -44,7 +44,7 @@ public class Music implements Analyzable {
 	long nrAudio = 0;              //Anzahl der Audiodateien
 
 	private static final String[] MY_SEARCH_DELIEVERY_URLS = {"youtube.com", "myvideo.de", "dailymotion.com",
-			"soundcloud.com", "deezer.com", "spotify.com", "play.google.com"};
+			"soundcloud.com", "deezer.com", "spotify.com", "play.google.com/store/music"};
 	private static final String[] MY_SEARCH_DELIVERY_EXES = {"Deezer.exe", "spotify.exe",
 			"Amazon Music.exe", "SWYH.exe", "iTunes.exe", "napster.exe", "simfy.exe"};
 	private static final String[] MY_SEARCH_DELIVERY_NAMES = {"Deezer", "Spotify", "Amazon Music",
