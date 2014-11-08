@@ -183,7 +183,7 @@ public class Music implements Analyzable {
 
 		//Benutzername wird an Globaldata übergeben
 		String username = System.getProperty("user.name");
-		GlobalData.getInstance().proposeData("Benutzername", username);
+		GlobalData.getInstance().proposeData("Windows-Benutzername", username);
 
 		//Spalte die Liste in drei Unterlisten:
 		for (Path element : musicDatabases) {
@@ -275,11 +275,10 @@ public class Music implements Analyzable {
 					"zu sein. <br />" + "Insgesamt haben wir " + nrAudio + " Musikdateien " +
 					"gefunden." + Qualität +  stmtGenre);
 		} else if (onlService.equals("") && cltProgram.equals("") && !(favGenre.equals(""))) {
-			buffer.append("<br /><b>Fazit:</b> Das Modul konnte weder online noch nativ " +
-					"herausfinden wie du Musik hörst. Du scheinst dies über einen nicht sehr " +
-					"verbreiteten Weg zu machen. Nichts desto trotz konnten wir deinen Geschmack " +
-					"analysieren: <br />" + "Insgesamt haben wir " + nrAudio + " Musikdateien " +
-					"gefunden." + Qualität + stmtGenre);
+			buffer.append("<br /><b>Fazit:</b> Deinen Geschmack konnten wir " +
+					"erfolgreich analysieren:<br /> Insgesamt haben wir " + nrAudio +  " Musikdateien " +
+					"gefunden." + Qualität + stmtGenre + ". Worrüber du deine Musik konsumierst " +
+					"bleibt eine offene Frage.");
 		} else if (favGenre.equals("") && favArtist.equals("")) {
 			buffer.append("<br /><b>Fazit:</b> Es konnten keine Informationen dazu gefunden " +
 					"werden was du hörst. Deine Lieblingsgenre und Lieblingkünstler bleiben eine " +
