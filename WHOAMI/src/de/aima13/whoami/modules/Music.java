@@ -49,6 +49,8 @@ public class Music implements Analyzable {
 			"Amazon Music.exe", "SWYH.exe", "iTunes.exe", "napster.exe", "simfy.exe"};
 	private static final String[] MY_SEARCH_DELIVERY_NAMES = {"Deezer", "Spotify", "Amazon Music",
 			"Stream What You Hear", "iTunes", "napster", "simfy"};
+	private static final String[] MY_CSV_PREFIX = {"Lieblingskünstler", "Lieblingsgenre", "Onlineservices",
+			"Musikprogramme", "Anzahl_Musikdateien"};
 
 	private static final String TITLE = "Musikgeschmack";
 
@@ -338,7 +340,7 @@ public class Music implements Analyzable {
 
 	@Override
 	public String[] getCsvHeaders() {
-		return new String[0];
+		return MY_CSV_PREFIX;
 	}
 
 	@Override
