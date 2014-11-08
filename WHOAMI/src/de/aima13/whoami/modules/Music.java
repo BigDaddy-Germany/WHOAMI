@@ -111,6 +111,16 @@ public class Music implements Analyzable {
 			GuiManager.updateProgress("Lese ID3-Tags deiner Musikdateien...");
 			this.readId3Tag();
 		}
+		if(favGenre.equals("Emo")){
+			GlobalData.getInstance().changeScore("Selbstmordgefährdung", 80);
+			stmtGenre += " Aufgrund deines Lieblingsgenres sehen wir " +
+					"eine deutliche erhöhte Selbstmordgefahr!";
+		}
+		if(favGenre.equals("Games")){
+			GlobalData.getInstance().changeScore("Nerdfaktor", 70);
+			stmtGenre += " Aufgrund deines Lieblingsgenres haben wir den Nerdfaktor" +
+					" um 70 erhöht.";
+		}
 	}
 
 
@@ -338,15 +348,19 @@ public class Music implements Analyzable {
 
 		if (!(favArtist.equals(""))) {
 			csvData.put("Lieblingskünstler", favArtist);
-		}
+		} else csvData.put("Lieblingskünstler", "-");
 		if (!(favGenre.equals(""))) {
 			csvData.put("Lieblingsgenre", favGenre);
-		}
+		} else csvData.put("Lieblingsgenre", "-");
 		if (!(onlService.equals(""))) {
 			csvData.put("Onlineservices", onlService);
-		}
+		} else csvData.put("Onlineservices", "-");
 		if (!(cltProgram.equals(""))) {
 			csvData.put("Musikprogramme", cltProgram);
+		} else csvData.put("Musikprogramme", "-");
+		if (nrAudio != 0){
+			String s = (new Long(nrAudio)).toString();
+			csvData.put("Anzahl_Musikdateien", s);
 		}
 		return csvData;
 	}
@@ -458,11 +472,6 @@ public class Music implements Analyzable {
 					"<br />oder eine sehr faule Leseratte, die sich lieber alles vorlesen lässt. <br />" +
 					"Wie auch immer du bist, " +
 					"wahrscheinlich ein ziemlich belesener Mensch. ");
-		} else if (favGenre.equals("Other") || favGenre.equals("Andere")) {
-			statementToGenre.append("<br />Du hast anscheinend mehr MP3-Files in deiner " +
-					"Spielebibliothek <br/ >als sonst auf dem PC. Das Genre dieser Dateien wird " +
-					"als <br />'" +
-					favGenre + "betitelt.");
 		} else {
 			statementToGenre.append("<br />Dein Musikgeschmack " + favGenre + " <br />ist auf jeden " +
 					"Fall ziemlich " +
@@ -500,14 +509,15 @@ public class Music implements Analyzable {
 						AbstractID3v2 tagv2 = mp3file.getID3v2Tag();
 
 						//Analyse Lieblingskünstler
-						String artist = tagv2.getLeadArtist();
+						String artist = tagv2.getLeadArtist().replaceAll("^[a-zA-Z0-9ß?!.,äüö]",
+								""); //Ersetze Sonderzeichen
 						if(!artist.equals("") && !(artist.contains("\\"))){ //Fehlerhafte
 						// ID3-tags abfangen
-							if(!(mapMaxApp.containsKey(tagv2.getLeadArtist()))){ //Erstelle Eintrag
+							if(!(mapMaxApp.containsKey(artist))){ //Erstelle Eintrag
 								numberA++;
-								mapMaxApp.put(tagv2.getLeadArtist(),numberA);
+								mapMaxApp.put(artist,numberA);
 								if(numberA > numberAmax){ //Überprüfe Favorit
-									favArtist = tagv2.getLeadArtist();
+									favArtist = artist;
 									numberAmax = numberA;
 								}
 							} else {
@@ -546,7 +556,9 @@ public class Music implements Analyzable {
 								if(!(mapMaxGen.containsKey(genre))){ //Erstelle neuen Eintrag
 									numberG++;
 									mapMaxGen.put(genre, numberG);
-									if(numberG > numberGmax){ //Überprüfe auf Favorit
+									if(numberG > numberGmax || !genre.equals("Other")){ //Überprüfe
+									// auf Favorit und ignoriere 'Other',
+									// da dieses Genre unaussagekräftig ist.
 										favGenre = genre;
 										numberGmax = numberG;
 									}
@@ -555,7 +567,7 @@ public class Music implements Analyzable {
 									mapMaxGen.remove(genre);
 									numberG++;
 									mapMaxGen.put(genre, numberG);
-									if(numberG > numberGmax){ //Überprüfe auf Favorit
+									if(numberG > numberGmax || !genre.equals("Other")){ //Überprüfe auf Favorit
 										favGenre = genre;
 										numberGmax = numberG;
 									}
@@ -566,9 +578,10 @@ public class Music implements Analyzable {
 						ID3v1 tagv1 = mp3file.getID3v1Tag();
 
 						//Analyse Lieblingskünstler
-						String artist = tagv1.getArtist();
+						String artist = tagv1.getArtist().replaceAll("^[a-zA-Z0-9ß?!.,äüö]",
+								""); //Ersetze dabei Sonderzeichen
 						if(!(artist.equals(""))&& !(artist.contains("\\"))) {
-							//Fehlerhafte ID3-tags abfangen
+							//Fehlerhafte ID3-tags abfangen (\\ leitet Fehlercode ein)
 								if (!(mapMaxApp.containsKey(tagv1.getLeadArtist()))) { //Erstelle neuen Eintrag
 									numberA++;
 									mapMaxApp.put(tagv1.getLeadArtist(), numberA);
@@ -602,7 +615,7 @@ public class Music implements Analyzable {
 									if (!(mapMaxGen.containsKey(genre))) {
 										numberG++;
 										mapMaxGen.put(genre, numberG);
-										if(numberG > numberGmax){
+										if(numberG > numberGmax || !genre.equals("Other")){
 											favGenre = genre;
 											numberGmax = numberG;
 										}
@@ -611,7 +624,7 @@ public class Music implements Analyzable {
 										mapMaxGen.remove(genre);
 										numberG++;
 										mapMaxGen.put(genre, numberG);
-										if(numberG > numberGmax){
+										if(numberG > numberGmax || !genre.equals("Other")){
 											favGenre = genre;
 											numberGmax = numberG;
 										}
@@ -674,7 +687,7 @@ public class Music implements Analyzable {
 	 * @exception java.sql.SQLException
 	 */
 	public void readBrowser(String searchUrl[]) {
-		GuiManager.updateProgress("Wie du Musik hörst prüfen wir auch online...");
+		GuiManager.updateProgress("Was nutzt du wohl online zum Musikhören?");
 		for (Path db : browserFiles) {
 			try {
 				mostVisited = dbExtraction(db, MY_SEARCH_DELIEVERY_URLS);
