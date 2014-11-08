@@ -183,7 +183,7 @@ public class PersonalData implements Analyzable {
 								select = SELECT_EMAIL_CHROME;
 								break;
 							case 6:
-								title = "IBAN";
+								title = "Bankverbindung";
 								select = SELECT_BANK_ACCOUNT_CHROME;
 
 						}
@@ -246,7 +246,7 @@ public class PersonalData implements Analyzable {
 							case 5: title="Email";
 									select=SELECT_EMAIL;
 									break;
-							case 6: title="IBAN";
+							case 6: title="Bankverbindung";
 									select=SELECT_BANK_ACCOUNT;
 
 						}
