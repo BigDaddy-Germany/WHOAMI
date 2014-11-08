@@ -27,6 +27,8 @@ public class Games implements Analyzable {
 	private GameEntry resultLastCreatedGame;
 	private GameEntry resultLastModifiedGame;
 	static boolean cancelledByTimeLimit = false;
+	private GamesComments gamesComments;
+	private GameThreshold resultThreshold;
 
 	/**
 	 * Datenstruktur für die Kommentar-Ressourcen (Container)
@@ -50,8 +52,7 @@ public class Games implements Analyzable {
 	}
 
 	/**
-	 * Spielemodul fragt nach einer Liste von Executables und benötigt den Pfad eines
-	 * gegebenenfalls vorhandenen "SteamApps"-Ordners
+	 * Spielemodul benötigt eine Liste von Executables
 	 *
 	 * @return Filterliste
 	 */
@@ -83,55 +84,13 @@ public class Games implements Analyzable {
 	public String getHtml() {
 		StringBuilder html = new StringBuilder();
 
-		int count = gameList.size();
-		GamesComments gamesComments = Utilities.loadDataFromJson
-				("/data/Games_Comments.json", GamesComments.class);
-
-
-		//Anzahl Spiele mit Kommentar dazu und GamingScore
-		int score;
-		int scoreLevel = -1;
-		final int scoreMaxLevel = gamesComments.gameThresholds.size() - 1;
-
-		/**
-		 * Berechnung des Gaming-Scores:
-		 * Durch obere Grenzen definierte Level von 0 bis X werden in einer stückweise linearen
-		 * Funktion auf den Bereich 0-100 abgebildet (über 100 falls max. Level überschritten)
-		 *
-		 * Beispiel: Fünf Level in JSON-Ressource konfiguriert
-		 * LVL0 bis    0 Spiele: Score 0
-		 * LVL1 bis   10 Spiele: Score 1 - 25
-		 * LVL2 bis   50 Spiele: Score     25 - 50
-		 * LVL3 bis  150 Spiele: Score          50 - 75
-		 * LVL4 bis 1000 Spiele: Score               75 - 100
-		 *     über 1000 Spiele: Score                    100 - infinity
-		 */
-		GameThreshold threshold;
-		do { //Passendes Spiele-Level ermitteln
-			threshold = gamesComments.gameThresholds.get(++scoreLevel);
-		} while ((gameList.size() > threshold.limit)
-				&& (scoreLevel < scoreMaxLevel));
-
-		//auf 0-100 münzen
-		if (scoreLevel > 0) {
-			float band = 100 / scoreMaxLevel;
-			score = (int) (band * (scoreLevel - 1));
-			int upper = threshold.limit;
-			int lower = gamesComments.gameThresholds.get(scoreLevel - 1).limit;
-			int bonus = (int) (band * (gameList.size() - lower) / (upper - lower));
-			score += bonus;
-		} else {
-			score = 0;
-		}
-		GlobalData.getInstance().changeScore("GamingScore", -50 + score); //-50 to adjust to 0-100
-
 		html.append("Es wurden " + gameList.size() + " Spiele gefunden. "
-				+ threshold.comment + " ");
+				+ resultThreshold.comment + " ");
 
 		//Steam kommentieren
 		if (steamAppsPath != null) {
 			html.append(gamesComments.steamFound);
-		} else if (count > gamesComments.minGamesForDistributorRecommendation) {
+		} else if (gameList.size() > gamesComments.minGamesForDistributorRecommendation) {
 			html.append(gamesComments.distributorRecommendation);
 		}
 		html.append(" ");
@@ -189,6 +148,11 @@ public class Games implements Analyzable {
 	}
 
 	@Override
+	public String[] getCsvHeaders() {
+		return new String[0];
+	}
+
+	@Override
 	public SortedMap<String, String> getCsvContent() {
 		TreeMap<String, String> csvContent = new TreeMap();
 
@@ -222,8 +186,46 @@ public class Games implements Analyzable {
 				break;
 			}
 		}
+		//Dem Ergebnis dienliche Abschlussoperationen auch bei Timeboxing-Abbruch durchführen:
 
-		//Dem Ergebnis dienliche Abschlussoperationen auch bei Timeboxing-Abbruch durchführen
+		/**
+		 * Berechnung des Gaming-Scores:
+		 * Durch obere Grenzen definierte Level von 0 bis X werden in einer stückweise linearen
+		 * Funktion auf den Bereich 0-100 abgebildet (über 100 falls max. Level überschritten)
+		 *
+		 * Beispiel: Fünf Level in JSON-Ressource konfiguriert
+		 * LVL0 bis    0 Spiele: Score 0
+		 * LVL1 bis   10 Spiele: Score 1 - 25
+		 * LVL2 bis   50 Spiele: Score     25 - 50
+		 * LVL3 bis  150 Spiele: Score          50 - 75
+		 * LVL4 bis 1000 Spiele: Score               75 - 100
+		 *     über 1000 Spiele: Score                    100 - infinity
+		 */
+		gamesComments = Utilities.loadDataFromJson
+				("/data/Games_Comments.json", GamesComments.class);
+		int score;
+		int scoreLevel = -1;
+		int scoreMaxLevel = gamesComments.gameThresholds.size() - 1;
+
+		do { //Passendes Spiele-Level ermitteln
+			resultThreshold = gamesComments.gameThresholds.get(++scoreLevel);
+		} while ((gameList.size() > resultThreshold.limit)
+				&& (scoreLevel < scoreMaxLevel));
+
+		if (scoreLevel > 0) { //Zugehörige Punkte berechnen
+			float band = 100 / scoreMaxLevel;
+			score = (int) (band * (scoreLevel - 1));
+			int upper = resultThreshold.limit;
+			int lower = gamesComments.gameThresholds.get(scoreLevel - 1).limit;
+			int bonus = (int) (band * (gameList.size() - lower) / (upper - lower));
+			score += bonus;
+		} else {
+			score = 0;
+		}
+		GlobalData.getInstance().changeScore("Gaming", score - 50); //Scoreänderung -50 bis +50
+
+
+		//Installationsdaten behandeln
 		if (gameList.size() > 0) {
 			//Zuletzt & zuerst installierte sowie modifizierte Spiele ermitteln
 			gameList.sortByLatestModified();

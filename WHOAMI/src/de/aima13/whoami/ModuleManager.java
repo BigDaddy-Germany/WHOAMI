@@ -12,7 +12,9 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by Marco Dörfler on 16.10.14.
+ * Zuständig für das Laden und instanziieren der Module
+ *
+ * @author Marco Dörfler
  */
 public class ModuleManager {
 
@@ -22,8 +24,6 @@ public class ModuleManager {
 	/**
 	 * Gibt eine Liste der Instanzen aller Module zurück
 	 * @return Die Liste der Module
-	 *
-	 * @author Marco Dörfler
 	 */
 	public static List<Analyzable> getModuleList() {
 

@@ -1,0 +1,9 @@
+[
+	{"ext":"php", "lang":"PHP", "type":"web"},
+	{"ext":"java", "lang":"Java", "type":"native"},
+	{"ext":"c", "lang":"C", "type":"native"},
+	{"ext":"cpp", "lang":"C++", "type":"native"},
+	{"ext":"cs", "lang":"C#", "type":"native"},
+	{"ext":"m", "lang":"Objective C", "type":"native"},
+	{"ext":"vb", "lang":"Visual Basic", "type":"native"}
+]

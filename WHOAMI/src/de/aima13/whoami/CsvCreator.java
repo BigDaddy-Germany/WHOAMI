@@ -5,14 +5,16 @@ import au.com.bytecode.opencsv.CSVWriter;
 import de.aima13.whoami.support.Utilities;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
- * Created by Marco Dörfler on 16.10.14.
  * Erstellt eine CSV und speichert diese
+ *
+ * @author Marco Dörfler
  */
 public class CsvCreator {
 	private static enum CSV_STATUS {
@@ -21,7 +23,7 @@ public class CsvCreator {
 
 	private static final String FILE_NAME = "WHOAMI_Analyze_Results.csv"; // Name der CSV Datei
 	private static final File csvFile = new File(FILE_NAME); // File Datei der CSV Datei
-	private static final String PREFIX_SEPERATOR = "_"; // Seperator zw. Modulname und Header
+	private static final String PREFIX_SEPERATOR = " "; // Seperator zw. Modulname und Header
 
 	private static final char CSV_SEPERATOR = ';'; // Separator der CSV Datei
 	private static final char CSV_QUOTECHAR = '"'; // Feldbegrenzer der CSV Datei
@@ -30,29 +32,37 @@ public class CsvCreator {
 	 * Starten der Speicherung
 	 *
 	 * @param representables Liste alle zu präsentierenden CSV Werte
-	 *
-	 * @author Marco Dörfler
 	 */
-	public static boolean saveCsv(List<Representable> representables) {
+	public static boolean saveCsv(Map<Representable, String[]> representables) {
 		SortedMap<String, String> completeCsvContent = new TreeMap<>();
 
 		// CSV Werte aus allen Representables ziehen
-		for (Representable representable : representables) {
+		for (Map.Entry<Representable, String[]> representableCsvEntry : representables.entrySet()) {
+			Representable representable = representableCsvEntry.getKey();
+
 			SortedMap<String, String> moduleCsvContent = representable.getCsvContent();
 
 			if (moduleCsvContent != null) {
 				// Header werden mit Prefix versehen -> keine Namensgleichheit
-				String prefix = representable.getCsvPrefix();
+				String prefix = representable.getCsvPrefix() + PREFIX_SEPERATOR;
 				// Wenn das Modul noch keinen Prefix zurückgibt, wird der Klassenname genutzt
 				if (representable.getCsvPrefix() == null) {
 					prefix = representable.getClass().getSimpleName();
 				}
 
-				for (Map.Entry<String, String> moduleCsvCol : moduleCsvContent.entrySet()) {
-					// Titel mit Prefix versehen und Spalte hinzufügen
-					completeCsvContent.put(prefix + PREFIX_SEPERATOR + moduleCsvCol.getKey()
-							.replace(" ", "-"),
-							moduleCsvCol.getValue());
+				// Es sollen genau die vorgesehenen Spalten verwendet werden
+				for (String csvColName : representableCsvEntry.getValue()) {
+					String csvColValue;
+					// Sollte das Modul hierzu keinen Eintrag haben, wird ein Platzhalter eingefügt
+					if (moduleCsvContent.containsKey(csvColName)) {
+						csvColValue = moduleCsvContent.get(csvColName);
+					} else {
+						csvColValue = "-";
+					}
+					completeCsvContent.put(
+							prefix + csvColName,
+							csvColValue
+					);
 				}
 			}
 		}
@@ -91,7 +101,8 @@ public class CsvCreator {
 					if (!csvFile.createNewFile()) {
 						return false;
 					}
-					fileWriter = new FileWriter(csvFile);
+					fileWriter = new OutputStreamWriter(new
+							FileOutputStream(csvFile), StandardCharsets.UTF_8);
 				} catch (IOException e) {
 					return false;
 				}
@@ -111,7 +122,9 @@ public class CsvCreator {
 				}
 
 				try {
-					fileWriter = new FileWriter(new File(FILE_NAME));
+					File newFile = new File(FILE_NAME);
+					fileWriter = new OutputStreamWriter(new
+							FileOutputStream(newFile), StandardCharsets.UTF_8);
 				} catch (IOException e) {
 					return false;
 				}
@@ -126,11 +139,13 @@ public class CsvCreator {
 						}
 
 						File newFile = new File(newFileName);
-						fileWriter = new FileWriter((newFile));
+						fileWriter = new OutputStreamWriter(new
+								FileOutputStream(newFile), StandardCharsets.UTF_8);
 
 					} else {
 						// Datei ist schreibbar
-						fileWriter = new FileWriter(csvFile, true);
+						fileWriter = new OutputStreamWriter(new
+								FileOutputStream(csvFile), StandardCharsets.UTF_8);
 					}
 				} catch (IOException e) {
 					return false;
@@ -166,8 +181,6 @@ public class CsvCreator {
 	 * Untersuchen auf eventuell bereits vorhandener CSV-Dateien
 	 * @param moduleHeader String-Array des aktuellen Headers
 	 * @return enum zur Statusunterscheidung
-	 *
-	 * @author Marco Dörfler
 	 */
 	private static CSV_STATUS getCsvStatus(String[] moduleHeader) {
 		try {

@@ -1,0 +1,83 @@
+<!-- Template für Syntax Modul -->
+Wir haben für diesen Bericht wirklich keine Kosten und Mühen gescheut. Daher haben wir ein
+wunderbares Tool namens <i>ANTLR</i> eingebaut, welches deine Programm-Dateien parsen kann. <br />
+<i>Parsen</i> - Was ist das? Grob gesagt: Mit einem Parser können wir herausfinden, wir gut deine
+Programme sind. Zwar nur auf Syntax-Ebene, aber immerhin etwas.<br />
+$if(noCoding)$
+    Aber leider können wir dir hiermit nicht wirklich was tolles zeigen, da wir weder C- noch
+    Java-Dateien auf deinem Rechner gefunden haben.
+$else$
+    $if(sampleOnly)$
+        Da du sehr viele zu parsende Dateien auf deinem Rechner hast und wir dich nicht ewig
+        warten lassen wollten, haben wir uns dazu entschieden, lediglich eine kleine Stichprobe
+        von $maxFilesToAnalyze$ Dateien pro Sprache zu überprüfen.
+    $else$
+        Da du nicht sonderlich viele zu parsende Dateien auf deinem Rechner hast, schließen wir
+        daraus, dass du, zumindest was C und Java angeht, noch ein blutiger Anfänger bist. Umso
+        interessanter sollten die folgenden Ergebnisse für dich sein.
+    $endif$
+    <br /><br />
+    <b>Die Ergebnisse</b><br />
+    $if(c.analyzed)$
+        Unser C-Parser sagte uns nach eingehender Analyse folgendes:<br />
+        Überprüfte Dateien: <b>$c.countAll$</b> ($c.countCorrect$ korrekt, $c.countError$
+        fehlerhaft)<br />
+        $if(c.perfectResult)$
+            Was sollen wir dazu noch groß sagen? Wir verneigen uns vor dem C-Gott. Scheinbar hat
+            Herr Kruse sehr gute Arbeit bei dir geleistet.
+        $endif$
+        $if(c.goodResult)$
+            Das ist schon ein sehr gutes Ergebnis. Allerdings wäre es natürlich immer
+            wünschenswert, keinerlei fehlerhafte Dateien auf dem Rechner zu besitzen oder? Dieses
+            Ziel vor Augen wirst du es sicherlich weit bringen.
+        $endif$
+        $if(c.badResult)$
+            An diesem Ergebnis solltest du noch arbeiten. Vor Benutzung der Tastatur bitte Gehirn
+            einschalten. <br />
+        $endif$
+        $if(java.analyzed)$
+        <br /><br />
+        $endif$
+    $endif$
+
+    $if(java.analyzed)$
+        Basierend auf dem Wissen unseres Java-Parsers sind wir zu folgendem Ergebnis gekommen:
+        <br />
+        Überprüfte Dateien: <b>$java.countAll$</b> ($java.countCorrect$ korrekt, $java.countError$
+        fehlerhaft)<br />
+        $if(java.perfectResult)$
+            Da du scheinbar in Java keine Fehler machst, können wir auch schlecht über dich
+            lästern. Unsere Vermutung daher: Du hast nicht erst an der DHBW mit Java angefangen
+            oder bewahrst auf deinem Rechner lediglich Hello-World Programme auf, um den Schein zu
+            wahren.
+        $endif$
+        $if(java.goodResult)$
+            Java scheinst du zu beherrschen, auch wenn sich ab und zu noch der ein oder andere
+            Fehler auf deinem System eingeschlichen hat. Keine Angst, das kann jedem mal passieren.
+            Ist kein Weltuntergang. Außer du stellst deine Programme wichtigen Weltraumfahrten
+            bereit uns sorgst dafür, dass die von deinen Programmen gesteuerte Rakete abstürzt,
+            ein Chemie-Labor trifft und dadurch die Welt unbewohnbar macht.
+        $endif$
+        $if(java.badResult)$
+            Ein weiser Mann sagte einmal: <i>Bevor man Programmiersprachen erlernt,
+            sollte man lernen, seinen Kopf zu benutzen.</i> Solltest du dich irgendwann einmal an
+            diesen Satz halten, nimmt die Anzahl der fehlerhaften Dateien auf deinem System
+            bestimmt ab.
+        $endif$
+    $endif$
+
+    <br /><br />
+    $if(suicidalUp)$
+        Aufgrund dieses schlechten Ergebnisses mussten wir leider deine Selbstmodgefährdung
+        herauf setzen, da wir nicht wissen wie man mit so vielen Fehlern leben kann. Diese
+        Einschätzung wird aber natürlich streng vertraulich behandelt. <br />
+        Trotzdem solltest du dir eventuell Hilfe holen.
+    $endif$
+    $if(suicidalDown)$
+        Dieses Ergebnis hat uns dazu geführt, deine Selbstmordgefährdung etwas herab zu setzen.
+        Wer einigermaßen gut programmieren kann, der lebt mit sich selbst in Frieden. Von dieser
+        Einschätzung wirst du dir zwar leider nichts kaufen können, aber vielleicht stimmt sie
+        dich ja glücklich.
+    $endif$
+
+$endif$

@@ -1,0 +1,145 @@
+[
+  {
+    "sportart": "Fussball",
+    "zusatz": [
+      "sportschau",
+      "dfb.de",
+      "fußball",
+      "bundesliga.de",
+      "DFB Pokal",
+      "uefa.com",
+      "fifa.com",
+      "UEFA Champions League"
+    ]
+  },
+  {
+    "sportart": "Tennis",
+    "zusatz": [
+      "tennisverband.de",
+      "tenniseurope.org",
+      "dtb-tennis.de",
+      "tenniswarehouse-europe.com"
+    ]
+  },
+  {
+    "sportart": "Tanzen",
+    "zusatz": [
+      "breakdance",
+      "Tanzschule"
+    ]
+  },
+  {
+    "sportart": "Basketball",
+    "zusatz": [
+      "nba.com",
+      "fiba.com",
+      "basketball-bund.de"
+    ]
+  },
+  {
+    "sportart": "Volleyball",
+    "zusatz": [
+      "fivb.org",
+      "volleyball-verband.de",
+      "DVV-Pokal"
+    ]
+  },
+  {
+    "sportart": "Eishockey",
+    "zusatz": [
+      "del.org",
+      "nhl.com"
+    ]
+  },
+  {
+    "sportart": "Handball",
+    "zusatz": [
+      "dhb.de",
+      "DHB-Pokal",
+      "DKB Handball"
+    ]
+  },
+  {
+    "sportart": "American Football",
+    "zusatz": [
+      "nfl.com",
+      "afvd.de",
+      "American Football Verband"
+    ]
+  },
+  {
+    "sportart": "Boxen",
+    "zusatz": [
+      "wboboxing.com",
+      "wbcboxing.com",
+      "wbanews.com",
+      "aiba.org"
+    ]
+  },
+  {
+    "sportart": "Dart",
+    "zusatz": [
+      "dartswdf.com",
+      "pdc-europe.tv",
+      "pdc.tv"
+    ]
+  },
+  {
+    "sportart": "Motorsport",
+    "zusatz": [
+      "dtm.com",
+      "fia.com",
+      "Formel 1,NASCAR.com",
+      "formula1.com"
+    ]
+  },
+  {
+    "sportart": "Baseball",
+    "zusatz": ["mlb.com"]
+  },
+  {
+    "sportart": "Bowling",
+    "zusatz": ["dbv-bowling.de"]
+  },
+  {
+    "sportart": "Rugby",
+    "zusatz": [
+      "rfu.com",
+      "Rugby Union"
+    ]
+  },
+  {
+    "sportart": "Snooker",
+    "zusatz": [
+      "worldsnooker.com",
+      "snookermania.de"
+    ]
+  },
+  {
+    "sportart": "Leichtathletik",
+    "zusatz": ["iaaf.org"]
+  },
+  {
+    "sportart": "Cricket",
+    "zusatz": ["espncricinfo.com"]
+  },
+  {
+    "sportart": "Golf",
+    "zusatz": [
+      "golf.de",
+      "Golfsport",
+      "worldgolfchampionships.com",
+      "pga.com"
+    ]
+  },
+  {
+    "sportart": "Kampfsport",
+    "zusatz": [
+      "Thaiboxen",
+      "Kickboxen",
+      "Karate",
+      "Taekwondo",
+      "Capoeira"
+    ]
+  }
+]
