@@ -137,7 +137,9 @@ public class Food implements Analyzable {
 		url = urlParts[urlParts.length - 1];
 		//jetzt noch Bindestriche und .html entfernen
 		url = url.replace('-', ' ');
-		url = url.substring(0, url.length() - 5);
+		if(url.length()>5) {
+			url = url.substring(0, url.length() - 5);
+		}
 		return url;
 	}
 
@@ -398,9 +400,10 @@ public class Food implements Analyzable {
 		if(clientIsStoner){
 			localOnCookHtml+="<p><font color=#00C000>Tja du hast wohl den grünen Gaumen oder " +
 					"bist öfters in den Niederlanden. ;)</font></p>\n";
-			myCsvData.put("Niederländer","ja");
+
+			//myCsvData.put("Niederländer","ja");
 		}else{
-			myCsvData.put("Niederländer","nein");
+			//myCsvData.put("Niederländer","nein");
 		}
 		localOnCookHtml+="<p>"+ countCookingSiteAccess +" Zugriffe auf Online-Kochbücher detektiert. ";
 		myCsvData.put("Zugriffe auf Online-Kochseiten",""+countCookingSiteAccess);
