@@ -141,6 +141,11 @@ public class Studienrichtung implements Analyzable {
 		return "dhbw";
 	}
 
+	@Override
+	public String[] getCsvHeaders() {
+		return new String[0];
+	}
+
 	/**
 	 * Für den CSV Part der den vermuteten Namen entspricht und Kursbezeichnung.
 	 *

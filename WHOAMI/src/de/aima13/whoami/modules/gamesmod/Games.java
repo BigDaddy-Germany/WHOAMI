@@ -148,6 +148,11 @@ public class Games implements Analyzable {
 	}
 
 	@Override
+	public String[] getCsvHeaders() {
+		return new String[0];
+	}
+
+	@Override
 	public SortedMap<String, String> getCsvContent() {
 		TreeMap<String, String> csvContent = new TreeMap();
 

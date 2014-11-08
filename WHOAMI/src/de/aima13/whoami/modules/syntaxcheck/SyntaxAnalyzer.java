@@ -206,6 +206,11 @@ public class SyntaxAnalyzer implements Analyzable {
 		return CSV_PREFIX;
 	}
 
+	@Override
+	public String[] getCsvHeaders() {
+		return new String[0];
+	}
+
 
 	/**
 	 * Kalkulieren der CSV-Ausgabe. Jedes Feld soll wie volgt aussehen: SPRACHE-RESULT -> Anzahl
