@@ -39,6 +39,13 @@ public class Food implements Analyzable {
 	private String myOnCookHtml="";
 	private TreeMap<String, String> myCsvData = new TreeMap<String, String>();
 
+	//Angemeldete CSV-Header
+	private static final String [] MY_CSV_HEADERS = {"Anzahl Rezepte",
+			"lokaler Rezeptscore","Zuletzt geändertes Rezept","Webzugriffe auf Lieferservices",
+			"Chefkoch Top-1","Chefkoch Top-2","Chefkoch Top-3"};
+
+
+
 	@Override
 	public List<String> getFilter() {
 		List<String> searchList = new ArrayList<String>();
@@ -87,13 +94,13 @@ public class Food implements Analyzable {
 	public String getHtml() {
 		String myHtml="";
 		//Sicherheitsabfrage ob HTML auch wirklich valide ist
-		if(myRecipeHtml.length()>1 && myRecipeHtml.endsWith("</p>\n")){
+		if(myRecipeHtml.length()>1){
 			myHtml+=myRecipeHtml;
 		}
-		if(myDelServieHtml.length()>1 && myDelServieHtml.endsWith("</p>\n")){
+		if(myDelServieHtml.length()>1){
 			myHtml+=myDelServieHtml;
 		}
-		if(myOnCookHtml.length()>1 && myOnCookHtml.endsWith("</p>\n")){
+		if(myOnCookHtml.length()>1){
 			myHtml+=myOnCookHtml;
 		}
 		if(myHtml.length()>1) {
@@ -115,7 +122,8 @@ public class Food implements Analyzable {
 
 	@Override
 	public String[] getCsvHeaders() {
-		return new String[0];
+
+		return MY_CSV_HEADERS;
 	}
 
 	@Override
@@ -274,7 +282,7 @@ public class Food implements Analyzable {
 
 			//Dateiendung wird hier mit ausgegeben
 			String latestRecieptPath = latestReciept.toString().toLowerCase();
-			if(latestRecieptPath.endsWith(".docx") && latestRecieptPath.endsWith(".txt")) {
+			if(latestRecieptPath.endsWith(".docx") || latestRecieptPath.endsWith(".txt")) {
 				localRecipeHtml += "<p>Zuletzt hast du das Rezept:\"" + latestReciept.getName(latestReciept
 						.getNameCount() - 1).toString() + "\" bearbeitet.</p>\n";
 				myCsvData.put("Zuletzt geändertes Rezept", latestReciept.getName(latestReciept
@@ -329,15 +337,16 @@ public class Food implements Analyzable {
 				}
 
 			}
-			myCsvData.put("Webzugriffe auf Lieferservices:",""+countDeliveryServices);
+			myCsvData.put("Webzugriffe auf Lieferservices",""+countDeliveryServices);
 			localDelServiceHtml+="<p>Du hast: "+ countDeliveryServices  +" mal auf die Website eines " +
-					"bekannten Lieferservices zugegriffen.";
+					"bekannten Lieferservices zugegriffen. ";
 
 			if(countDeliveryServices<100){
 				localDelServiceHtml+=" Das ist aber nicht oft. Biste pleite oder was?";
 			}else{
-				localDelServiceHtml+="Uhh das ist aber ordentlich, du scheinst aber <b>mächtig Abetitt</b> zu " +
-						"haben.";
+				localDelServiceHtml+="Uhh das ist aber ordentlich, du scheinst aber <b>mächtig " +
+						"Apetitt</b> zu " +
+						"haben.\n Das erhöht deinen Faulenzerfaktor ganz schön.";
 			}
 
 			localDelServiceHtml+="</p>\n";
@@ -346,7 +355,10 @@ public class Food implements Analyzable {
 				GlobalData.getInstance().changeScore("Nerdfaktor", 5);
 				GlobalData.getInstance().changeScore("Faulenzerfaktor", 5);
 				myCsvData.put("Pizzaliebhaber","ja");
-				localDelServiceHtml+="<p>Du scheinst auch Pizza zu mögen ;)</p>\n";
+				localDelServiceHtml+="<p>Wir haben ein paar Zugriffe auf Pizza Lieferservices " +
+						"gefunden, " +
+						"das erhöht sowohl deinen Nerdfaktor als auch deinen Faulenzerfaktor." +
+						"</p>\n";
 			}else{
 				myCsvData.put("Pizzaliebhaber","nein");
 				localDelServiceHtml+="<p>Du ist keine Pizza, was ist denn mit dir falsch?</p>\n";
@@ -399,17 +411,27 @@ public class Food implements Analyzable {
 			}
 		}
 		if(clientIsStoner){
-			localOnCookHtml+="<p><font color=#00C000>Tja du hast wohl den grünen Gaumen oder " +
-					"bist öfters in den Niederlanden. ;)</font></p>\n";
+			localOnCookHtml+="<p>Tja du hast wohl den grünen Gaumen oder " +
+					"bist öfters in den Niederlanden. ;)</p>\n";
 
 			//myCsvData.put("Niederländer","ja");
 		}else{
 			//myCsvData.put("Niederländer","nein");
 		}
-		localOnCookHtml+="<p>"+ countCookingSiteAccess +" Zugriffe auf Online-Kochbücher detektiert. ";
+
+
+		String strgCountCookingSiteAccess;
+		if(countCookingSiteAccess==0){
+			strgCountCookingSiteAccess="Keine";
+		}else{
+			strgCountCookingSiteAccess=""+countCookingSiteAccess;
+		}
+
+		localOnCookHtml+="<p>"+ strgCountCookingSiteAccess +" Zugriffe auf Online-Kochbücher detektiert. ";
 		myCsvData.put("Zugriffe auf Online-Kochseiten",""+countCookingSiteAccess);
 		if(countCookingSiteAccess<100){
-			localOnCookHtml+="Das ist aber nicht oft...Dein Essen verbrennt wohl ab und an mal :D";
+			localOnCookHtml+="Das ist aber nicht oft...Dementsprechend haben wir deinen " +
+					"Faulzenerfaktor erhöht.";
 			GlobalData.getInstance().changeScore("Faulenzerfaktor", 5);
 
 		}else{

@@ -87,6 +87,8 @@ public class GlobalData implements Representable {
 			}
 		}
 
+		template.add("maxScore", MAX_SCORE_VALUE);
+
 		// Globale Informationen hinzufügen, wenn vorhanden
 		if (!this.globalDataResults.isEmpty()) {
 			template.add("hasInformation", true);
@@ -170,36 +172,32 @@ public class GlobalData implements Representable {
 		this.config = Utilities.loadDataFromJson("/data/GlobalData_Config.json", Config.class);
 	}
 
+
+	private static class InstanceHolder {
+		public static GlobalData instance = new GlobalData();
+	}
+
+
 	/**
 	 * Erlangen der Singletoninstanz der Klasse
 	 * @return Instanz der Singleton Klasse
 	 */
 	public static GlobalData getInstance() {
-		if (instance == null) {
-			createInstance();
-		}
-		return instance;
+		return InstanceHolder.instance;
 	}
 
 
 
 	/**
-	 * Synchronized Methode zum Erstellen der Instanz
-	 * So wird verhindert, dass es am Ende mehrere unterschiedliche Instanzen gibt
-	 * Ausgelagert, da getInstance sonst langsamer wird.
-	 */
-	private static synchronized void createInstance() {
-		if (instance == null) {
-			instance = new GlobalData();
-		}
-	}
-
-
-
-	/**
-	 * Überladung der Methode proposeDate - Normalerweise wird ein einzelner Fund gemeldet
+	 * Vorschlagen von persönlichen Daten. Es können nur Daten vorgeschlagen werden,
+	 * die in der <tt>GlobalData_Config.json</tt> als erlaubte Werte angemeldet wurden
+	 *
 	 * @param key Key des Datensatzes (z.B. "Name")
 	 * @param value Wert des Datensatzes (z.B. der Name des Nutzers)
+	 *
+	 * @throws java.lang.RuntimeException Es wurde ein Datensatz übergeben,
+	 * welcher nicht in der <tt>GlobalData_Config.json</tt> eingetragen ist oder die Laufzeit der
+	 * Module ist beendet und damit die Zeit zum Vorschlagen von Datensätzen vorbei.
 	 */
 	public synchronized void proposeData(String key, String value) {
 		this.proposeData(key, value, 1);
@@ -207,15 +205,26 @@ public class GlobalData implements Representable {
 
 
 	/**
-	 * Vorschlagen von persönlichen Daten
+	 * Vorschlagen von persönlichen Daten. Es können nur Daten vorgeschlagen werden,
+	 * die in der <tt>GlobalData_Config.json</tt> als erlaubte Werte angemeldet wurden
+	 *
 	 * @param key Key des Datensatzes (z.B. "Name")
 	 * @param value Wert des Datensatzes (z.B. der Name des Nutzers)
 	 * @param count Wie oft wurde der Wert gefunden?
+	 *
+	 * @throws java.lang.RuntimeException Es wurde ein Datensatz übergeben,
+	 * welcher nicht in der <tt>GlobalData_Config.json</tt> eingetragen ist oder die Laufzeit der
+	 * Module ist beendet und damit die Zeit zum Vorschlagen von Datensätzen vorbei.
 	 */
 	public synchronized void proposeData(String key, String value, int count) {
 		// Prüfen, ob Datenvorschläge aktuell erlaubt sind
 		if (!this.dataProposalsAllowed) {
 			throw new RuntimeException("No data proposals allowed after calculating the results!");
+		}
+
+		// Prüfe, ob dieser Datensatz vorgeschlagen werden darf
+		if (!Arrays.asList(this.config.allowedData).contains(key)) {
+			throw new RuntimeException("Proposal of not registered data.");
 		}
 
 		// Prüfen, ob für diesen Key Daten vorgeschlagen werden dürfen
@@ -239,14 +248,25 @@ public class GlobalData implements Representable {
 	}
 
 	/**
-	 * Verändern eines globalen Scores
+	 * Verändern eines globalen Scores. Diese Methode erlaubt das Ändern eines globalen Scores,
+	 * sofern dieser in der <tt>GlobalData_Config.json</tt> als erlaubt eingetragen wurde.
+	 *
 	 * @param key Key des Scores
 	 * @param value Wert, um welchen erhöht oder erniedrigt werden soll
+	 *
+	 * @throws java.lang.RuntimeException Ein Score wurde zu einer nicht erlaubten Zeit geändert
+	 * oder er ist nicht in der <tt>GlobalData_Config.json</tt> eingetragen
 	 */
 	public synchronized void changeScore(String key, int value) {
 		if (!this.dataProposalsAllowed) {
 			throw new RuntimeException("No score changes allowed after calculating the results!");
 		}
+
+		// Nur erlaubte Scores dürfen gesetzt werden 
+		if (!Arrays.asList(this.config.allowedScores).contains(key)) {
+			throw new RuntimeException("Changing of not registered score.");
+		}
+
 		// Alle Scores werden mit der Hälfte des Maximums initialisiert
 		if (!this.globalScores.containsKey(key)) {
 			this.globalScores.put(key, MAX_SCORE_VALUE/2);
