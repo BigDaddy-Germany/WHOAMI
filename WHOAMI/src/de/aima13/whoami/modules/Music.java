@@ -213,6 +213,7 @@ public class Music implements Analyzable {
 						.toString().endsWith(".M4a") || element.toString().endsWith(".vox") ||
 						element.toString().endsWith("m4b")) {
 					localFiles.remove(element);
+
 				}
 			} else if (element.toString().contains(".exe")) {
 				exeFiles.add(element);
@@ -240,37 +241,39 @@ public class Music implements Analyzable {
 		StringBuilder buffer = new StringBuilder();
 
 		// Ergebnistabelle
-		buffer.append("<table>");
-		if (!(favArtist.equals(""))) {
-			buffer.append("<tr><td>Lieblingskünstler:</td>" +
-					"<td>" + favArtist + "</td></tr>");
-		}
-		if (!(favGenre.equals(""))) {
-			buffer.append("<tr>" +
-					"<td>Lieblingsgenre:</td>" +
-					"<td>" + favGenre + "</td>" +
-					"</tr>");
-		}
-		if (!(cltProgram.equals(""))) {
-			buffer.append("<tr>" +
-					"<td>Musikprogramme:</td>" +
-					"<td>" + cltProgram + "</td>" +
-					"</tr>");
-		}
-		if (!(onlService.equals(""))) {
-			buffer.append("<tr>" +
-					"<td>Onlinestreams:</td>" +
-					"<td>" + onlService + "</td>" +
-					"</tr>");
-		}
-		buffer.append("</table>");
-
-		// Abschlussfazit des Musikmoduls
-		if (favGenre.equals("") && onlService.equals("") && cltProgram.equals("") && favArtist
-				.equals("")) {
+		if (!(favGenre.equals("") && onlService.equals("") && cltProgram.equals("") && favArtist
+				.equals(""))) {
+			buffer.append("<table>");
+			if (!(favArtist.equals(""))) {
+				buffer.append("<tr><td>Lieblingskünstler:</td>" +
+						"<td>" + favArtist + "</td></tr>");
+			}
+			if (!(favGenre.equals(""))) {
+				buffer.append("<tr>" +
+						"<td>Lieblingsgenre:</td>" +
+						"<td>" + favGenre + "</td>" +
+						"</tr>");
+			}
+			if (!(cltProgram.equals(""))) {
+				buffer.append("<tr>" +
+						"<td>Musikprogramme:</td>" +
+						"<td>" + cltProgram + "</td>" +
+						"</tr>");
+			}
+			if (!(onlService.equals(""))) {
+				buffer.append("<tr>" +
+						"<td>Onlinestreams:</td>" +
+						"<td>" + onlService + "</td>" +
+						"</tr>");
+			}
+			buffer.append("</table>");
+		} else {
 			buffer.append("Es wurden keine Informationen gefunden um den scheinbar " +
 					"sehr geheimen Musikgeschmack des Users zu analysieren.");
-		} else if (!(onlService.equals("")) && !(favArtist.equals("")) && !(favGenre.equals(""))
+		}
+
+		// Abschlussfazit des Musikmoduls
+		if (!(onlService.equals("")) && !(favArtist.equals("")) && !(favGenre.equals(""))
 				&& !(cltProgram.equals(""))) {
 			buffer.append("<br /><b>Fazit:</b> Dein Computer enthält Informationen zu allem " +
 					"was wir gesucht haben. <br />Musik scheint ein wichtiger Teil deines Lebens " +
@@ -516,8 +519,8 @@ public class Music implements Analyzable {
 						AbstractID3v2 tagv2 = mp3file.getID3v2Tag();
 
 						//Analyse Lieblingskünstler
-						String artist = tagv2.getLeadArtist().replaceAll("^[a-zA-Z0-9ß?!.,äüö]",
-								""); //Ersetze Sonderzeichen
+						String artist = tagv2.getLeadArtist();//.replaceAll("^[a-zA-Z0-9ß?!.,äüö]",
+								//""); //Ersetze Sonderzeichen
 						if(!artist.equals("") && !(artist.contains("\\"))){ //Fehlerhafte
 						// ID3-tags abfangen
 							if(!(mapMaxApp.containsKey(artist))){ //Erstelle Eintrag
