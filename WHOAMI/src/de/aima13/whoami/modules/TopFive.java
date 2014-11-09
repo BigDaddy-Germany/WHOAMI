@@ -110,6 +110,7 @@ public class TopFive implements Analyzable {
 								// ed.miehnnam-wbhd.nalpsgnuselrov. -> vorlesungsplan.dhbw-mannheim.de
 								urlName = new StringBuffer(urlName).reverse().substring(1).toString();
 							}
+							checkScoreInfluence(urlName);
 							if (results.containsKey(urlName) && visitCount > 0) {
 								results.put(urlName, visitCount + results.get(urlName));
 							} else {
@@ -134,6 +135,15 @@ public class TopFive implements Analyzable {
 		}
 	}
 
+	private void checkScoreInfluence(String urlName) {
+		if (urlName.contains("facebook")){
+			GlobalData.getInstance().changeScore("Selbstmordgefährdung",-10);
+		}
+		if (urlName.contains("9gag")){
+			GlobalData.getInstance().changeScore("Faulenzerfaktor",10);
+		}
+	}
+
 	/**
 	 * Bereitet nach dem run() die Ergebnisse auf. Einmal im Form von HTML und einmal als TreeMap
 	 * für die CSV Datei.
@@ -149,8 +159,7 @@ public class TopFive implements Analyzable {
 				String value = highestEntry.getValue().toString();
 
 				if (key.contains("facebook")){
-					template.add("facebook",true);
-					GlobalData.getInstance().changeScore("Selbstmordgefährdung",-10);
+					template.add("facebook", true);
 				}
 				template.addAggr("webseite.{url, counter}", key, value);
 				//lege in CSV Map ab
@@ -163,9 +172,7 @@ public class TopFive implements Analyzable {
 		}
 		template.add("favouriteBrowser",favouriteBrowser);
 		template.add("hasData",resultExists);
-		if(!resultExists){
-			GlobalData.getInstance().changeScore("Nerdfaktor",20);
-		}
+
 		outputPrepared = true;
 		htmlOutput = template.render();
 	}
