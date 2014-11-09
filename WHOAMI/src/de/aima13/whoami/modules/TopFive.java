@@ -75,7 +75,9 @@ public class TopFive implements Analyzable {
 
 	@Override
 	public String[] getCsvHeaders() {
-		return new String[0];
+		return new String[]{"MostVisitedWebsitePlaceNo1","MostVisitedWebsitePlaceNo2",
+				"MostVisitedWebsitePlaceNo3","MostVisitedWebsitePlaceNo4",
+				"MostVisitedWebsitePlaceNo5"};
 	}
 
 

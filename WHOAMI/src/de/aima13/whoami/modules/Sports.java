@@ -67,7 +67,7 @@ public class Sports implements Analyzable{
 
 	@Override
 	public String[] getCsvHeaders() {
-		return new String[0];
+		return new String[]{"kind"};
 	}
 
 	/**
@@ -76,7 +76,7 @@ public class Sports implements Analyzable{
 	@Override
 	public SortedMap<String, String> getCsvContent() {
 		TreeMap<String,String> csvResult = new TreeMap<String,String>();
-		csvResult.put("1",Utilities.getHighestEntry(sportPopularity).getKey().toString());
+		csvResult.put("kind",Utilities.getHighestEntry(sportPopularity).getKey().toString());
 		return csvResult;
 	}
 
