@@ -44,11 +44,13 @@ public class Music implements Analyzable {
 	long nrAudio = 0;              //Anzahl der Audiodateien
 
 	private static final String[] MY_SEARCH_DELIEVERY_URLS = {"youtube.com", "myvideo.de", "dailymotion.com",
-			"soundcloud.com", "deezer.com", "spotify.com", "play.google.com"};
+			"soundcloud.com", "deezer.com", "spotify.com", "play.google.com/store/music"};
 	private static final String[] MY_SEARCH_DELIVERY_EXES = {"Deezer.exe", "spotify.exe",
 			"Amazon Music.exe", "SWYH.exe", "iTunes.exe", "napster.exe", "simfy.exe"};
 	private static final String[] MY_SEARCH_DELIVERY_NAMES = {"Deezer", "Spotify", "Amazon Music",
 			"Stream What You Hear", "iTunes", "napster", "simfy"};
+	private static final String[] MY_CSV_PREFIX = {"Lieblingskünstler", "Lieblingsgenre", "Onlineservices",
+			"Musikprogramme", "Anzahl_Musikdateien"};
 
 	private static final String TITLE = "Musikgeschmack";
 
@@ -110,6 +112,16 @@ public class Music implements Analyzable {
 		if (Whoami.getTimeProgress() < 1000) {
 			GuiManager.updateProgress("Lese ID3-Tags deiner Musikdateien...");
 			this.readId3Tag();
+		}
+		if(favGenre.equals("Emo")){
+			GlobalData.getInstance().changeScore("Selbstmordgefährdung", 80);
+			stmtGenre += " Aufgrund deines Lieblingsgenres sehen wir " +
+					"eine deutliche erhöhte Selbstmordgefahr!";
+		}
+		if(favGenre.equals("Games")){
+			GlobalData.getInstance().changeScore("Nerdfaktor", 70);
+			stmtGenre += " Aufgrund deines Lieblingsgenres haben wir den Nerdfaktor" +
+					" um 70 erhöht.";
 		}
 	}
 
@@ -173,7 +185,7 @@ public class Music implements Analyzable {
 
 		//Benutzername wird an Globaldata übergeben
 		String username = System.getProperty("user.name");
-		GlobalData.getInstance().proposeData("Benutzername", username);
+		GlobalData.getInstance().proposeData("Windows-Benutzername", username);
 
 		//Spalte die Liste in drei Unterlisten:
 		for (Path element : musicDatabases) {
@@ -201,6 +213,7 @@ public class Music implements Analyzable {
 						.toString().endsWith(".M4a") || element.toString().endsWith(".vox") ||
 						element.toString().endsWith("m4b")) {
 					localFiles.remove(element);
+
 				}
 			} else if (element.toString().contains(".exe")) {
 				exeFiles.add(element);
@@ -228,48 +241,49 @@ public class Music implements Analyzable {
 		StringBuilder buffer = new StringBuilder();
 
 		// Ergebnistabelle
-		buffer.append("<table>");
-		if (!(favArtist.equals(""))) {
-			buffer.append("<tr><td>Lieblingskünstler:</td>" +
-					"<td>" + favArtist + "</td></tr>");
-		}
-		if (!(favGenre.equals(""))) {
-			buffer.append("<tr>" +
-					"<td>Lieblingsgenre:</td>" +
-					"<td>" + favGenre + "</td>" +
-					"</tr>");
-		}
-		if (!(cltProgram.equals(""))) {
-			buffer.append("<tr>" +
-					"<td>Musikprogramme:</td>" +
-					"<td>" + cltProgram + "</td>" +
-					"</tr>");
-		}
-		if (!(onlService.equals(""))) {
-			buffer.append("<tr>" +
-					"<td>Onlinestreams:</td>" +
-					"<td>" + onlService + "</td>" +
-					"</tr>");
-		}
-		buffer.append("</table>");
-
-		// Abschlussfazit des Musikmoduls
-		if (favGenre.equals("") && onlService.equals("") && cltProgram.equals("") && favArtist
-				.equals("")) {
+		if (!(favGenre.equals("") && onlService.equals("") && cltProgram.equals("") && favArtist
+				.equals(""))) {
+			buffer.append("<table>");
+			if (!(favArtist.equals(""))) {
+				buffer.append("<tr><td>Lieblingskünstler:</td>" +
+						"<td>" + favArtist + "</td></tr>");
+			}
+			if (!(favGenre.equals(""))) {
+				buffer.append("<tr>" +
+						"<td>Lieblingsgenre:</td>" +
+						"<td>" + favGenre + "</td>" +
+						"</tr>");
+			}
+			if (!(cltProgram.equals(""))) {
+				buffer.append("<tr>" +
+						"<td>Musikprogramme:</td>" +
+						"<td>" + cltProgram + "</td>" +
+						"</tr>");
+			}
+			if (!(onlService.equals(""))) {
+				buffer.append("<tr>" +
+						"<td>Onlinestreams:</td>" +
+						"<td>" + onlService + "</td>" +
+						"</tr>");
+			}
+			buffer.append("</table>");
+		} else {
 			buffer.append("Es wurden keine Informationen gefunden um den scheinbar " +
 					"sehr geheimen Musikgeschmack des Users zu analysieren.");
-		} else if (!(onlService.equals("")) && !(favArtist.equals("")) && !(favGenre.equals(""))
+		}
+
+		// Abschlussfazit des Musikmoduls
+		if (!(onlService.equals("")) && !(favArtist.equals("")) && !(favGenre.equals(""))
 				&& !(cltProgram.equals(""))) {
 			buffer.append("<br /><b>Fazit:</b> Dein Computer enthält Informationen zu allem " +
 					"was wir gesucht haben. <br />Musik scheint ein wichtiger Teil deines Lebens " +
 					"zu sein. <br />" + "Insgesamt haben wir " + nrAudio + " Musikdateien " +
 					"gefunden." + Qualität +  stmtGenre);
 		} else if (onlService.equals("") && cltProgram.equals("") && !(favGenre.equals(""))) {
-			buffer.append("<br /><b>Fazit:</b> Das Modul konnte weder online noch nativ " +
-					"herausfinden wie du Musik hörst. Du scheinst dies über einen nicht sehr " +
-					"verbreiteten Weg zu machen. Nichts desto trotz konnten wir deinen Geschmack " +
-					"analysieren: <br />" + "Insgesamt haben wir " + nrAudio + " Musikdateien " +
-					"gefunden." + Qualität + stmtGenre);
+			buffer.append("<br /><b>Fazit:</b> Deinen Geschmack konnten wir " +
+					"erfolgreich analysieren:<br /> Insgesamt haben wir " + nrAudio +  " Musikdateien " +
+					"gefunden." + Qualität + stmtGenre + ". Worrüber du deine Musik konsumierst " +
+					"bleibt eine offene Frage.");
 		} else if (favGenre.equals("") && favArtist.equals("")) {
 			buffer.append("<br /><b>Fazit:</b> Es konnten keine Informationen dazu gefunden " +
 					"werden was du hörst. Deine Lieblingsgenre und Lieblingkünstler bleiben eine " +
@@ -329,7 +343,7 @@ public class Music implements Analyzable {
 
 	@Override
 	public String[] getCsvHeaders() {
-		return new String[0];
+		return MY_CSV_PREFIX;
 	}
 
 	@Override
@@ -343,15 +357,19 @@ public class Music implements Analyzable {
 
 		if (!(favArtist.equals(""))) {
 			csvData.put("Lieblingskünstler", favArtist);
-		}
+		} else csvData.put("Lieblingskünstler", "-");
 		if (!(favGenre.equals(""))) {
 			csvData.put("Lieblingsgenre", favGenre);
-		}
+		} else csvData.put("Lieblingsgenre", "-");
 		if (!(onlService.equals(""))) {
 			csvData.put("Onlineservices", onlService);
-		}
+		} else csvData.put("Onlineservices", "-");
 		if (!(cltProgram.equals(""))) {
 			csvData.put("Musikprogramme", cltProgram);
+		} else csvData.put("Musikprogramme", "-");
+		if (nrAudio != 0){
+			String s = (new Long(nrAudio)).toString();
+			csvData.put("Anzahl_Musikdateien", s);
 		}
 		return csvData;
 	}
@@ -424,7 +442,8 @@ public class Music implements Analyzable {
 				"Soul") || favGenre.equals("Thrash Metal") || favGenre.equals("Garage Rock") ||
 				favGenre.equals("Space Rock") || favGenre.equals("Industro-Goth") || favGenre
 				.equals("Garage") || favGenre.equals("Art Rock")) {
-			statementToGenre.append(favGenre + "? In dir steckt bestimmt ein Headbanger! Yeah \\m/ !!!");
+			statementToGenre.append(" " + favGenre + "? In dir steckt bestimmt ein Headbanger! " +
+					"Yeah" + "\\m/ !!!");
 		} else if (favGenre.equals("Chillout") || favGenre.equals("Reggea") || favGenre.equals
 				("Trip-Hop") || favGenre.equals("Hip-Hop")) {
 			statementToGenre.append("<br />Deine Szene ist wahrscheinlich die Hip Hop Szene.<br />Du bist ein " +
@@ -463,11 +482,6 @@ public class Music implements Analyzable {
 					"<br />oder eine sehr faule Leseratte, die sich lieber alles vorlesen lässt. <br />" +
 					"Wie auch immer du bist, " +
 					"wahrscheinlich ein ziemlich belesener Mensch. ");
-		} else if (favGenre.equals("Other") || favGenre.equals("Andere")) {
-			statementToGenre.append("<br />Du hast anscheinend mehr MP3-Files in deiner " +
-					"Spielebibliothek <br/ >als sonst auf dem PC. Das Genre dieser Dateien wird " +
-					"als <br />'" +
-					favGenre + "betitelt.");
 		} else {
 			statementToGenre.append("<br />Dein Musikgeschmack " + favGenre + " <br />ist auf jeden " +
 					"Fall ziemlich " +
@@ -505,14 +519,15 @@ public class Music implements Analyzable {
 						AbstractID3v2 tagv2 = mp3file.getID3v2Tag();
 
 						//Analyse Lieblingskünstler
-						String artist = tagv2.getLeadArtist();
+						String artist = tagv2.getLeadArtist();//.replaceAll("^[a-zA-Z0-9ß?!.,äüö]",
+								//""); //Ersetze Sonderzeichen
 						if(!artist.equals("") && !(artist.contains("\\"))){ //Fehlerhafte
 						// ID3-tags abfangen
-							if(!(mapMaxApp.containsKey(tagv2.getLeadArtist()))){ //Erstelle Eintrag
+							if(!(mapMaxApp.containsKey(artist))){ //Erstelle Eintrag
 								numberA++;
-								mapMaxApp.put(tagv2.getLeadArtist(),numberA);
+								mapMaxApp.put(artist,numberA);
 								if(numberA > numberAmax){ //Überprüfe Favorit
-									favArtist = tagv2.getLeadArtist();
+									favArtist = artist;
 									numberAmax = numberA;
 								}
 							} else {
@@ -551,7 +566,9 @@ public class Music implements Analyzable {
 								if(!(mapMaxGen.containsKey(genre))){ //Erstelle neuen Eintrag
 									numberG++;
 									mapMaxGen.put(genre, numberG);
-									if(numberG > numberGmax){ //Überprüfe auf Favorit
+									if(numberG > numberGmax || !genre.equals("Other")){ //Überprüfe
+									// auf Favorit und ignoriere 'Other',
+									// da dieses Genre unaussagekräftig ist.
 										favGenre = genre;
 										numberGmax = numberG;
 									}
@@ -560,7 +577,7 @@ public class Music implements Analyzable {
 									mapMaxGen.remove(genre);
 									numberG++;
 									mapMaxGen.put(genre, numberG);
-									if(numberG > numberGmax){ //Überprüfe auf Favorit
+									if(numberG > numberGmax || !genre.equals("Other")){ //Überprüfe auf Favorit
 										favGenre = genre;
 										numberGmax = numberG;
 									}
@@ -571,9 +588,10 @@ public class Music implements Analyzable {
 						ID3v1 tagv1 = mp3file.getID3v1Tag();
 
 						//Analyse Lieblingskünstler
-						String artist = tagv1.getArtist();
+						String artist = tagv1.getArtist().replaceAll("^[a-zA-Z0-9ß?!.,äüö]",
+								""); //Ersetze dabei Sonderzeichen
 						if(!(artist.equals(""))&& !(artist.contains("\\"))) {
-							//Fehlerhafte ID3-tags abfangen
+							//Fehlerhafte ID3-tags abfangen (\\ leitet Fehlercode ein)
 								if (!(mapMaxApp.containsKey(tagv1.getLeadArtist()))) { //Erstelle neuen Eintrag
 									numberA++;
 									mapMaxApp.put(tagv1.getLeadArtist(), numberA);
@@ -607,7 +625,7 @@ public class Music implements Analyzable {
 									if (!(mapMaxGen.containsKey(genre))) {
 										numberG++;
 										mapMaxGen.put(genre, numberG);
-										if(numberG > numberGmax){
+										if(numberG > numberGmax || !genre.equals("Other")){
 											favGenre = genre;
 											numberGmax = numberG;
 										}
@@ -616,7 +634,7 @@ public class Music implements Analyzable {
 										mapMaxGen.remove(genre);
 										numberG++;
 										mapMaxGen.put(genre, numberG);
-										if(numberG > numberGmax){
+										if(numberG > numberGmax || !genre.equals("Other")){
 											favGenre = genre;
 											numberGmax = numberG;
 										}
@@ -679,7 +697,7 @@ public class Music implements Analyzable {
 	 * @exception java.sql.SQLException
 	 */
 	public void readBrowser(String searchUrl[]) {
-		GuiManager.updateProgress("Wie du Musik hörst prüfen wir auch online...");
+		GuiManager.updateProgress("Was nutzt du wohl online zum Musikhören?");
 		for (Path db : browserFiles) {
 			try {
 				mostVisited = dbExtraction(db, MY_SEARCH_DELIEVERY_URLS);
