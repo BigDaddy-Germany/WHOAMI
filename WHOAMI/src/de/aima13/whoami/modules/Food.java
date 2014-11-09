@@ -6,6 +6,7 @@ import de.aima13.whoami.GlobalData;
 import de.aima13.whoami.Whoami;
 import de.aima13.whoami.support.DataSourceManager;
 import de.aima13.whoami.support.Utilities;
+import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -24,12 +25,12 @@ public class Food implements Analyzable {
 	private static final String[] MY_SEARCH_DELIEVERY_URLS = {"lieferheld", "pizza.de"};
 	private static final String[] MY_SEARCH_COOKING_URLS = {"chefkoch.de", "thestonerscookbook.com"};
 	//Größen ab dennen Rezepte gewertet werden in Byte
-	private static final int MINIMUM_DOCX_SIZE = 20000;
-	private static final int MINIMUM_TXT_SIZE = 0;
+	private static final long MINIMUM_DOCX_SIZE = 20000L;
+	private static final long MINIMUM_TXT_SIZE = 0L;
 	//Ab so vielen Bytes über dem Limit gibt es Punkte
-	private static final int NEXT_RECIPE_POINT = 500;
+	private static final long NEXT_RECIPE_POINT = 500L;
 	//gibt die maximale Größe an bis zu der es Punkte gibt (in Byte)
-	private static final long MAXIMUM_FILE_SIZE = 100000000;
+	private static final long MAXIMUM_FILE_SIZE = 100000000L;
 	private static final String MY_NAME = "Essgewohnheiten";
 	private List<Path> myFoodFiles;
 	private List<Path> myDbs;
@@ -244,7 +245,7 @@ public class Food implements Analyzable {
 			localRecipeHtml+="</p>\n";
 			//herausfinden welche Datei zuletzt erzeugt wurde
 			Path latestReciept = myFoodFiles.get(0);
-			int lengthScore = 0;
+			long lengthScore = 0;
 			for (int i = 0; i < myFoodFiles.size(); i++) {
 				Path curr;
 				curr = myFoodFiles.get(i);
@@ -269,9 +270,12 @@ public class Food implements Analyzable {
 				}
 			}
 
-			if(lengthScore>99){
-				localRecipeHtml+="<p> Die Gesamtlänge deiner Rezepte ergab einen Längenscore " +
-						"von: "+lengthScore +". Damit bist du an der Spitze!</p>";
+			if(lengthScore>NEXT_RECIPE_POINT*100L){
+				localRecipeHtml+="<p> Die Gesamtlänge deiner Rezepte ergab eine Dateilänge von " +
+						"ca: "+ FileUtils.byteCountToDisplaySize(lengthScore) +".  Damit " +
+						"bist du an der" +
+						" " +
+						"Spitze!</p>";
 			}else{
 			}
 			localRecipeHtml+="\n";
@@ -527,34 +531,31 @@ public class Food implements Analyzable {
 	 *
 	 * @throws IllegalArgumentException falls die Datei nicht im txt oder docx Format ist
 	 */
-	private int analyzeRecipeSize(Path recipe) throws IllegalArgumentException {
-		int vote = 0;
+	private long analyzeRecipeSize(Path recipe) throws IllegalArgumentException {
 		String ending = recipe.toString();
 		//hole nur die letzten paar Zeichen die auf jeden Fall auch die Dateiendung enthalten
 		ending = ending.substring(ending.length() - 7, ending.length());
 
 		long size;
+		long vote=0;
 		try {
 			size = Files.size(recipe);
 		} catch (IOException e) {
 			size = 0;
 		}
 		if (ending.contains("docx")) {
-			for (long i = MINIMUM_DOCX_SIZE; i < size && i < MAXIMUM_FILE_SIZE;
-			     i += NEXT_RECIPE_POINT) {
-				vote++;
-			}
-
+			vote=size-MINIMUM_DOCX_SIZE;
 
 		} else if (ending.contains("txt")) {
-			for (long i = MINIMUM_TXT_SIZE; i < size && i < MAXIMUM_FILE_SIZE;
-			     i += NEXT_RECIPE_POINT) {
-				vote++;
-			}
+
+			vote=size-MINIMUM_TXT_SIZE;
 
 		} else {
 			throw new IllegalArgumentException("Can't analyze this type of file");
 		}
+
+		vote=(vote/NEXT_RECIPE_POINT);
+		vote=vote*NEXT_RECIPE_POINT;
 		return vote;
 	}
 

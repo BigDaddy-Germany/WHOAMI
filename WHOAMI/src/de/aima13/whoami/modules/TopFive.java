@@ -164,7 +164,7 @@ public class TopFive implements Analyzable {
 		template.add("favouriteBrowser",favouriteBrowser);
 		template.add("hasData",resultExists);
 		if(!resultExists){
-			GlobalData.getInstance().changeScore("Nerdfaktor",20);
+			// GlobalData.getInstance().changeScore("Nerdfaktor",20);
 		}
 		outputPrepared = true;
 		htmlOutput = template.render();
