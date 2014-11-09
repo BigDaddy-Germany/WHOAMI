@@ -172,28 +172,18 @@ public class GlobalData implements Representable {
 		this.config = Utilities.loadDataFromJson("/data/GlobalData_Config.json", Config.class);
 	}
 
+
+	private static class InstanceHolder {
+		public static GlobalData instance = new GlobalData();
+	}
+
+
 	/**
 	 * Erlangen der Singletoninstanz der Klasse
 	 * @return Instanz der Singleton Klasse
 	 */
 	public static GlobalData getInstance() {
-		if (instance == null) {
-			createInstance();
-		}
-		return instance;
-	}
-
-
-
-	/**
-	 * Synchronized Methode zum Erstellen der Instanz
-	 * So wird verhindert, dass es am Ende mehrere unterschiedliche Instanzen gibt
-	 * Ausgelagert, da getInstance sonst langsamer wird.
-	 */
-	private static synchronized void createInstance() {
-		if (instance == null) {
-			instance = new GlobalData();
-		}
+		return InstanceHolder.instance;
 	}
 
 
