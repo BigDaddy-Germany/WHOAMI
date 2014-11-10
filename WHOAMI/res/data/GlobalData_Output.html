@@ -1,68 +1,74 @@
 <!-- Template für GlobalData Output -->
-<b>
-    $if(firstName)$
-        Hallo $firstName$,
+<div>
+    <b>
+        $if(firstName)$
+            Hallo $firstName$,
+        $else$
+            Hallo,
+        $endif$
+    </b><br />
+    Dann wollen wir mal sehen was uns dein Rechnenknecht über dich verrät!
+    $if(location)$
+        Fangen wir mal mit einer kleinen Übersicht an wie wäre es mit deiner Anschrift?
+        Wo du wohnst interessiert bestimmt viele!
+        Ich tippe auf $location$. Wie lebt es sich denn so in $location$? Schön dort?
     $else$
-        Hallo,
+        Eigentlich wollten wir dich ja damit überraschen, dass wir deinen Wohnort herausgefunden
+        haben, aber leider hast du den sehr gut vor uns versteckt.
     $endif$
-</b><br />
-Dann wollen wir mal sehen was uns dein Rechnenknecht über dich verrät!
-$if(location)$
-    Fangen wir mal mit einer kleinen Übersicht an wie wäre es mit deiner Anschrift?
-    Wo du wohnst interessiert bestimmt viele!
-    Ich tippe auf $location$. Wie lebt es sich denn so in $location$? Schön dort?
-$else$
-    Eigentlich wollten wir dich ja damit überraschen, dass wir deinen Wohnort herausgefunden
-    haben, aber leider hast du den sehr gut vor uns versteckt.
-$endif$
-$if(street)$
-    Ein kleiner Hinweis noch: Uns ist zu Ohren gekommen, dass Nachts schreckliche Dinge in der
-    $street$ passieren kannst du das bestätigen?
-$endif$
-$if(street && location && zipCode)$
-    Wenn nicht nicht würden wir dich glatt morgen Abend mal in der $street$, $zipCode$ $location$
-    besuchen kommen. Oder wir schicken dir die Waschmaschine die du mit der Endnutzervereinbarung
-    akzeptiert hast.
-    $if(iban)$
-        Achso, das Geld für die Waschmaschine ziehen wir dann von folgendem Konto ein $iban$, das
-        Sepa Mandata stand ja in der Eula.
+    $if(street)$
+        Ein kleiner Hinweis noch: Uns ist zu Ohren gekommen, dass Nachts schreckliche Dinge in der
+        $street$ passieren kannst du das bestätigen?
     $endif$
-$endif$
+    $if(street && location && zipCode)$
+        Wenn nicht nicht würden wir dich glatt morgen Abend mal in der $street$, $zipCode$ $location$
+        besuchen kommen. Oder wir schicken dir die Waschmaschine die du mit der Endnutzervereinbarung
+        akzeptiert hast.
+        $if(iban)$
+            Achso, das Geld für die Waschmaschine ziehen wir dann von folgendem Konto ein $iban$, das
+            Sepa Mandata stand ja in der Eula.
+        $endif$
+    $endif$
+</div>
 $if(hasInformation)$
-    Na ja wir weichen vom Thema ab. Mal schauen was wir noch so interessantes haben.
-    <table border="1">
-        <tr>
-            <th>Name</th>
-            <th>Wert</th>
-        </tr>
-        $information:{info|
-        <tr>
-            <td>$info.name$</td>
-            <td>$info.value$</td>
-        </tr>
-        }$
-    </table>
+    <div>
+        Na ja wir weichen vom Thema ab. Mal schauen was wir noch so interessantes haben.
+        <table border="1">
+            <tr>
+                <th>Name</th>
+                <th>Wert</th>
+            </tr>
+            $information:{info|
+            <tr>
+                <td>$info.name$</td>
+                <td>$info.value$</td>
+            </tr>
+            }$
+        </table>
+    </div>
 $endif$
 $if(hasScores)$
-    $if(hasInformation)$
-        Wir haben uns zusätzlich dazu auch noch die Müge gemacht, Scores für dich zu berechnen.
-    $else$
-        Übrigens haben wir uns die Mühe gemacht, einige Scores für dich zu berechnen.
-    $endif$
-    Fragst du dich gerade was Scores sind? Ein Score ist ein Wert (in diesem Fall zwischen 0 und
-    $maxScore$), welcher bewertet, wie extrem eine gewisse Neigung bei dir ausgeprägt zu
-    sein scheint. Hierbei bedeutet $maxScore$ immer sehr stark und 0 gar nicht. Die goldene Mitte
-    besagt, dass es hier nicht wirklich eine Aussage gibt.
-    <table border="1">
-        <tr>
-            <th>Score</th>
-            <th>Wertung</th>
-        </tr>
-        $scores:{s|
-        <tr>
-            <td>$s.name$</td>
-            <td> $s.value$</td>
-        </tr>
-        }$
-    </table>
+    <div>
+        $if(hasInformation)$
+            Wir haben uns zusätzlich dazu auch noch die Müge gemacht, Scores für dich zu berechnen.
+        $else$
+            Übrigens haben wir uns die Mühe gemacht, einige Scores für dich zu berechnen.
+        $endif$
+        Fragst du dich gerade was Scores sind? Ein Score ist ein Wert (in diesem Fall zwischen 0 und
+        $maxScore$), welcher bewertet, wie extrem eine gewisse Neigung bei dir ausgeprägt zu
+        sein scheint. Hierbei bedeutet $maxScore$ immer sehr stark und 0 gar nicht. Die goldene Mitte
+        besagt, dass es hier nicht wirklich eine Aussage gibt.
+        <table border="1">
+            <tr>
+                <th>Score</th>
+                <th>Wertung</th>
+            </tr>
+            $scores:{s|
+            <tr>
+                <td>$s.name$</td>
+                <td> $s.value$</td>
+            </tr>
+            }$
+        </table>
+    </div>
 $endif$
