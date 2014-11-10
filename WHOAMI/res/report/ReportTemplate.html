@@ -1,8 +1,8 @@
 <!DOCTYPE HTML>
 <html>
-    <head>
-        <meta charset="utf-8" />
-        <style type="text/css">
+	<head>
+		<meta charset="utf-8" />
+		<style type="text/css">
 /* RESET START */
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -65,14 +65,16 @@ h1 {
 	padding: 7px;
 	font-weight:bold;
 	font-family:"Lucida Console", Monaco, monospace;
-	margin-bottom:10px;	
+	margin-bottom:10px; 
 }
 
 div.module {
 	margin-bottom: 42px;
 	background-color: #F0F0F0;
 	border-radius: 10px 10px 10px 10px;
+	overflow: auto;
 }
+
 div.module > h2 {
 	font-variant:small-caps;
 	font-size:16pt;
@@ -80,8 +82,9 @@ div.module > h2 {
 	color: #FFFFFF;
 	padding: 7px;
 	font-weight:bold;
-	margin: 10px 0px 0px 0px;
+	margin: 0px 0px 0px 0px;
 }
+
 div.module > div {
 	font-size:12pt;
 	padding: 10px;
@@ -95,7 +98,8 @@ table {
 	border-collapse: seperate;
 	box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
 	background-color:transparent;
-	margin: 10px 5px 10px 5px;
+	margin: 15px 20px 15px 5px;
+	float: left;
 }
 
 td, th {
@@ -125,24 +129,24 @@ tr:nth-child(even) td {
 	font-style: italic;
 	font-size: 0.8em;
 }
-        </style>
-        <title>Analysebericht</title>
-    </head>
-    <body>
-    <h1>Analysebericht</h1>
-    $modules:{module|
+		 </style>
+		<title>Analysebericht</title>
+	</head>
+	<body>
+	<h1>Analysebericht</h1>
+	$modules:{module|
 		<div class="module">
-        <h2>$module.title$</h2>
-        <div>
-            $module.content$
-        </div>
+		<h2>$module.title$</h2>
+		<div>
+			$module.content$
 		</div>
-    }$
+		</div>
+	}$
 
 
-    <div id="footer">
-        &copy; by BigDaddy AnalystGroup 2014
-    </div>
+	<div id="footer">
+		&copy; by BigDaddy AnalystGroup 2014
+	</div>
 
-    </body>
+	</body>
 </html>
