@@ -1,10 +1,16 @@
 $if(hasData)$
-        Du nutzt anscheinend am meisten $favouriteBrowser$ als Browser.$if(facebook)$Was
+        Du nutzt anscheinend am meisten $favouriteBrowser$ als Browser. $if(facebook)$Was
 treibst du dich eigentlich so viel auf Facebook rum, hast du soviele Freunde, die dir
-schreiben? Wir haben uns deshalb entschieden deine Selbstmordgefährung herunterzusetzen.$endif$
-<br>
+schreiben? Wir haben uns deshalb entschieden deine Selbstmordgefährung herunterzusetzen. $endif$
+$if(bild)$Und du liest also den Qualitätsjournalismus von Bild sogar Online. Nicht schlecht .$endif$
+$if(stackoverflow && bild)$Das du zusätzlich aber viel auf Stackoverflow unterwegs bist
+lässt uns vermuten das Programme nie so richtig funktionieren. $endif$
+$if(localhost)$localhost? Hast du dich nur verirrt oder nutzt du deinen PC als Server? Du bist
+wohl ein wahrer Nerd, als heben wir diesen Faktor mal etwas an! $endif$
 
-        Hier deine 5 am häufigsten aufgerufenen Webseiten.
+
+
+Hier deine 5 am häufigsten aufgerufenen Webseiten.
         <b>Deine Aufrufstatistik:</b>
         <table border="1">
             <tr>
@@ -18,6 +24,7 @@ schreiben? Wir haben uns deshalb entschieden deine Selbstmordgefährung herunter
             </tr>
             }$
         </table>
+
 $else$
         Hm deine Browserverläufe sind leider alle leer. Entweder scheinst deine Spuren gut zu
 verwischen oder du nutzt Internet Explorer. Da wir Dir keine Nutzung vom Internet Explorer

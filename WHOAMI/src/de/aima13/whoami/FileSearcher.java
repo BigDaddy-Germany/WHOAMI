@@ -145,7 +145,7 @@ public class FileSearcher {
 		 */
 		@Override
 		public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-			if (dir.toString().contains("$Recycle.Bin")) {
+			if (dir.toString().toLowerCase().contains("$recycle.bin")) {
 				return FileVisitResult.SKIP_SUBTREE;
 			}
 			return FileVisitResult.CONTINUE;

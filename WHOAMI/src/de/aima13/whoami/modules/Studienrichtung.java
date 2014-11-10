@@ -233,7 +233,7 @@ public class Studienrichtung implements Analyzable {
 	 */
 	private void analyzePathNames(ArrayList<CourseVisitedEntry> courseResult) {
 		float influence = 100;
-		if (courseResult != null && !courseResult.isEmpty()) {
+		if (courseResult != null && !courseResult.isEmpty() && this.foundOnlineCalender) {
 			influence = courseResult.get(0).visitCount * DROPBOX_WEIGHTING_FACTOR;
 		}
 		for (CourseVisitedEntry entry : courseResult) {
