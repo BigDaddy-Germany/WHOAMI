@@ -52,7 +52,7 @@ public class Sports implements Analyzable{
 			return "Du scheinst dich nicht viel für Sport zu interessieren!";
 		}
 		return "Warum auch immer interessiert du dich am meisten für "+ mostPopularSport.getKey()
-				+"!" + getCommentAccordingToSport(mostPopularSport.getKey().toString());
+				+"! " + getCommentAccordingToSport(mostPopularSport.getKey().toString());
 	}
 
 	/**
