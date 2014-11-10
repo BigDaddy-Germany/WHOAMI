@@ -8,7 +8,7 @@ import java.util.*;
  * @author Marco Dörfler
  */
 public class Whoami implements Runnable {
-	private static final int ANALYZE_TIME= 1000; // Analysezeit in Sekunden
+	private static final int ANALYZE_TIME = 1000; // Analysezeit in Sekunden
 	public static final int PERCENT_FOR_FILE_SEARCHER = 75; // Wie viel Prozent für den
 	private static long startTime;
 	private Map<Representable, String[]> csvHeaderMap = new HashMap<>();
@@ -70,12 +70,17 @@ public class Whoami implements Runnable {
 		SlaveDriver.startModules(moduleList);
 
 		// Starte Speichervorgang
+		/*
+		Zur besseren Zuordnung von Bericht und Tabelleneintrag sollten beide mit einer ID
+		versehen werden. Diese wird jetzt generiert
+		 */
+		String scanId = Integer.toHexString((int) (startTime / 1000));
 
 		// CSV
-		CsvCreator.saveCsv(this.csvHeaderMap);
+		CsvCreator.saveCsv(this.csvHeaderMap, scanId);
 
 		// PDF
-		ReportCreator reportCreator = new ReportCreator(representableList);
+		ReportCreator reportCreator = new ReportCreator(representableList, scanId);
 		reportCreator.savePdf();
 		
 		GuiManager.updateProgress("Bin fertig :)");

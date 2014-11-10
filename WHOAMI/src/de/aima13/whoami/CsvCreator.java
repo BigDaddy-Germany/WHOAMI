@@ -33,8 +33,11 @@ public class CsvCreator {
 	 *
 	 * @param representables Liste alle zu präsentierenden CSV Werte
 	 */
-	public static boolean saveCsv(Map<Representable, String[]> representables) {
+	public static boolean saveCsv(Map<Representable, String[]> representables, String scanId) {
 		SortedMap<String, String> completeCsvContent = new TreeMap<>();
+
+		// Als erster Eintrag jeder Spalte sollte die ID des Scans stehen
+		completeCsvContent.put("ScanId", scanId);
 
 		// CSV Werte aus allen Representables ziehen
 		for (Map.Entry<Representable, String[]> representableCsvEntry : representables.entrySet()) {
