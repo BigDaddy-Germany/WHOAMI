@@ -75,7 +75,9 @@ public class TopFive implements Analyzable {
 
 	@Override
 	public String[] getCsvHeaders() {
-		return new String[0];
+		return new String[]{"MostVisitedWebsitePlaceNo1","MostVisitedWebsitePlaceNo2",
+				"MostVisitedWebsitePlaceNo3","MostVisitedWebsitePlaceNo4",
+				"MostVisitedWebsitePlaceNo5"};
 	}
 
 
@@ -94,6 +96,7 @@ public class TopFive implements Analyzable {
 	 */
 	@Override
 	public void run() {
+		boolean urlsFound = false;
 		for (Path db : browserDatabases) {
 			ResultSet mostVisited = null;
 			try {
@@ -116,6 +119,7 @@ public class TopFive implements Analyzable {
 							} else {
 								results.put(urlName, visitCount);
 							}
+							urlsFound = true;
 						}
 					}
 				}
@@ -132,6 +136,9 @@ public class TopFive implements Analyzable {
 					}
 				}
 			}
+		}
+		if (!urlsFound){
+			GlobalData.getInstance().changeScore("Nerdfaktor",3);
 		}
 	}
 

@@ -65,6 +65,7 @@ public class CodeStatistics implements Analyzable {
 				".json", FileExtension[].class);
 
 		this.statisticResults = new HashMap<>();
+		// Intitialisieren der Resultate
 		for (FileExtension fileExtension : this.fileExtensions) {
 			this.statisticResults.put(fileExtension, 0);
 		}
@@ -158,7 +159,12 @@ public class CodeStatistics implements Analyzable {
 
 	@Override
 	public String[] getCsvHeaders() {
-		return new String[0];
+		List<String> csvHeaders = new ArrayList<>();
+
+		for (FileExtension fileExtension : this.fileExtensions) {
+			csvHeaders.add(fileExtension.lang);
+		}
+		return csvHeaders.toArray(new String[csvHeaders.size()]);
 	}
 
 
