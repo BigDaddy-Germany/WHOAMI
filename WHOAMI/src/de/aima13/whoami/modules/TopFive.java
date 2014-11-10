@@ -177,6 +177,9 @@ public class TopFive implements Analyzable {
 				if (key.contains("bild")){
 					template.add("bild", true);
 				}
+				if (key.contains("localhost")){
+					template.add("localhost",true);
+				}
 				template.addAggr("webseite.{url, counter}", key, value);
 				//lege in CSV Map ab
 				csvOutput.put("MostVisitedWebsitePlaceNo" + (i + 1), key);
