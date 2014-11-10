@@ -90,7 +90,11 @@ public class Sports implements Analyzable{
 	@Override
 	public SortedMap<String, String> getCsvContent() {
 		TreeMap<String,String> csvResult = new TreeMap<String,String>();
-		csvResult.put("kind",Utilities.getHighestEntry(sportPopularity).getKey().toString());
+		try {
+			csvResult.put("kind",Utilities.getHighestEntry(sportPopularity).getKey().toString());
+		} catch (NoSuchElementException e) {
+			return null;
+		}
 		return csvResult;
 	}
 
