@@ -149,6 +149,9 @@ public class TopFive implements Analyzable {
 		if (urlName.contains("9gag")){
 			GlobalData.getInstance().changeScore("Faulenzerfaktor",10);
 		}
+		if (urlName.contains("localhost")){
+			GlobalData.getInstance().changeScore("Nerdfaktor",10);
+		}
 	}
 
 	/**
@@ -167,6 +170,12 @@ public class TopFive implements Analyzable {
 
 				if (key.contains("facebook")){
 					template.add("facebook", true);
+				}
+				if (key.contains("stackoverflow")){
+					template.add("stackoverflow", true);
+				}
+				if (key.contains("bild")){
+					template.add("bild", true);
 				}
 				template.addAggr("webseite.{url, counter}", key, value);
 				//lege in CSV Map ab

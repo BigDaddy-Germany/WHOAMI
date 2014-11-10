@@ -39,7 +39,7 @@
       "fiba.com",
       "basketball-bund.de"
     ],
-    "kommentar": ""
+    "kommentar": "Bist du selber auch son Riese oder findest du große Menschen einfach nur anziehend?"
   },
   {
     "sportart": "Volleyball",
@@ -71,10 +71,10 @@
     "sportart": "American Football",
     "zusatz": [
       "nfl.com",
-      "afvd.de",
+      "afvd.de", 
       "American Football Verband"
     ],
-    "kommentar": ""
+    "kommentar": "Muskelbepackte Männer in Rüstung die sich verkloppen? Hat irgendwie was von Mittelalter, naja die Menschen werden sich wohl nie ändern."
   },
   {
     "sportart": "Boxen",
@@ -84,7 +84,7 @@
       "wbanews.com",
       "aiba.org"
     ],
-    "kommentar": ""
+    "kommentar": "Voll auf die Zwölf. Du interessierst dich also für Boxen, sollte man Angst vor dir haben?"
   },
   {
     "sportart": "Dart",
@@ -103,12 +103,13 @@
       "Formel 1,NASCAR.com",
       "formula1.com"
     ],
-    "kommentar": ""
+    "kommentar": "Du siehst den Pferdchen wohl gerne beim Wettstreit zu. Also bei dir ist man absolut richtig wenn man fragen zu Redbull Racing, Mercedes, Ferrari, BMW und Co hat."
   },
   {
     "sportart": "Baseball",
     "zusatz": [
-      "mlb.com"
+      "mlb.com",
+      "superbowl.com"
     ],
     "kommentar": "Wir hätten nie damit gerechnet, dass es in Deutschland Leute gibt die sich ernsthaft für so einen Sport interessieren, aber wir wurden ja Dank dir eines besseres belehrt. Vielleicht gelingt dir ja bald auch ein Homerun."
   },
@@ -125,7 +126,7 @@
       "rfu.com",
       "Rugby Union"
     ],
-    "kommentar": ""
+    "kommentar": "Große muskelbepackte Männer die Sinnfrei auf einander losrennen? Aber naja wer drauf steht..."
   },
   {
     "sportart": "Snooker",
@@ -133,7 +134,7 @@
       "worldsnooker.com",
       "snookermania.de"
     ],
-    "kommentar": ""
+    "kommentar": "Snooker also: Dass so was als Sport durchgeht wundert nicht nur uns..."
   },
   {
     "sportart": "Leichtathletik",
@@ -147,7 +148,7 @@
     "zusatz": [
       "espncricinfo.com"
     ],
-    "kommentar": ""
+    "kommentar": "Gehörst du zu den Royals? Oder bist du einfach nur ein reicher Angeber?"
   },
   {
     "sportart": "Golf",
@@ -168,6 +169,6 @@
       "Taekwondo",
       "Capoeira"
     ],
-    "kommentar": ""
+    "kommentar": "Kampfsport also? Wir werden uns in Zukunft wohl besser von dir fern halten."
   }
 ]
