@@ -1,21 +1,173 @@
 [
-{ "sportart":"Fussball", "zusatz":["sportschau","dfb","fußball"]},
-{ "sportart":"Tennis"},
-{ "sportart":"Tanzen","zusatz":["breakdance","Tanzschule"]},
-{ "sportart":"Basketball","zusatz":["NBA","FIBA"]},
-{ "sportart":"Volleyball","zusatz":["FIVB","DVV"]},
-{ "sportart":"Eishockey"},
-{ "sportart":"Handball","zusatz":["EHF","DKB"]},
-{ "sportart":"American Football"},
-{ "sportart":"Boxen","zusatz":["WBO","WBC","WBA","IBF"]},
-{ "sportart":"Dart"},
-{ "sportart":"Motorsport","zusatz":["DTM","Formel 1"]},
-{ "sportart":"Baseball"},
-{ "sportart":"Bowling"},
-{ "sportart":"Rugby"},
-{ "sportart":"Snooker"},
-{ "sportart":"Leichtathletik"},
-{ "sportart":"Cricket"},
-{ "sportart":"Golf"},
-{ "sportart":"Kampfsport"}
+  {
+    "sportart": "Fussball",
+    "zusatz": [
+      "sportschau",
+      "dfb.de",
+      "fußball",
+      "bundesliga.de",
+      "DFB Pokal",
+      "uefa.com",
+      "fifa.com",
+      "UEFA Champions League"
+    ],
+    "kommentar": "Hätten wir an dieser Stelle weiter forschen sollen? Das haben wir uns an dieser Stelle gespart. Vielleicht bist du auch nur in letzter Zeit daran interessiert gewesen, weil die WM in Brasilien war!"
+  },
+  {
+    "sportart": "Tennis",
+    "zusatz": [
+      "tennisverband.de",
+      "tenniseurope.org",
+      "dtb-tennis.de",
+      "tenniswarehouse-europe.com"
+    ],
+    "kommentar": "Und mitbekommen, dass 2014 Roger Federer in Wimbledon verloren hat? Wenn nicht, ist es nicht schlimm. Wir nämlich auch nicht."
+  },
+  {
+    "sportart": "Tanzen",
+    "zusatz": [
+      "breakdance",
+      "Tanzschule",
+      "tanz"
+    ],
+    "kommentar": "Ob Standard oder Latein du scheinst gerne das Tanzbein zu schwingen."
+  },
+  {
+    "sportart": "Basketball",
+    "zusatz": [
+      "nba.com",
+      "fiba.com",
+      "basketball-bund.de"
+    ],
+    "kommentar": ""
+  },
+  {
+    "sportart": "Volleyball",
+    "zusatz": [
+      "fivb.org",
+      "volleyball-verband.de",
+      "DVV-Pokal"
+    ],
+    "kommentar": "Also uns gefällt Beachvolleyball ja doch schon einiges besser als so klassisches Volleyball. Die Sprungkraft der Sportler ist jedoch bemerkenswert."
+  },
+  {
+    "sportart": "Eishockey",
+    "zusatz": [
+      "del.org",
+      "nhl.com"
+    ],
+    "kommentar": "Eishockey ist schon ein cooler Sport. Zum größten Teil fair und manchmal löst man Probleme auch ganz konventionell wie vor Jahrtausenden. Entweder gibt es einen Schlag mit dem Stock oder man prügelt sich so. Das ist doch immer noch das unterhaltsamste an den Spielen."
+  },
+  {
+    "sportart": "Handball",
+    "zusatz": [
+      "dhb.de",
+      "DHB-Pokal",
+      "DKB Handball"
+    ],
+    "kommentar": ""
+  },
+  {
+    "sportart": "American Football",
+    "zusatz": [
+      "nfl.com",
+      "afvd.de",
+      "American Football Verband"
+    ],
+    "kommentar": ""
+  },
+  {
+    "sportart": "Boxen",
+    "zusatz": [
+      "wboboxing.com",
+      "wbcboxing.com",
+      "wbanews.com",
+      "aiba.org"
+    ],
+    "kommentar": ""
+  },
+  {
+    "sportart": "Dart",
+    "zusatz": [
+      "dartswdf.com",
+      "pdc-europe.tv",
+      "pdc.tv"
+    ],
+    "kommentar": "Quizfrage, welche Punktzahl ist mit 3 Darts maximal möglich? Richtig 180. Frage 2. Wie Möglichkeiten gibt es für einen 9-Darter bei einenm 501 Double-Out. Insgesamt 71 Möglichkeiten!"
+  },
+  {
+    "sportart": "Motorsport",
+    "zusatz": [
+      "dtm.com",
+      "fia.com",
+      "Formel 1,NASCAR.com",
+      "formula1.com"
+    ],
+    "kommentar": ""
+  },
+  {
+    "sportart": "Baseball",
+    "zusatz": [
+      "mlb.com"
+    ],
+    "kommentar": "Wir hätten nie damit gerechnet, dass es in Deutschland Leute gibt die sich ernsthaft für so einen Sport interessieren, aber wir wurden ja Dank dir eines besseres belehrt. Vielleicht gelingt dir ja bald auch ein Homerun."
+  },
+  {
+    "sportart": "Bowling",
+    "zusatz": [
+      "dbv-bowling.de"
+    ],
+    "kommentar": "Dazu bleibt uns nur noch folgendes zu sagen: Hoffentlich schiebst du die Kugel nur auf der Bahn vor dir her und trägst nicht auch noch in Echt eine vor dir her. Dann machst du nämlich wahrscheinlich den falschen Sport."
+  },
+  {
+    "sportart": "Rugby",
+    "zusatz": [
+      "rfu.com",
+      "Rugby Union"
+    ],
+    "kommentar": ""
+  },
+  {
+    "sportart": "Snooker",
+    "zusatz": [
+      "worldsnooker.com",
+      "snookermania.de"
+    ],
+    "kommentar": ""
+  },
+  {
+    "sportart": "Leichtathletik",
+    "zusatz": [
+      "iaaf.org"
+    ],
+    "kommentar": "Uns ist zu Ohren gekommen Informatiker laufen die 100m zur Kaffeemaschine wenn sie es eilig haben auch in unter 10 Sekunden."
+  },
+  {
+    "sportart": "Cricket",
+    "zusatz": [
+      "espncricinfo.com"
+    ],
+    "kommentar": ""
+  },
+  {
+    "sportart": "Golf",
+    "zusatz": [
+      "golf.de",
+      "Golfsport",
+      "worldgolfchampionships.com",
+      "pga.com"
+    ],
+    "kommentar": "Eine letzte Frage: Ist dein Vater Arzt?"
+  },
+  {
+    "sportart": "Kampfsport",
+    "zusatz": [
+      "Thaiboxen",
+      "Kickboxen",
+      "Karate",
+      "Taekwondo",
+      "Capoeira"
+    ],
+    "kommentar": ""
+  }
 ]

@@ -23,10 +23,10 @@ $if(street && location && zipCode)$
     Wenn nicht nicht würden wir dich glatt morgen Abend mal in der $street$, $zipCode$ $location$
     besuchen kommen. Oder wir schicken dir die Waschmaschine die du mit der Endnutzervereinbarung
     akzeptiert hast.
-$endif$
-$if(iban)$
-    Achso, das Geld für die Waschmaschine ziehen wir dann von folgendem Konto ein $iban$, das Sepa
-    Mandata stand ja in der Eula.
+    $if(iban)$
+        Achso, das Geld für die Waschmaschine ziehen wir dann von folgendem Konto ein $iban$, das
+        Sepa Mandata stand ja in der Eula.
+    $endif$
 $endif$
 $if(hasInformation)$
     Na ja wir weichen vom Thema ab. Mal schauen was wir noch so interessantes haben.
@@ -45,10 +45,14 @@ $if(hasInformation)$
 $endif$
 $if(hasScores)$
     $if(hasInformation)$
-        Zusätzlich haben wir folgende Scores für dich berechnet:
+        Wir haben uns zusätzlich dazu auch noch die Müge gemacht, Scores für dich zu berechnen.
     $else$
-        Wir haben vor den Bericht noch ein paar Scores für dich:
+        Übrigens haben wir uns die Mühe gemacht, einige Scores für dich zu berechnen.
     $endif$
+    Fragst du dich gerade was Scores sind? Ein Score ist ein Wert (in diesem Fall zwischen 0 und
+    $maxScore$), welcher bewertet, wie extrem eine gewisse Neigung bei dir ausgeprägt zu
+    sein scheint. Hierbei bedeutet $maxScore$ immer sehr stark und 0 gar nicht. Die goldene Mitte
+    besagt, dass es hier nicht wirklich eine Aussage gibt.
     <table border="1">
         <tr>
             <th>Score</th>

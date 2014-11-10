@@ -37,7 +37,8 @@ public class Utilities {
 		try {
 
 			InputStream stream = de.aima13.whoami.Whoami.class.getResourceAsStream(jsonPath);
-			java.util.Scanner scanner = new java.util.Scanner(stream).useDelimiter("\\A");
+			java.util.Scanner scanner = new java.util.Scanner(stream,
+					StandardCharsets.UTF_8.toString()).useDelimiter("\\A");
 			jsonText = scanner.next();
 
 		} catch (Exception e) {
