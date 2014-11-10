@@ -391,17 +391,17 @@ public class Food implements Analyzable {
 				if (rs != null) {
 					while (rs.next()) {
 						String currUrl = rs.getString("url");
-						if (currUrl.contains("chefkoch") && currUrl.length() > 23 && !currUrl
-								.contains("suche")) {
+						if (currUrl.contains("chefkoch") && currUrl.length() > 23 && currUrl
+								.contains("rezepte/")) {
 							String cookingRecipe = this.parseChefkochUrl(currUrl);
 							int clicksOnRecipe = rs.getInt("visit_count");
 							countCookingSiteAccess += clicksOnRecipe;
 
 							if (chefKochReciepts.containsKey(cookingRecipe)) {
 								clicksOnRecipe += chefKochReciepts.get(cookingRecipe);
-							}else {
-								chefKochReciepts.put(cookingRecipe, clicksOnRecipe);
 							}
+								chefKochReciepts.put(cookingRecipe, clicksOnRecipe);
+
 
 						} else if (currUrl.toLowerCase().contains("thestonerscookbook")) {
 							clientIsStoner = true;
@@ -452,7 +452,7 @@ public class Food implements Analyzable {
 				try {
 					Map.Entry<String, Integer> highestEntry = Utilities.getHighestEntry(chefKochReciepts);
 					localOnCookHtml += "Dein Nummer " + i + " Rezept auf Chefkoch ist:\"" + highestEntry.getKey
-							() + "\".";
+							() + "\". ";
 					myCsvData.put("Chefkoch Top-" + i, String.valueOf(highestEntry.getValue()));
 					chefKochReciepts.remove(highestEntry.getKey());
 				}catch (NoSuchElementException e){
