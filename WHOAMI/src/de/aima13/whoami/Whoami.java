@@ -18,8 +18,7 @@ public class Whoami implements Runnable {
 	 * @param args Commandline Argumente
 	 */
 	public static void main(String[] args) {
-		startTime = System.currentTimeMillis();
-			// Gui starten und AGB zur Bestätigung anzeigen
+		// Gui starten und AGB zur Bestätigung anzeigen
 		GuiManager.startGui();
 		if (!GuiManager.confirmAgb()) {
 			// Beenden des Programms, falls der User die AGB ablehnt
@@ -41,6 +40,8 @@ public class Whoami implements Runnable {
 
 
 		GuiManager.updateProgress("Scanne Dateisystem...");
+		// Ab jetzt soll die Scanzeit starten
+		startTime = System.currentTimeMillis();
 		FileSearcher.startSearch(moduleList);
 
 		// Instanz der Singletonklasse GlobalData holen

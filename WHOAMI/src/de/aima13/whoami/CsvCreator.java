@@ -37,7 +37,7 @@ public class CsvCreator {
 		SortedMap<String, String> completeCsvContent = new TreeMap<>();
 
 		// Als erster Eintrag jeder Spalte sollte die ID des Scans stehen
-		completeCsvContent.put("ScanId", scanId);
+		completeCsvContent.put("00_ScanId", scanId);
 
 		// CSV Werte aus allen Representables ziehen
 		for (Map.Entry<Representable, String[]> representableCsvEntry : representables.entrySet()) {
@@ -47,10 +47,12 @@ public class CsvCreator {
 
 			if (moduleCsvContent != null) {
 				// Header werden mit Prefix versehen -> keine Namensgleichheit
-				String prefix = representable.getCsvPrefix() + PREFIX_SEPERATOR;
-				// Wenn das Modul noch keinen Prefix zurückgibt, wird der Klassenname genutzt
+				String prefix;
+				// Wenn das Modul keinen Prefix zurückgibt, wird der Klassenname genutzt
 				if (representable.getCsvPrefix() == null) {
 					prefix = representable.getClass().getSimpleName();
+				} else {
+					prefix = representable.getCsvPrefix() + PREFIX_SEPERATOR;
 				}
 
 				// Es sollen genau die vorgesehenen Spalten verwendet werden
