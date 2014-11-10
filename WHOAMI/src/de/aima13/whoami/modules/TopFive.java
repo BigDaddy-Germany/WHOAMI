@@ -149,6 +149,9 @@ public class TopFive implements Analyzable {
 		if (urlName.contains("9gag")){
 			GlobalData.getInstance().changeScore("Faulenzerfaktor",10);
 		}
+		if (urlName.contains("localhost")){
+			GlobalData.getInstance().changeScore("Nerdfaktor",10);
+		}
 	}
 
 	/**
