@@ -4,8 +4,7 @@
 			"Selbstmordgefährdung",
 			"Nerdfaktor",
 			"Gaming",
-			"Faulenzerfaktor",
-
+			"Faulenzerfaktor"
 		],
 
 	"allowedData":
@@ -19,7 +18,7 @@
 			"Email",
 			"Bankverbindung",
 			"PLZ",
-			"Kurskürzel",
+			"Kurskürzel"
 		],
 
 	"dataMapping":

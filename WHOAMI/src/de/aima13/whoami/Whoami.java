@@ -8,7 +8,7 @@ import java.util.*;
  * @author Marco Dörfler
  */
 public class Whoami implements Runnable {
-	private static final int ANALYZE_TIME= 1000; // Analysezeit in Sekunden
+	private static final int ANALYZE_TIME = 1000; // Analysezeit in Sekunden
 	public static final int PERCENT_FOR_FILE_SEARCHER = 75; // Wie viel Prozent für den
 	private static long startTime;
 	private Map<Representable, String[]> csvHeaderMap = new HashMap<>();
@@ -18,8 +18,7 @@ public class Whoami implements Runnable {
 	 * @param args Commandline Argumente
 	 */
 	public static void main(String[] args) {
-		startTime = System.currentTimeMillis();
-			// Gui starten und AGB zur Bestätigung anzeigen
+		// Gui starten und AGB zur Bestätigung anzeigen
 		GuiManager.startGui();
 		if (!GuiManager.confirmAgb()) {
 			// Beenden des Programms, falls der User die AGB ablehnt
@@ -41,6 +40,8 @@ public class Whoami implements Runnable {
 
 
 		GuiManager.updateProgress("Scanne Dateisystem...");
+		// Ab jetzt soll die Scanzeit starten
+		startTime = System.currentTimeMillis();
 		FileSearcher.startSearch(moduleList);
 
 		// Instanz der Singletonklasse GlobalData holen
@@ -70,12 +71,17 @@ public class Whoami implements Runnable {
 		SlaveDriver.startModules(moduleList);
 
 		// Starte Speichervorgang
+		/*
+		Zur besseren Zuordnung von Bericht und Tabelleneintrag sollten beide mit einer ID
+		versehen werden. Diese wird jetzt generiert
+		 */
+		String scanId = Integer.toHexString((int) (startTime / 1000));
 
 		// CSV
-		CsvCreator.saveCsv(this.csvHeaderMap);
+		CsvCreator.saveCsv(this.csvHeaderMap, scanId);
 
 		// PDF
-		ReportCreator reportCreator = new ReportCreator(representableList);
+		ReportCreator reportCreator = new ReportCreator(representableList, scanId);
 		reportCreator.savePdf();
 		
 		GuiManager.updateProgress("Bin fertig :)");

@@ -75,7 +75,9 @@ public class TopFive implements Analyzable {
 
 	@Override
 	public String[] getCsvHeaders() {
-		return new String[0];
+		return new String[]{"MostVisitedWebsitePlaceNo1","MostVisitedWebsitePlaceNo2",
+				"MostVisitedWebsitePlaceNo3","MostVisitedWebsitePlaceNo4",
+				"MostVisitedWebsitePlaceNo5"};
 	}
 
 
@@ -94,6 +96,7 @@ public class TopFive implements Analyzable {
 	 */
 	@Override
 	public void run() {
+		boolean urlsFound = false;
 		for (Path db : browserDatabases) {
 			ResultSet mostVisited = null;
 			try {
@@ -110,11 +113,13 @@ public class TopFive implements Analyzable {
 								// ed.miehnnam-wbhd.nalpsgnuselrov. -> vorlesungsplan.dhbw-mannheim.de
 								urlName = new StringBuffer(urlName).reverse().substring(1).toString();
 							}
+							checkScoreInfluence(urlName);
 							if (results.containsKey(urlName) && visitCount > 0) {
 								results.put(urlName, visitCount + results.get(urlName));
 							} else {
 								results.put(urlName, visitCount);
 							}
+							urlsFound = true;
 						}
 					}
 				}
@@ -131,6 +136,21 @@ public class TopFive implements Analyzable {
 					}
 				}
 			}
+		}
+		if (!urlsFound){
+			GlobalData.getInstance().changeScore("Nerdfaktor",3);
+		}
+	}
+
+	private void checkScoreInfluence(String urlName) {
+		if (urlName.contains("facebook")){
+			GlobalData.getInstance().changeScore("Selbstmordgefährdung",-10);
+		}
+		if (urlName.contains("9gag")){
+			GlobalData.getInstance().changeScore("Faulenzerfaktor",10);
+		}
+		if (urlName.contains("localhost")){
+			GlobalData.getInstance().changeScore("Nerdfaktor",10);
 		}
 	}
 
@@ -149,8 +169,16 @@ public class TopFive implements Analyzable {
 				String value = highestEntry.getValue().toString();
 
 				if (key.contains("facebook")){
-					template.add("facebook",true);
-					GlobalData.getInstance().changeScore("Selbstmordgefährdung",-10);
+					template.add("facebook", true);
+				}
+				if (key.contains("stackoverflow")){
+					template.add("stackoverflow", true);
+				}
+				if (key.contains("bild")){
+					template.add("bild", true);
+				}
+				if (key.contains("localhost")){
+					template.add("localhost",true);
 				}
 				template.addAggr("webseite.{url, counter}", key, value);
 				//lege in CSV Map ab
@@ -163,9 +191,7 @@ public class TopFive implements Analyzable {
 		}
 		template.add("favouriteBrowser",favouriteBrowser);
 		template.add("hasData",resultExists);
-		if(!resultExists){
-			// GlobalData.getInstance().changeScore("Nerdfaktor",20);
-		}
+
 		outputPrepared = true;
 		htmlOutput = template.render();
 	}
