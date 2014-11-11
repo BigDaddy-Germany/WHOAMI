@@ -197,8 +197,10 @@ public class Music implements Analyzable {
 
 				//Kommentar zu ".flac-Dateien" abgeben
 				if(element.toString().endsWith(".flac")) {
-					Qualität = "Du bist ein richtiger Audiofan und legst wert auf die maximale " +
-							"Qualität deiner Musiksammlung! ";
+					Qualität = "Da du '.flac'- Dateien auf deinem PC hast, " +
+							"Komliment von unserer Seite: Du scheinst ein richtiger Audiofan " +
+							"zu sein und legst wert auf die maximale Qualität deiner " +
+							"Musiksammlung! ";
 				}
 
 				//Entferne Musik zu PC-Spielen (aus Steam), Beispielmusik und
@@ -269,7 +271,9 @@ public class Music implements Analyzable {
 			buffer.append("</table>");
 		} else {
 			buffer.append("Es wurden keine Informationen gefunden um den scheinbar " +
-					"sehr geheimen Musikgeschmack des Users zu analysieren.");
+					"sehr geheimen Musikgeschmack des Users zu analysieren. Entweder dein besitzt" +
+					" du erschreckender Weise kein Interesse für Musik oder du konsumierst deine" +
+					" Musik über einen anderen Weg.");
 		}
 
 		// Abschlussfazit des Musikmoduls
@@ -277,22 +281,44 @@ public class Music implements Analyzable {
 				&& !(cltProgram.equals(""))) {
 			buffer.append("<br /><b>Fazit:</b> Dein Computer enthält Informationen zu allem " +
 					"was wir gesucht haben. <br />Musik scheint ein wichtiger Teil deines Lebens " +
-					"zu sein. <br />" + "Insgesamt haben wir " + nrAudio + " Musikdateien " +
-					"gefunden." + Qualität +  stmtGenre);
+					"zu sein. Und tatsächlich ist sogar wissenschaftlich bewiesen, " +
+					"dass Musik uns im tiefsten Inneren berührt, von Geburt an prägt und zu " +
+					"Höchstleistungen treibt. Kurz: Musik kann eine Menge über einen Menschen " +
+					"verraten!<br />" + "Insgesamt " +
+					"haben wir ganze " + nrAudio + " Musikdateien gefunden.");
+			if(nrAudio > 200){
+				buffer.append(" Eine Menge Futter für das Modul! <br />");
+			}
+			if(nrAudio > 100 && nrAudio <= 200){
+				buffer.append(" Schon eine Menge mit der das Modul einiges anfangen kann! <br />");
+			}
+			if(nrAudio <= 100){
+				buffer.append(" Immerhin ein bischen Input.<br />");
+			}
+			if(!(Qualität.equals(""))){
+				buffer.append( Qualität + " ");
+			}
+			buffer.append(stmtGenre);
 		} else if (onlService.equals("") && cltProgram.equals("") && !(favGenre.equals(""))) {
-			buffer.append("<br /><b>Fazit:</b> Deinen Geschmack konnten wir " +
-					"erfolgreich analysieren:<br /> Insgesamt haben wir " + nrAudio +  " Musikdateien " +
-					"gefunden." + Qualität + stmtGenre + ". Worrüber du deine Musik konsumierst " +
-					"bleibt eine offene Frage.");
+			buffer.append("<br /><b>Fazit:</b> Es ist wissenschaftlich bewiesen, dass " +
+					"Musik uns im tiefsten Inneren berührt, von Geburt an prägt und uns sogar " +
+					"Höchstleistungen treibt. Umso besser, dass wir deinen Geschmack " +
+					"erfolgreich analysieren konnten:<br /> Insgesamt haben wir " + nrAudio +  " " +
+					"Musikdateien " +
+					"gefunden." + Qualität + stmtGenre + ". Du benutzt wohl irgendeinen " +
+					"anderen Musikplayer um deine Musik zu hören. Was wir wissen: Spotify, " +
+					"iTunes und Co sind es nicht!");
 		} else if (favGenre.equals("") && favArtist.equals("")) {
 			buffer.append("<br /><b>Fazit:</b> Es konnten keine Informationen dazu gefunden " +
-					"werden was du hörst. Deine Lieblingsgenre und Lieblingkünstler bleiben eine " +
-					"offene Frage...");
-			if (!(onlService.equals("")) || !(cltProgram.equals(""))) {
-				buffer.append(" Aber Musik hörst du über " + onlService + ", " + cltProgram + ".");
+					"werden was du hörst. Deine Lieblingsgenre und Lieblingkünstler bleiben " +
+					"leider eine offene Frage... Schade, wenn man bedenkt, " +
+					"dass Musik so viel über Menschen verraten kann. ");
+			if (!(onlService.equals("")) && !(cltProgram.equals(""))) {
+				buffer.append(" Immerhin gehen wir nicht ganz leer aus: Du hörst auf jeden " +
+						"Fall Musik über " + onlService + ", " + cltProgram + ".");
 				if(nrAudio != 0){
 					buffer.append("Insgesamt haben wir zusätzlich " + nrAudio + " Musikdateien " +
-							"gefunden." + Qualität);
+							"gefunden, die leider keine Analyse zulassen." + Qualität);
 				}
 			}
 		} else {
@@ -301,6 +327,15 @@ public class Music implements Analyzable {
 			if(!(localFiles.isEmpty())){
 				buffer.append("<br />Insgesamt haben wir " + nrAudio + " Musikdateien gefunden." +
 						Qualität);
+			}
+			if(nrAudio > 200){
+				buffer.append(" Eine Menge Futter für das Modul! <br />");
+			}
+			if(nrAudio > 100 && nrAudio <= 200){
+				buffer.append(" Schon eine Menge mit der das Modul einiges anfangen kann! <br />");
+			}
+			if(nrAudio <= 100){
+				buffer.append(" Immerhin ein bischen Input.<br />");
 			}
 			if (!(onlService.equals(""))) {
 				buffer.append("<br />Du hörst über " + onlService + " online Musik.");
