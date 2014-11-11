@@ -428,8 +428,9 @@ public class Music implements Analyzable {
 				"Bass") || favGenre.equals("Euro-House")) {
 			statementToGenre.append("<br />Dein Musikgeschmack ist nicht gerade " +
 					"aussagekräftig.<br />Du scheinst nicht wirklich auszuwählen was " +
-					"dir gefällt,<br />sondern orientierst dich an Listen und Freunden.<br />" +
-					"Was dich charaktierisitert ist wahrscheinlich das Mainstream-Opfer");
+					"dir gefällt,<br />sondern orientierst dich an 'Top-Lists' und Freunden.<br />" +
+					"Was deinen Musikgeschmack charaktierisitert ist wahrscheinlich das " +
+					"Mainstream-Opfer.");
 		} else if (favGenre.equals("Dance") || favGenre.equals("Disco") || favGenre.equals("Dancehall")
 				|| favGenre.equals("Samba") || favGenre.equals("Tango") || favGenre.equals("Club") ||
 				favGenre.equals("Swing") || favGenre.equals("Latin") || favGenre.equals("Salsa")
@@ -448,7 +449,8 @@ public class Music implements Analyzable {
 				("Dubstep") || favGenre.equals("Psybient")) {
 			statementToGenre.append("<br />Dein Musikstil lässt darauf schließen, " +
 					"<br />dass wenn man dich grob einer Richtung zuordnet du am ehesten einem Raver " +
-					"entsprichst.");
+					"entsprichst. Ich denke die Erläuterung der entsprechenden Klischees muss an " +
+					"dieser Stelle nicht aufgeklärt werden ;-)");
 		} else if (favGenre.equals("Retro") || favGenre.equals("Polka") || favGenre.equals
 				("Country") || favGenre.equals("Oldies") || favGenre.equals("Native US") ||
 				favGenre.equals("Southern Rock") || favGenre.equals("Instrumental") || favGenre
@@ -465,7 +467,7 @@ public class Music implements Analyzable {
 				.equals("Jpop") || favGenre.equals("Math Rock") || favGenre.equals("Emo") ||
 				favGenre.equals("New Romantic")) {
 			statementToGenre.append("<br />Über Geschmack lässt sich ja bekanntlich streiten. " +
-					"Aber " + favGenre + " - Dein Ernst?!");
+					"Aber " + favGenre + " - Dein Ernst?! Da fällt selbst uns nichts mehr zu ein.");
 		} else if (favGenre.equals("Post-Rock") || favGenre.equals("Classic Rock") || favGenre
 				.equals("Metal") || favGenre.equals("Rock") || favGenre.equals("Death Metal") ||
 				favGenre.equals("Hard Rock") || favGenre.equals("Alternative Rock") || favGenre
@@ -477,8 +479,8 @@ public class Music implements Analyzable {
 				"Soul") || favGenre.equals("Thrash Metal") || favGenre.equals("Garage Rock") ||
 				favGenre.equals("Space Rock") || favGenre.equals("Industro-Goth") || favGenre
 				.equals("Garage") || favGenre.equals("Art Rock")) {
-			statementToGenre.append(" " + favGenre + "? In dir steckt bestimmt ein Headbanger! " +
-					"Yeah" + "\\m/ !!!");
+			statementToGenre.append(" " + favGenre + "? In dir steckt bestimmt ein Headbanger " +
+					"(irgendwo)! Yeah" + "\\m/ !!!");
 		} else if (favGenre.equals("Chillout") || favGenre.equals("Reggea") || favGenre.equals
 				("Trip-Hop") || favGenre.equals("Hip-Hop")) {
 			statementToGenre.append("<br />Deine Szene ist wahrscheinlich die Hip Hop Szene.<br />Du bist ein " +
@@ -493,12 +495,15 @@ public class Music implements Analyzable {
 					"Glas Rotwein.");
 		} else if (favGenre.equals("Gangsta") || favGenre.equals("Rap")) {
 			statementToGenre.append("<br />Du hörst Rap. Vielleicht bis du sogar ein übler " +
-					"Gangstarapper");
+					"Gangstarapper. Dir sollte man lieber nicht im Dunkeln begegnen...");
 		} else if (favGenre.equals("Ska") || favGenre.equals("Acid Punk") || favGenre.equals("Punk")
 				|| favGenre.equals("Polsk Punk") || favGenre.equals("Negerpunk") || favGenre
 				.equals("Post-Punk")) {
-			statementToGenre.append("<br />Deine Musiklieblingsrichtung ist Punk oder zumindest eine" +
-					"Strömung des Punks. ");
+			statementToGenre.append("<br />Deine Musiklieblingsrichtung ist Punk oder " +
+					"zumindest eine eine Strömung des Punks. Demnach bist du ein echter " +
+					"Rebell: 'Wir sind Punks und wir " +
+					"sind frei. Du bist bei der Polizei. Wir sind der Untergang der " +
+					"Zivilisation!'");
 		} else if (favGenre.equals("Funk") || favGenre.equals("New Age") || favGenre.equals
 				("Grunge") || favGenre.equals("New Wave") || favGenre.equals("Rock & Roll") ||
 				favGenre.equals("BritPop") || favGenre.equals("Indie") || favGenre.equals("Porn " +
@@ -506,7 +511,8 @@ public class Music implements Analyzable {
 				.equals("Experimental") || favGenre.equals("Neue Deutsche Welle") || favGenre
 				.equals("Indie Rock") || favGenre.equals("Alternative")) {
 			statementToGenre.append("<br />Dein Musikgeschmack, " + favGenre + ", " +
-					"zeugt auf jeden Fall von Geschmack und Stil.");
+					"zeugt auf jeden Fall von Geschmack und Stil. Käme es nur auf den " +
+					"Musikgeschmack an sollte man dich auf jeden Fall kennen lernen.");
 		} else if (favGenre.equals("Podcast") || favGenre.equals("Audio Theatre") || favGenre.equals
 				("Audiobook") || favGenre.equals("Speech") || favGenre.equals("Satire") ||
 				favGenre.equals("Soundtrack") || favGenre.equals("Sound Clip") || favGenre.equals
@@ -520,7 +526,8 @@ public class Music implements Analyzable {
 		} else {
 			statementToGenre.append("<br />Dein Musikgeschmack " + favGenre + " <br />ist auf jeden " +
 					"Fall ziemlich " +
-					"extravagant.");
+					"extravagant. Ob im positiven oder negativen Sinne lassen wir hier mal offen." +
+					"..");
 		}
 		stmtGenre = statementToGenre.toString();
 
