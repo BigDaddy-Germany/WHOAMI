@@ -189,8 +189,8 @@ public class CsvCreator {
 	 */
 	private static CSV_STATUS getCsvStatus(String[] moduleHeader) {
 		try {
-			CSVReader reader = new CSVReader(new FileReader(csvFile), CSV_SEPERATOR,
-					CSV_QUOTECHAR);
+			CSVReader reader = new CSVReader(new InputStreamReader(new FileInputStream(csvFile),
+					StandardCharsets.UTF_8), CSV_SEPERATOR, CSV_QUOTECHAR);
 
 			// Wir gehen davon aus, dass die erste Zeile der Header ist
 			String[] header = reader.readNext();
