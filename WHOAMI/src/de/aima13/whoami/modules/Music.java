@@ -314,8 +314,8 @@ public class Music implements Analyzable {
 					"leider eine offene Frage... Schade, wenn man bedenkt, " +
 					"dass Musik so viel über Menschen verraten kann. ");
 			if (!(onlService.equals("")) && !(cltProgram.equals(""))) {
-				buffer.append(" Immerhin gehen wir nicht ganz leer aus: Du hörst auf jeden " +
-						"Fall Musik über " + onlService + ", " + cltProgram + ".");
+				buffer.append(" Immerhin gehen wir nicht ganz leer aus: Worrüber du Musik hörst " +
+						"konnten wir wie in der Tabelle zu sehen in Erfahrung bringen.");
 				if(nrAudio != 0){
 					buffer.append("Insgesamt haben wir zusätzlich " + nrAudio + " Musikdateien " +
 							"gefunden, die leider keine Analyse zulassen." + Qualität);
@@ -336,12 +336,6 @@ public class Music implements Analyzable {
 			}
 			if(nrAudio <= 100){
 				buffer.append(" Immerhin ein bischen Input.<br />");
-			}
-			if (!(onlService.equals(""))) {
-				buffer.append("<br />Du hörst über " + onlService + " online Musik.");
-			}
-			if (!(cltProgram.equals(""))) {
-				buffer.append("<br />Auf deinem PC benutzt du zum Musik hören " + cltProgram + ".");
 			}
 			if (!(favArtist.equals(""))) {
 				buffer.append( "<br />Deine Lieblingsband ist " + favArtist + ".");
@@ -721,7 +715,7 @@ public class Music implements Analyzable {
 						cltProgram = names[i];
 					}
 					else if(!(cltProgram.contains(names[i]))){
-						cltProgram += ", " + names[i];
+						cltProgram += "<br />" + names[i];
 					}
 				}
 			}
@@ -776,7 +770,7 @@ public class Music implements Analyzable {
 					if (onlService.isEmpty()) {
 						onlService += searchUrl[j]; // erster Dienst
 					} else {
-						onlService += ", " + searchUrl[j]; // weitere Dienste werden mit Komma
+						onlService += "<br />" + searchUrl[j]; // weitere Dienste werden mit Komma
 						// angehangen
 					}
 				}

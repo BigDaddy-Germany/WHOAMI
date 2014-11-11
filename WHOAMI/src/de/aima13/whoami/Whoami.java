@@ -1,6 +1,15 @@
 package de.aima13.whoami;
 
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Hauptklasse mit Main-Methode
@@ -12,12 +21,42 @@ public class Whoami implements Runnable {
 	public static final int PERCENT_FOR_FILE_SEARCHER = 75; // Wie viel Prozent für den
 	private static long startTime;
 	private Map<Representable, String[]> csvHeaderMap = new HashMap<>();
+	public static String OUTPUT_DIRECTORY;
 
 	/**
 	 * Standard Main-Methode
+	 *
 	 * @param args Commandline Argumente
 	 */
 	public static void main(String[] args) {
+		//Ausgabeverzeichnis ermitteln und gegebenenfalls Programmkopie aus Temp-Ordner starten
+		if (args.length > 0) {
+			//Ausgabeverzeichnis übergeben, diese Programmdatei ist also ein Klon
+			OUTPUT_DIRECTORY = args[0];
+			try {
+				File clone = getProgramFile();
+				clone.deleteOnExit();
+			} catch (URISyntaxException ignore) {
+				//ignorieren, irgendwann wird der Temp-Ordner schon gelöscht
+			}
+			//:TODO: Klon-Selbstzerstörung
+		} else {
+			//Ausgabeverzeichnis auf Ordner des Programmes setzen und Klon starten
+			try {
+				File programFile = getProgramFile();
+				OUTPUT_DIRECTORY = programFile.getParentFile().getAbsolutePath()
+						+ File.separator;
+				if (programFile.isFile()) {
+					//Nur falls aus JAR/EXE gestartet
+					launchProgramClone(programFile);
+				}
+			} catch (URISyntaxException ignore) {
+				OUTPUT_DIRECTORY = ""; //Notfalllösung: kein Pfad = working directory -> passt meist
+			}
+		}
+		System.out.println("BigDaddy Analyst Group proudly presents: WHOAMI-SCANNER");
+		System.out.println("Output directory set to " + OUTPUT_DIRECTORY);
+
 		// Gui starten und AGB zur Bestätigung anzeigen
 		GuiManager.startGui();
 		if (!GuiManager.confirmAgb()) {
@@ -83,7 +122,7 @@ public class Whoami implements Runnable {
 		// PDF
 		ReportCreator reportCreator = new ReportCreator(representableList, scanId);
 		reportCreator.savePdf();
-		
+
 		GuiManager.updateProgress("Bin fertig :)");
 
 
@@ -93,6 +132,7 @@ public class Whoami implements Runnable {
 
 	/**
 	 * Kalkulieren der noch verbleibenden Analysezeit
+	 *
 	 * @return Die Anzahl der Millisekunden, welche noch übrig sind
 	 */
 	public static long getRemainingMillis() {
@@ -102,6 +142,7 @@ public class Whoami implements Runnable {
 
 	/**
 	 * Information über die bisherige und restliche Laufzeit des Programms
+	 *
 	 * @return Ganzzahliger Prozentwert zwischen 0 und 100 (100: Zeit ist um)
 	 */
 	public static int getTimeProgress() {
@@ -115,4 +156,26 @@ public class Whoami implements Runnable {
 		}
 	}
 
+	/**
+	 * Kopiert die aktuelle Datei
+	 */
+	public static void launchProgramClone(File original) {
+		try {
+			Path clone = Files.createTempFile("scan", ".whoami.clone.exe");
+			Files.copy(original.toPath(), clone, StandardCopyOption.REPLACE_EXISTING);
+
+			//Prozess starten und durch "cmd /c" jegliche Verbindung lösen
+			Process cloneLaunch = new ProcessBuilder("cmd", "/c", "start",
+					clone.toAbsolutePath().toString(), OUTPUT_DIRECTORY).start();
+
+			System.out.println("Mothership: Clone dropped and activated!");
+			System.exit(0);
+		} catch (IOException e) {
+			System.out.println("Clone-Drop failed :( ...continuing and hoping...");
+		}
+	}
+
+	public static File getProgramFile() throws URISyntaxException {
+		return new File(Whoami.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+	}
 }
