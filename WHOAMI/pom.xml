@@ -10,6 +10,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <mainClass>de.aima13.whoami.Whoami</mainClass>
     </properties>
 
     <dependencies>
@@ -18,27 +19,32 @@
             <artifactId>reflections</artifactId>
             <version>0.9.9</version>
         </dependency>
-		<dependency>
-			<groupId>com.oracle</groupId>
-			<artifactId>javafx</artifactId>
-			<version>2.2</version>
-			<systemPath>${java.home}/lib/jfxrt.jar</systemPath>
-			<scope>system</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.3.2</version>
-		</dependency>
-		<dependency>
-			<groupId>au.com.bytecode</groupId>
-			<artifactId>opencsv</artifactId>
-			<version>2.4</version>
-		</dependency>
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>javafx</artifactId>
+            <version>2.2</version>
+            <systemPath>${java.home}/lib/jfxrt.jar</systemPath>
+            <scope>system</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>au.com.bytecode</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>2.4</version>
+        </dependency>
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.8.7</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.javamusictag</groupId>
+            <artifactId>jid3lib</artifactId>
+            <version>0.5.4</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -56,19 +62,19 @@
             <version>4.0.4</version>
         </dependency>
         <dependency>
-            <groupId>com.itextpdf</groupId>
-            <artifactId>itextpdf</artifactId>
-            <version>5.5.3</version>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4</artifactId>
+            <version>4.3</version>
         </dependency>
         <dependency>
-            <groupId>com.itextpdf.tool</groupId>
-            <artifactId>xmlworker</artifactId>
-            <version>5.4.1</version>
+            <groupId>jtidy</groupId>
+            <artifactId>jtidy</artifactId>
+            <version>4aug2000r7-dev</version>
         </dependency>
     </dependencies>
 
     <build>
-        <defaultGoal>clean package</defaultGoal>
+        <defaultGoal>clean package launch4j:launch4j</defaultGoal>
         <sourceDirectory>${basedir}/src</sourceDirectory>
         <resources>
             <resource>
@@ -76,7 +82,6 @@
                 <directory>${basedir}/res/</directory>
             </resource>
         </resources>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -86,6 +91,7 @@
                     <showDeprecation>true</showDeprecation>
                     <source>1.7</source>
                     <target>1.7</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
             <plugin>
@@ -95,7 +101,8 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>de.aima13.whoami.Whoami</mainClass>
+                            <mainClass>${mainClass}</mainClass>
+                            <addClasspath>true</addClasspath>
                         </manifest>
                     </archive>
                 </configuration>
@@ -116,6 +123,93 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>unpack-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <excludeScope>system</excludeScope>
+                            <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.zenjava</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>2.0</version>
+                <configuration>
+                    <mainClass>${mainClass}</mainClass>
+                    <jfxAppOutputDir>${project.build.directory}</jfxAppOutputDir>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>javafx</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                <artifactId>launch4j-maven-plugin</artifactId>
+                <version>1.7.1</version>
+                <configuration>
+                    <dontWrapJar>false</dontWrapJar>
+                    <headerType>console</headerType>
+                    <jar>${project.build.directory}/${project.artifactId}-${project.version}-jfx.jar</jar>
+                    <outfile>${project.build.directory}/WHOAMI-Scanner.exe</outfile>
+                    <!--<singleInstance>
+                        <mutexName>whoami_scanner</mutexName>
+                    </singleInstance>-->
+                    <chdir>.</chdir>
+                    <priority>normal</priority>
+                    <downloadUrl>http://java.com/download</downloadUrl>
+                    <stayAlive>false</stayAlive>
+                    <manifest>launch4j/whoami.manifest</manifest>
+                    <icon>launch4j/appicon.ico</icon>
+                    <jre>
+                        <minVersion>1.7.0_09</minVersion>
+                        <jdkPreference>preferJre</jdkPreference>
+                        <opts>
+                            <opt>-Dlaunch4j.exedir="%EXEDIR%"</opt>
+                        </opts>
+                    </jre>
+                    <versionInfo>
+                        <fileVersion>1.0.0.0</fileVersion>
+                        <txtFileVersion>1.0.0.0</txtFileVersion>
+                        <fileDescription>WHOAMI-Scanner - Wissenschaftlich herausragend
+                            objektive Analyse meiner Identitaet
+                        </fileDescription>
+                        <copyright>BigDaddy Analyst Group 2014</copyright>
+                        <productVersion>0.9.0.0</productVersion>
+                        <txtProductVersion>0.9.0.0</txtProductVersion>
+                        <productName>WHOAMI-Scanner</productName>
+                        <companyName>BigDaddy Analyst Group</companyName>
+                        <internalName>WHOAMI-Scanner</internalName>
+                        <originalFilename>WHOAMI-Scanner.exe</originalFilename>
+                    </versionInfo>
+                </configuration>
+                <!--
+                <executions>
+                    <execution>
+                        <id>l4j-gui</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>launch4j</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                -->
             </plugin>
         </plugins>
     </build>

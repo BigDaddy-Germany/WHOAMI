@@ -1,46 +1,64 @@
 package de.aima13.whoami;
 
-import org.apache.commons.lang3.text.WordUtils;
+import de.aima13.whoami.support.Utilities;
+import org.stringtemplate.v4.ST;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
- * Created by Marco Dörfler on 16.10.14.
+ * Diese Klasse bietet allen Modulen an, globale Scores und persönliche Daten zu sammeln. Dies
+ * ist nur zur Laufzeit der Module und nicht während der Auswertung der HTML- und CSV-Dateien
+ * möglich
+ *
+ * @author Marco Dörfler
  */
 public class GlobalData implements Representable {
 
 	private final String REPORT_TITLE = "Persönliche Daten und Scores";
-	private final String CSV_PREFIX = "global";
-	private final String CSV_PREFIX_SCORE = "score";
-	private final String CSV_PREFIX_DATA = "data";
-	private final int MAX_SCORE_VALUE = 100;
+	private final String CSV_PREFIX = "GlobalData";
+	private final String CSV_PREFIX_SCORE = "Score ";
+	private final String CSV_PREFIX_DATA = "PersData  ";
+	private final String TEMPLATE_LOCATION = "/data/GlobalData_Output.html";
+	public final int MAX_SCORE_VALUE = 100;
+	private boolean dataProposalsAllowed = true;
+	private Config config;
 
 	// Zuordnung: Key - Value
 	private Map<String, Integer> globalScores = new HashMap<>();
 
-	/**
+	/*
 	 * Jedem Key können verschiedenen Vorschläge zugeordnet werden, wobei jedem Vorschlag
 	 * die Häufigkeit zugeordnet werden kann.
-	 * Sämtliche vorschläge werden in Großbuchstaben gespeichert und später Capitalized (erster
-	 * Buchstabe groß) ausgegeben, sodass es grundsätzlich besser aussieht und es keine Probleme
-	 * mit eventuell unterschiedlicher Groß-/Kleinschreibung gibt
 	 */
 	private Map<String, Map<String, Integer>> globalDataProposals = new HashMap<>();
 	private Map<String, String> globalDataResults;
 
-	/**
-	 * @todo Global Data muss Thread-safe sein
+	/*
+	 * Instanz der Singleton-Klasse
 	 */
+	private static GlobalData instance;
 
 	/**
-	 * Instanz der Singleton-Klasse
+	 * DataMapping stellt das Mapping der Templatevariablen auf die vorgeschlagenen Daten der
+	 * GlobalData Klasse dar und wird jeweils durch zwei Strings dargestellt
 	 *
 	 * @author Marco Dörfler
 	 */
-	private static GlobalData instance;
+	private class DataMapping {
+		public String templateName;
+		public String dataName;
+	}
+
+	/**
+	 * Private Klasse zum Laden der Konfigurationen
+	 *
+	 * @author Marco Dörfler
+	 */
+	private class Config {
+		public String[] allowedScores;
+		public String[] allowedData;
+		public DataMapping[] dataMapping;
+	}
 
 	@Override
 	public String getHtml() {
@@ -49,20 +67,55 @@ public class GlobalData implements Representable {
 			this.calculateDataResults();
 		}
 
-		String html = "<b>Es wurden folgende Daten gefunden:</b><br />";
-		html += "<table border=\"1\"><tr><th>Name</th><th>Wert</th></tr>";
 
-		for (Map.Entry<String, Integer> score : this.globalScores.entrySet()) {
-			html += "<tr><td>Score " + score.getKey() + "</td><td>" + score.getValue().toString()
-					+ "</td></tr>";
+		// Template laden
+		ST template = new ST(Utilities.getResourceAsString(TEMPLATE_LOCATION), '$', '$');
+
+		/*
+		Das Template benötigt im Header einige Variablen aus den Scores. Diese müssen vorher in
+		der JSON Datei auf die entsprechenden Attribute der Daten gemapt werden
+		Beispiel: Der Datensatz Straße wird auf die Templatevariable street gemapt
+		 */
+		// Durchgehen der einzelnen Mappings
+		for (DataMapping dataMapping : this.config.dataMapping) {
+			// Wenn ein Datensatz vorhanden ist, wird dieser gesetzt. Ansonsten wird false gesetzt
+			if (this.globalDataResults.containsKey(dataMapping.dataName)) {
+				template.add(dataMapping.templateName, this.globalDataResults.get(dataMapping
+						.dataName));
+			} else {
+				template.add(dataMapping.templateName, false);
+			}
 		}
-		for (Map.Entry<String, String> data : this.globalDataResults.entrySet()) {
-			html += "<tr><td>" + data.getKey() + "</td><td>" + data.getValue() + "</td></tr>";
+
+		template.add("maxScore", MAX_SCORE_VALUE);
+
+		// Globale Informationen hinzufügen, wenn vorhanden
+		if (!this.globalDataResults.isEmpty()) {
+			template.add("hasInformation", true);
+
+			// Daten vorhanden? -> füllen
+			for (Map.Entry<String, String> dataResult : this.globalDataResults.entrySet()) {
+				template.addAggr("information.{name, value}", dataResult.getKey(),
+						dataResult.getValue());
+			}
+		} else {
+			template.add("hasInformation", false);
 		}
 
-		html += "</table>";
+		// Scores hinzufügen, wenn vorhanden
+		if (!this.globalScores.isEmpty()) {
+			template.add("hasScores", true);
 
-		return html;
+			// Scores vorhanden? -> füllen
+			for (Map.Entry<String, Integer> score : this.globalScores.entrySet()) {
+				template.addAggr("scores.{name, value}", score.getKey(), score.getValue());
+			}
+		} else {
+			template.add("hasScores", false);
+		}
+
+		// Template rendern und zurückgeben
+		return template.render();
 	}
 
 	@Override
@@ -76,6 +129,21 @@ public class GlobalData implements Representable {
 	}
 
 	@Override
+	public String[] getCsvHeaders() {
+		List<String> headerCols = new ArrayList<>();
+
+		for (String dataName : this.config.allowedData) {
+			headerCols.add(CSV_PREFIX_DATA + dataName);
+		}
+
+		for (String scoreName : this.config.allowedScores) {
+			headerCols.add(CSV_PREFIX_SCORE + scoreName);
+		}
+
+		return headerCols.toArray(new String[headerCols.size()]);
+	}
+
+	@Override
 	public SortedMap<String, String> getCsvContent() {
 		// Wenn Werte noch nicht kalkuliert wurden, berechne diese jetzt
 		if (this.globalDataResults == null) {
@@ -84,11 +152,11 @@ public class GlobalData implements Representable {
 
 		SortedMap<String, String> csvContent = new TreeMap<>();
 		for (Map.Entry<String, Integer> globalScore : this.globalScores.entrySet()) {
-			csvContent.put(this.CSV_PREFIX_SCORE + "_" + globalScore.getKey(),
+			csvContent.put(this.CSV_PREFIX_SCORE + globalScore.getKey(),
 					globalScore.getValue().toString());
 		}
 		for (Map.Entry<String, String> globalData : this.globalDataResults.entrySet()) {
-			csvContent.put(this.CSV_PREFIX_DATA + "_" + globalData.getKey(),
+			csvContent.put(this.CSV_PREFIX_DATA + globalData.getKey(),
 					globalData.getValue());
 		}
 
@@ -98,50 +166,68 @@ public class GlobalData implements Representable {
 
 	/**
 	 * Privater Konstruktor, da Singleton
-	 *
-	 * @author Marco Dörfler
 	 */
 	private GlobalData() {
-
+		// Lesen der JSON-Konfiguration
+		this.config = Utilities.loadDataFromJson("/data/GlobalData_Config.json", Config.class);
 	}
+
+
+	private static class InstanceHolder {
+		public static GlobalData instance = new GlobalData();
+	}
+
 
 	/**
 	 * Erlangen der Singletoninstanz der Klasse
 	 * @return Instanz der Singleton Klasse
-	 *
-	 * @author Marco Dörfler
 	 */
 	public static GlobalData getInstance() {
-		if (instance == null) {
-			createInstance();
-		}
-		return instance;
+		return InstanceHolder.instance;
 	}
 
+
+
 	/**
-	 * Synchronized Methode zum Erstellen der Instanz
-	 * So wird verhindert, dass es am Ende mehrere unterschiedliche Instanzen gibt
-	 * Ausgelagert, da getInstance sonst langsamer wird.
+	 * Vorschlagen von persönlichen Daten. Es können nur Daten vorgeschlagen werden,
+	 * die in der <tt>GlobalData_Config.json</tt> als erlaubte Werte angemeldet wurden
 	 *
-	 * @author Marco Dörfler
-	 */
-	private static synchronized void createInstance() {
-		if (instance == null) {
-			instance = new GlobalData();
-		}
-	}
-
-
-	/**
-	 * Vorschlagen von persönlichen Daten
 	 * @param key Key des Datensatzes (z.B. "Name")
 	 * @param value Wert des Datensatzes (z.B. der Name des Nutzers)
 	 *
-	 * @author Marco Dörfler
+	 * @throws java.lang.RuntimeException Es wurde ein Datensatz übergeben,
+	 * welcher nicht in der <tt>GlobalData_Config.json</tt> eingetragen ist oder die Laufzeit der
+	 * Module ist beendet und damit die Zeit zum Vorschlagen von Datensätzen vorbei.
 	 */
 	public synchronized void proposeData(String key, String value) {
-		// Siehe Beschreibung oben - value to upper
-		value = value.toUpperCase();
+		this.proposeData(key, value, 1);
+	}
+
+
+	/**
+	 * Vorschlagen von persönlichen Daten. Es können nur Daten vorgeschlagen werden,
+	 * die in der <tt>GlobalData_Config.json</tt> als erlaubte Werte angemeldet wurden
+	 *
+	 * @param key Key des Datensatzes (z.B. "Name")
+	 * @param value Wert des Datensatzes (z.B. der Name des Nutzers)
+	 * @param count Wie oft wurde der Wert gefunden?
+	 *
+	 * @throws java.lang.RuntimeException Es wurde ein Datensatz übergeben,
+	 * welcher nicht in der <tt>GlobalData_Config.json</tt> eingetragen ist oder die Laufzeit der
+	 * Module ist beendet und damit die Zeit zum Vorschlagen von Datensätzen vorbei.
+	 */
+	public synchronized void proposeData(String key, String value, int count) {
+		// Prüfen, ob Datenvorschläge aktuell erlaubt sind
+		if (!this.dataProposalsAllowed) {
+			throw new RuntimeException("No data proposals allowed after calculating the results!");
+		}
+
+		// Prüfe, ob dieser Datensatz vorgeschlagen werden darf
+		if (!Arrays.asList(this.config.allowedData).contains(key)) {
+			throw new RuntimeException("Proposal of not registered data.");
+		}
+
+		// Prüfen, ob für diesen Key Daten vorgeschlagen werden dürfen
 
 		// Prüfen, ob der Datensatz für diesen Key schon existiert, ansonsten anlegen und mit
 		// diesem Vorschlag initialisieren
@@ -155,20 +241,32 @@ public class GlobalData implements Representable {
 
 		// Entscheide, ob dieser Wert für diesen Keyschonmal vorgeschlagen wurde
 		if (valueProposals.containsKey(value)) {
-			valueProposals.put(value, valueProposals.get(value) + 1);
+			valueProposals.put(value, valueProposals.get(value) + count);
 		} else {
-			valueProposals.put(value, 1);
+			valueProposals.put(value, count);
 		}
 	}
 
 	/**
-	 * Verändern eines globalen Scores
+	 * Verändern eines globalen Scores. Diese Methode erlaubt das Ändern eines globalen Scores,
+	 * sofern dieser in der <tt>GlobalData_Config.json</tt> als erlaubt eingetragen wurde.
+	 *
 	 * @param key Key des Scores
 	 * @param value Wert, um welchen erhöht oder erniedrigt werden soll
 	 *
-	 * @author Marco Dörfler
+	 * @throws java.lang.RuntimeException Ein Score wurde zu einer nicht erlaubten Zeit geändert
+	 * oder er ist nicht in der <tt>GlobalData_Config.json</tt> eingetragen
 	 */
 	public synchronized void changeScore(String key, int value) {
+		if (!this.dataProposalsAllowed) {
+			throw new RuntimeException("No score changes allowed after calculating the results!");
+		}
+
+		// Nur erlaubte Scores dürfen gesetzt werden 
+		if (!Arrays.asList(this.config.allowedScores).contains(key)) {
+			throw new RuntimeException("Changing of not registered score.");
+		}
+
 		// Alle Scores werden mit der Hälfte des Maximums initialisiert
 		if (!this.globalScores.containsKey(key)) {
 			this.globalScores.put(key, MAX_SCORE_VALUE/2);
@@ -184,10 +282,11 @@ public class GlobalData implements Representable {
 	/**
 	 * Kalkuliere den wahrscheinlich richtigen Wert aus allen Vorschlägen für alle
 	 * vorgeschlagenen Werte und speichere die Ergebnisse
-	 *
-	 * @author Marco Dörfler
 	 */
 	private void calculateDataResults() {
+		// Sobald diese Methode aufgerufen wurde, sind keine dataProposals mehr erlaubt
+		this.dataProposalsAllowed = false;
+
 		Map<String, String> dataResults = new HashMap<>();
 
 		// Iteriere über alle Keys
@@ -210,7 +309,7 @@ public class GlobalData implements Representable {
 
 			// Gab es ein Ergebnis? Dann Wert speichern
 			if (bestProposal != null) {
-				dataResults.put(key, WordUtils.capitalizeFully(bestProposal.getKey()));
+				dataResults.put(key, bestProposal.getKey());
 			}
 		}
 
