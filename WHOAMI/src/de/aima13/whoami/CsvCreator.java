@@ -6,7 +6,6 @@ import de.aima13.whoami.support.Utilities;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -22,7 +21,8 @@ public class CsvCreator {
 	}
 
 	private static final String FILE_NAME = "WHOAMI_Analyze_Results.csv"; // Name der CSV Datei
-	private static final File csvFile = new File(FILE_NAME); // File Datei der CSV Datei
+	private static final File csvFile = new File(Whoami.OUTPUT_DIRECTORY
+			+ FILE_NAME); // File Datei der CSV Datei
 	private static final String PREFIX_SEPERATOR = " "; // Seperator zw. Modulname und Header
 
 	private static final char CSV_SEPERATOR = ';'; // Separator der CSV Datei
@@ -93,7 +93,6 @@ public class CsvCreator {
 				);
 
 
-
 		// Status der CSV-Datei herausfinden
 		CSV_STATUS csvStatus = getCsvStatus(csvHeader);
 
@@ -115,7 +114,7 @@ public class CsvCreator {
 			case WRONG_FORMAT:
 				// Nach neuem, nicht vergebenem Namen suchen
 				String newFileName;
-				if ((newFileName = Utilities.getNewFileName(FILE_NAME)) == null) {
+				if ((newFileName = Utilities.getNewFileName(Whoami.OUTPUT_DIRECTORY + FILE_NAME)) == null) {
 					// Kein neuer nutzbarer Name gefunden
 					return false;
 				}
@@ -127,7 +126,7 @@ public class CsvCreator {
 				}
 
 				try {
-					File newFile = new File(FILE_NAME);
+					File newFile = new File(Whoami.OUTPUT_DIRECTORY + FILE_NAME);
 					fileWriter = new OutputStreamWriter(new
 							FileOutputStream(newFile), StandardCharsets.UTF_8);
 				} catch (IOException e) {
@@ -138,7 +137,7 @@ public class CsvCreator {
 				try {
 					if (!csvFile.canWrite() && !csvFile.setWritable(true)) {
 						// Datei kann nicht benutzt werden. Suche nach anderem Namen
-						if ((newFileName = Utilities.getNewFileName(FILE_NAME)) == null) {
+						if ((newFileName = Utilities.getNewFileName(Whoami.OUTPUT_DIRECTORY + FILE_NAME)) == null) {
 							// Kein neuer nutzbarer Name gefunden
 							return false;
 						}
@@ -150,7 +149,7 @@ public class CsvCreator {
 					} else {
 						// Datei ist schreibbar
 						fileWriter = new OutputStreamWriter(new
-								FileOutputStream(csvFile), StandardCharsets.UTF_8);
+								FileOutputStream(csvFile, true), StandardCharsets.UTF_8);
 					}
 				} catch (IOException e) {
 					return false;
@@ -184,13 +183,14 @@ public class CsvCreator {
 
 	/**
 	 * Untersuchen auf eventuell bereits vorhandener CSV-Dateien
+	 *
 	 * @param moduleHeader String-Array des aktuellen Headers
 	 * @return enum zur Statusunterscheidung
 	 */
 	private static CSV_STATUS getCsvStatus(String[] moduleHeader) {
 		try {
-			CSVReader reader = new CSVReader(new FileReader(csvFile), CSV_SEPERATOR,
-					CSV_QUOTECHAR);
+			CSVReader reader = new CSVReader(new InputStreamReader(new FileInputStream(csvFile),
+					StandardCharsets.UTF_8), CSV_SEPERATOR, CSV_QUOTECHAR);
 
 			// Wir gehen davon aus, dass die erste Zeile der Header ist
 			String[] header = reader.readNext();

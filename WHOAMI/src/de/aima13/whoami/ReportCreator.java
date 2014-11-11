@@ -46,7 +46,9 @@ public class ReportCreator {
 	public boolean savePdf() {
 		try {
 			// Evt. vorhandene Datei umbenennen
-			Path outputFile = Paths.get(FILE_NAME.replace(PLACEHOLDER_SCAN_ID, this.scanId));
+			Path outputFile = Paths.get(Whoami.OUTPUT_DIRECTORY +
+					FILE_NAME.replace(PLACEHOLDER_SCAN_ID,
+					this.scanId));
 			if (Files.exists(outputFile)) {
 				String newName = Utilities.getNewFileName(outputFile.getFileName().toString());
 				Files.move(outputFile, Paths.get(newName));
