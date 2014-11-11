@@ -42,12 +42,7 @@ public class DataSourceManager {
 
 		dbConnection = getAlreadyOpenConnection(sqliteDatabase);
 		if (dbConnection == null) {
-			if (sqliteDatabase.toString().contains("Chrome")) {
-				dbConnection = getConnectionFromShadowCopy(sqliteDatabase);
-			} else {
-				dbConnection = DriverManager.getConnection
-						("jdbc:sqlite:" + sqliteDatabase.toString());
-			}
+			dbConnection = getConnectionFromShadowCopy(sqliteDatabase);
 		}
 	}
 
@@ -77,15 +72,15 @@ public class DataSourceManager {
 	 * @return Connection Verbindung zur kopierten SQLite Datenbank.
 	 */
 	private Connection getConnectionFromShadowCopy(Path source) {
-		File chromeCopy = null;
+		File browserCopy = null;
 		try {
-			chromeCopy = File.createTempFile("chrome", ".sqlite", null);
-			chromeCopy.deleteOnExit();
+			browserCopy = File.createTempFile("db"+ java.util.UUID.randomUUID().toString(), ".sqlite", null);
+			browserCopy.deleteOnExit();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		try {
-			Files.copy(source, chromeCopy.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			Files.copy(source, browserCopy.toPath(), StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -93,7 +88,7 @@ public class DataSourceManager {
 		try {
 			Class.forName("org.sqlite.JDBC");
 			fakedConnection = DriverManager.getConnection
-					("jdbc:sqlite:" + chromeCopy.toString());
+					("jdbc:sqlite:" + browserCopy.toString());
 			openConnections.put(source, fakedConnection);
 		} catch (SQLException e) {
 			e.printStackTrace();
