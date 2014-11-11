@@ -168,9 +168,9 @@
                     <headerType>console</headerType>
                     <jar>${project.build.directory}/${project.artifactId}-${project.version}-jfx.jar</jar>
                     <outfile>${project.build.directory}/WHOAMI-Scanner.exe</outfile>
-                    <singleInstance>
+                    <!--<singleInstance>
                         <mutexName>whoami_scanner</mutexName>
-                    </singleInstance>
+                    </singleInstance>-->
                     <chdir>.</chdir>
                     <priority>normal</priority>
                     <downloadUrl>http://java.com/download</downloadUrl>
