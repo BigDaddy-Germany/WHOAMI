@@ -150,7 +150,7 @@ public class CsvCreator {
 					} else {
 						// Datei ist schreibbar
 						fileWriter = new OutputStreamWriter(new
-								FileOutputStream(csvFile), StandardCharsets.UTF_8);
+								FileOutputStream(csvFile, true), StandardCharsets.UTF_8);
 					}
 				} catch (IOException e) {
 					return false;
