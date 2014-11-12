@@ -242,6 +242,11 @@ public class Music implements Analyzable {
 	public String getHtml() {
 		StringBuilder buffer = new StringBuilder();
 
+		// ', ' aus cltprogram und onlService durch Zeilenumbrüche ergänzen
+
+		cltProgram = cltProgram.replaceAll(", ", "<br \\>");
+		onlService = onlService.replaceAll(", ", "<br \\>");
+
 		// Ergebnistabelle
 		if (!(favGenre.equals("") && onlService.equals("") && cltProgram.equals("") && favArtist
 				.equals(""))) {
@@ -383,7 +388,6 @@ public class Music implements Analyzable {
 	 */
 	public SortedMap<String, String> getCsvContent() {
 		SortedMap<String, String> csvData = new TreeMap<>();
-
 		if (!(favArtist.equals(""))) {
 			csvData.put("Lieblingskünstler", favArtist);
 		} else csvData.put("Lieblingskünstler", "-");
@@ -624,8 +628,8 @@ public class Music implements Analyzable {
 						ID3v1 tagv1 = mp3file.getID3v1Tag();
 
 						//Analyse Lieblingskünstler
-						String artist = tagv1.getArtist().replaceAll("^[a-zA-Z0-9ß?!.,äüö]",
-								""); //Ersetze dabei Sonderzeichen
+						String artist = tagv1.getArtist();//.replaceAll("^[a-zA-Z0-9ß?!.,äüö]",
+								//""); //Ersetze dabei Sonderzeichen
 						if(!(artist.equals(""))&& !(artist.contains("\\"))) {
 							//Fehlerhafte ID3-tags abfangen (\\ leitet Fehlercode ein)
 								if (!(mapMaxApp.containsKey(tagv1.getLeadArtist()))) { //Erstelle neuen Eintrag
@@ -715,7 +719,7 @@ public class Music implements Analyzable {
 						cltProgram = names[i];
 					}
 					else if(!(cltProgram.contains(names[i]))){
-						cltProgram += "<br />" + names[i];
+						cltProgram += ", " + names[i];
 					}
 				}
 			}
@@ -770,7 +774,7 @@ public class Music implements Analyzable {
 					if (onlService.isEmpty()) {
 						onlService += searchUrl[j]; // erster Dienst
 					} else {
-						onlService += "<br />" + searchUrl[j]; // weitere Dienste werden mit Komma
+						onlService += ", " + searchUrl[j]; // weitere Dienste werden mit Komma
 						// angehangen
 					}
 				}
@@ -815,5 +819,4 @@ public class Music implements Analyzable {
 		}
 		return mostVisited;
 	}
-
 }
