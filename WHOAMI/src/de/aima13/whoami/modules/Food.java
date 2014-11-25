@@ -50,8 +50,7 @@ public class Food implements Analyzable {
 	@Override
 	public List<String> getFilter() {
 		List<String> searchList = new ArrayList<String>();
-		searchList.add("**Rezepte**.txt");
-		searchList.add("**Rezepte**.docx");
+
 
 		searchList.add("**Rezept**.txt");
 		searchList.add("**Rezept**.docx");
@@ -59,8 +58,8 @@ public class Food implements Analyzable {
 		searchList.add("**rezept**.txt");
 		searchList.add("**rezept**.docx");
 
-		searchList.add("**backen**.txt");
-		searchList.add("**backen**.docx");
+		searchList.add("**backen*/*.txt");
+		searchList.add("**backen*/*.docx");
 
 		searchList.add("**Kuchen**.txt");
 		searchList.add("**Kuchen**.docx");
