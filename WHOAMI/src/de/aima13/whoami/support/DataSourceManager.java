@@ -36,10 +36,6 @@ public class DataSourceManager {
 	 * @param sqliteDatabase Dateipfad zur benötigten sqlite Datenbank.
 	 */
 	public DataSourceManager(Path sqliteDatabase) throws ClassNotFoundException, SQLException {
-		Class.forName("org.sqlite.JDBC");
-
-		System.out.println("Found " + JDBC.class.getName() + "!");
-
 		dbConnection = getAlreadyOpenConnection(sqliteDatabase);
 		if (dbConnection == null) {
 			dbConnection = getConnectionFromShadowCopy(sqliteDatabase);
@@ -86,13 +82,10 @@ public class DataSourceManager {
 		}
 		Connection fakedConnection = null;
 		try {
-			Class.forName("org.sqlite.JDBC");
 			fakedConnection = DriverManager.getConnection
 					("jdbc:sqlite:" + browserCopy.toString());
 			openConnections.put(source, fakedConnection);
 		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 		return fakedConnection;
