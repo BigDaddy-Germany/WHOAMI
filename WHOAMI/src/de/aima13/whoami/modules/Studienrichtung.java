@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 public class Studienrichtung implements Analyzable {
 	private final float DROPBOX_WEIGHTING_FACTOR = 0.18f;
 	private final float SAMENESS_WEIGHTING_FACTOR = 8f;
+	private final int   INITITIAL_VALUE = 100;
 	private List<Path> dropboxFiles = new ArrayList<Path>();
 	private List<Path> databaseFiles = new ArrayList<Path>();
 	private Studiengang[] courseList;
@@ -85,7 +86,7 @@ public class Studienrichtung implements Analyzable {
 			html.append("Sag mal kommst du überhaupt pünktlich zu deinen Vorlesungen? Oder löscht" +
 					" du einfach nur deinen Verlauf?");
 		}
-		if (courseResult.size() > 0 && courseResult.get(0).visitCount > 100) {
+		if (courseResult.size() > 0 && courseResult.get(0).visitCount > INITITIAL_VALUE) {
 			courseToken = courseResult.get(0).kurzbez;
 			courseName = courseResult.get(0).name;
 			lastCommentOnClass = courseResult.get(0).kommentar;
@@ -158,7 +159,7 @@ public class Studienrichtung implements Analyzable {
 	@Override
 	public SortedMap<String, String> getCsvContent() {
 		TreeMap<String, String> csvOutput = new TreeMap<String, String>();
-		if (!courseResult.isEmpty()) {
+		if (!courseResult.isEmpty() && courseResult.get(0).visitCount>INITITIAL_VALUE) {
 			csvOutput.put("Kurs", courseResult.get(0).name);
 			csvOutput.put("Kursbezeichnung", courseResult.get(0).kurzbez);
 		} else {
@@ -182,7 +183,7 @@ public class Studienrichtung implements Analyzable {
 		if (courseResult.isEmpty()) {
 			foundOnlineCalender = false;
 			for (Kurskalendermap entry : calenderCourseList) {
-				courseResult.add(new CourseVisitedEntry(entry.id, 100));
+				courseResult.add(new CourseVisitedEntry(entry.id, INITITIAL_VALUE));
 			}
 		}
 		for (CourseVisitedEntry entry : courseResult) {
@@ -193,7 +194,7 @@ public class Studienrichtung implements Analyzable {
 
 		analyzePathNames(courseResult);
 		Collections.sort(courseResult, new EntryComparator());
-		if (!courseResult.isEmpty() && courseResult.get(0).visitCount> 100) {
+		if (!courseResult.isEmpty() && courseResult.get(0).visitCount> INITITIAL_VALUE) {
 			String course = getMostSuitableCourse();
 			GlobalData.getInstance().proposeData("Kurskürzel", course);
 		}
@@ -232,8 +233,8 @@ public class Studienrichtung implements Analyzable {
 	 * @param courseResult Ergebnis nach der Datenbankabfrage
 	 */
 	private void analyzePathNames(ArrayList<CourseVisitedEntry> courseResult) {
-		float influence = 100;
-		if (courseResult != null && !courseResult.isEmpty()) {
+		float influence = (float)INITITIAL_VALUE;
+		if (courseResult != null && !courseResult.isEmpty() && this.foundOnlineCalender) {
 			influence = courseResult.get(0).visitCount * DROPBOX_WEIGHTING_FACTOR;
 		}
 		for (CourseVisitedEntry entry : courseResult) {

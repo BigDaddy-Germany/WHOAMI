@@ -73,7 +73,7 @@ public class Games implements Analyzable {
 	@Override
 	public void setFileInputs(List<Path> paths) {
 		//Eingabedateien gleich in eigene Liste kopieren
-		exePaths = paths; //:TODO: Bestätigung holen, dass das MEINE LISTE GANZ ALLEIN ist
+		exePaths = paths; 
 		for (Path currentPath : exePaths) {
 			if (!currentPath.toAbsolutePath().toString().toLowerCase().endsWith(".exe")) {
 				throw new RuntimeException("Input passt nicht zu Filter: "

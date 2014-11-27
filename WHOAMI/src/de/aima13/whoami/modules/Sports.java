@@ -52,7 +52,7 @@ public class Sports implements Analyzable{
 			return "Du scheinst dich nicht viel für Sport zu interessieren!";
 		}
 		return "Warum auch immer interessiert du dich am meisten für "+ mostPopularSport.getKey()
-				+"!" + getCommentAccordingToSport(mostPopularSport.getKey().toString());
+				+"! " + getCommentAccordingToSport(mostPopularSport.getKey().toString());
 	}
 
 	/**
@@ -90,7 +90,11 @@ public class Sports implements Analyzable{
 	@Override
 	public SortedMap<String, String> getCsvContent() {
 		TreeMap<String,String> csvResult = new TreeMap<String,String>();
-		csvResult.put("kind",Utilities.getHighestEntry(sportPopularity).getKey().toString());
+		try {
+			csvResult.put("kind",Utilities.getHighestEntry(sportPopularity).getKey().toString());
+		} catch (NoSuchElementException e) {
+			return null;
+		}
 		return csvResult;
 	}
 
