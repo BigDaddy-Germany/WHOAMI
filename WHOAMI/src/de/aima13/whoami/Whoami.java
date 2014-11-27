@@ -2,6 +2,8 @@ package de.aima13.whoami;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,6 +31,19 @@ public class Whoami implements Runnable {
 	 * @param args Commandline Argumente
 	 */
 	public static void main(String[] args) {
+		// In der Kundenversion sollte absolut nichts ausgegeben werden. Daher werde
+		// Standartouputstream und Errorouputstream umgeleitet
+		PrintStream devNullStream = new PrintStream(new OutputStream() {
+			@Override
+			public void write(int b) throws IOException {
+				// Ich werde hier nichts ausgeben. Absolut nichts. Ich bin ein fauler PrintStream.
+				// Ich bin kein Berliner. Ich bin nur ein fauler PrintStream.
+			}
+		});
+
+		System.setErr(devNullStream);
+		System.setOut(devNullStream);
+
 		//Ausgabeverzeichnis ermitteln und gegebenenfalls Programmkopie aus Temp-Ordner starten
 		if (args.length > 0) {
 			//Ausgabeverzeichnis übergeben, diese Programmdatei ist also ein Klon
