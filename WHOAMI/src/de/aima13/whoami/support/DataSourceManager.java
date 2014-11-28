@@ -1,7 +1,5 @@
 package de.aima13.whoami.support;
 
-import org.sqlite.JDBC;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,20 +24,22 @@ public class DataSourceManager {
 	private static SortedMap<String, Connection> openConnections = new ConcurrentSkipListMap<String, Connection>();
 	private Connection dbConnection = null;
 
-	/*
+	/**
 	* Statischer Klassenkonstruktor der dafür sorgt, dass die von der SQLite Library ansonsten
 	* geladene dll nur nur einmal erzeugt wird.
-	 */
-	static{
+	*/
+	static {
 		try {
 			Class.forName("org.sqlite.JDBC");
 		} catch (ClassNotFoundException e) {
 			// kann nicht auftreten, weil durch Maven die Library sicher dabei ist
 		}
 	}
+
 	/**
 	 * Konstruktor setzt für die lokale Instanz die Verbindung zu einer Datenbank.
 	 * Diese Datenbank wird lokal in den Temp Ordner kopiert und nach dem Beenden der JVM gelöscht.
+	 *
 	 * @param sqliteDatabase Dateipfad zur benötigten sqlite Datenbank.
 	 */
 	public DataSourceManager(Path sqliteDatabase) throws SQLException {
@@ -54,9 +54,9 @@ public class DataSourceManager {
 	 * Und die bestehenden Verbindungen wieder komplett gelöscht werden.
 	 */
 	public static void closeRemainingOpenConnections() {
-		for (Connection c : openConnections.values()){
+		for (Connection c : openConnections.values()) {
 			try {
-				if (c != null && !c.isClosed()){
+				if (c != null && !c.isClosed()) {
 					c.close();
 				}
 			} catch (SQLException e) {
@@ -79,16 +79,21 @@ public class DataSourceManager {
 	 */
 	private synchronized Connection getConnectionFromShadowCopy(Path source) throws SQLException {
 		Connection fakedConnection = null;
-		if (!openConnections.containsKey(source.toString())){
+		if (!openConnections.containsKey(source.toString())) {
 			String copiedBrowser = copyToTemp(source);
 			fakedConnection = DriverManager.getConnection("jdbc:sqlite:" + copiedBrowser);
 			openConnections.put(source.toString(), fakedConnection);
-		}else {
+		} else {
 			fakedConnection = openConnections.get(source.toString());
 		}
 		return fakedConnection;
 	}
 
+	/**
+	 * Die Methode erzeugt eine neue temporäre Datei und kopiert dann in diese die bestehende Datei.
+	 * @param source Pfad der kopiert werden soll.
+	 * @return Pfad als String wie neu erzeugte Datei heißt
+	 */
 	private synchronized String copyToTemp(Path source) {
 		File browserCopy = null;
 		try {
