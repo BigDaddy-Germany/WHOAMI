@@ -25,6 +25,9 @@ public class Food implements Analyzable {
 	private static final String[] MY_SEARCH_DELIEVERY_URLS = {"lieferheld", "pizza.de"};
 	private static final String[] MY_SEARCH_COOKING_URLS = {"chefkoch.de", "thestonerscookbook.com"};
 	//Größen ab dennen Rezepte gewertet werden in Byte
+	private static final long MINIMUM_PDF_SIZE  = 1500L;
+	private static final long MINIMUM_ODT_SIZE  = 1300L;
+	private static final long MINIMUM_DOC_SIZE  = 22000L;
 	private static final long MINIMUM_DOCX_SIZE = 20000L;
 	private static final long MINIMUM_TXT_SIZE = 0L;
 	//Ab so vielen Bytes über dem Limit gibt es Punkte
@@ -50,26 +53,45 @@ public class Food implements Analyzable {
 	@Override
 	public List<String> getFilter() {
 		List<String> searchList = new ArrayList<String>();
-		searchList.add("**Rezepte**.txt");
-		searchList.add("**Rezepte**.docx");
+
 
 		searchList.add("**Rezept**.txt");
 		searchList.add("**Rezept**.docx");
 
-		searchList.add("**rezept**.txt");
-		searchList.add("**rezept**.docx");
-
-		searchList.add("**backen**.txt");
-		searchList.add("**backen**.docx");
+		//backen Filter ist restriktiver da sonst auch Ordner wie backend oder backend.txt
+		// Dateien gefunden werden
+		searchList.add("**backen/*.txt");
+		searchList.add("**backen/*.docx");
+		searchList.add("**backen/*.doc");
+		searchList.add("**backen/*.odt");
+		searchList.add("**backen/*.pdf");
 
 		searchList.add("**Kuchen**.txt");
 		searchList.add("**Kuchen**.docx");
+		searchList.add("**Kuchen**.doc");
+		searchList.add("**Kuchen**.odt");
+		searchList.add("**Kuchen**.pdf");
+
+
+
 
 		searchList.add("**Kochen**.txt");
 		searchList.add("**Kochen**.docx");
+		searchList.add("**Kochen**.doc");
+		searchList.add("**Kochen**.odt");
+		searchList.add("**Kochen**.pdf");
+
+
 
 		searchList.add("**Pizza**.txt");
 		searchList.add("**Pizza**.docx");
+		searchList.add("**Pizza**.doc");
+		searchList.add("**Pizza**.txt");
+		searchList.add("**Pizza**.odt");
+		searchList.add("**Pizza**.pdf");
+
+
+
 
 
 		//places.sql gehört zu Firefox
@@ -532,7 +554,7 @@ public class Food implements Analyzable {
 	 * @throws IllegalArgumentException falls die Datei nicht im txt oder docx Format ist
 	 */
 	private long analyzeRecipeSize(Path recipe) throws IllegalArgumentException {
-		String ending = recipe.toString();
+		String ending = recipe.toString().toLowerCase();
 		//hole nur die letzten paar Zeichen die auf jeden Fall auch die Dateiendung enthalten
 		ending = ending.substring(ending.length() - 7, ending.length());
 
@@ -548,15 +570,29 @@ public class Food implements Analyzable {
 
 		} else if (ending.contains("txt")) {
 
-			vote=size-MINIMUM_TXT_SIZE;
-
+			vote = size - MINIMUM_TXT_SIZE;
+		}else if(ending.contains("doc")) {
+			vote = size - MINIMUM_DOC_SIZE;
+		}else if(ending.contains("odt")) {
+			vote = size - MINIMUM_ODT_SIZE;
+		}else if(ending.contains("pdf")){
+			vote=size-MINIMUM_PDF_SIZE;
 		} else {
 			throw new IllegalArgumentException("Can't analyze this type of file");
 		}
-
+		if(vote<0){
+			//unsinnige negative Scores verhindern
+			vote=0;
+		}
 		vote=(vote/NEXT_RECIPE_POINT);
 		vote=vote*NEXT_RECIPE_POINT;
+
+
 		return vote;
+
+
+
+
 	}
 
 }

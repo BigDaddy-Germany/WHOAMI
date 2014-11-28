@@ -22,10 +22,9 @@ public class FileSearcher {
 
 	// Dieser Pfad wird als root dir zum Suchen genutzt, wenn ungleich null
 
-	private static final String[] DEBUG_TEST_DIR = null
-		//{"E:\\Dropbox\\Software Engineering WS14\\Wir als Lieferant\\Testdaten\\Personas\\Hoffi"}
-//
-	;
+	private static final String[] DEBUG_TEST_DIR = 
+		{"C:\\Users\\Marvin\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\i7v2pa47.default"}
+			;
 
 
 	/**
