@@ -24,8 +24,7 @@ public class FileSearcher {
 
 	private static final String[] DEBUG_TEST_DIR = null
 		//{"E:\\Dropbox\\Software Engineering WS14\\Wir als Lieferant\\Testdaten\\Personas\\Hoffi"}
-//
-	;
+			;
 
 
 	/**
