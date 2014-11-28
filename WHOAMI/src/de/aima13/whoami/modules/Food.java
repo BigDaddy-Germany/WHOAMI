@@ -333,8 +333,8 @@ public class Food implements Analyzable {
 							countDeliveryServices += resultSet.getInt("visit_count");
 
 						}
-						resultSet.getStatement().close();
 						resultSet.close();
+						resultSet.getStatement().close();
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -407,8 +407,8 @@ public class Food implements Analyzable {
 							clientIsStoner = true;
 						}
 					}
-					rs.getStatement().close();
 					rs.close();
+					rs.getStatement().close();
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -499,7 +499,7 @@ public class Food implements Analyzable {
 				}
 				try {
 					dbManager = new DataSourceManager(db);
-				} catch (ClassNotFoundException | SQLException e) {
+				} catch (SQLException e) {
 					dbManager = null;
 				}
 				if (dbManager != null) {

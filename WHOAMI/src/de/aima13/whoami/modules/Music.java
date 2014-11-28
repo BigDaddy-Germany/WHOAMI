@@ -810,7 +810,7 @@ public class Music implements Analyzable {
 				}
 				mostVisited = dbManager.querySqlStatement(sqlStatement);
 			}
-		} catch (ClassNotFoundException | SQLException | NullPointerException e) {
+		} catch (SQLException | NullPointerException e) {
 			// Deadlock auf DB | es kommt null auf die DB-Abfrage zurück
 		}
 		return mostVisited;
