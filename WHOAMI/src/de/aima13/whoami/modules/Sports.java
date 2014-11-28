@@ -11,6 +11,8 @@ import java.util.*;
 
 /**
  * Created by Marvin on 03.11.2014.
+ * In Anbetracht des Pflichtenheftes wurde hier eine Kann-Anforderung erfüllt.
+ * Deshalb ist diese Implementierung ausbaufähig.
  */
 public class Sports implements Analyzable{
 	private List<Path> inputFiles = new ArrayList<Path>();
