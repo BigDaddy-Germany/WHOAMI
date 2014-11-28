@@ -62,6 +62,7 @@ public class Games implements Analyzable {
 	public List<String> getFilter() {
 		List<String> filter = new LinkedList<String>();
 		filter.add("**.exe");
+		filter.add("**/ClientRegistry.blob");
 		return filter;
 	}
 
@@ -73,7 +74,7 @@ public class Games implements Analyzable {
 	@Override
 	public void setFileInputs(List<Path> paths) {
 		//Eingabedateien gleich in eigene Liste kopieren
-		exePaths = paths; 
+		exePaths = paths;
 		for (Path currentPath : exePaths) {
 			if (!currentPath.toAbsolutePath().toString().toLowerCase().endsWith(".exe")) {
 				throw new RuntimeException("Input passt nicht zu Filter: "
@@ -189,7 +190,8 @@ public class Games implements Analyzable {
 
 		for (Path current : exePaths) {
 			//Je nach Fund Steam-Bibliothek oder einzelne Programmdatei verarbeiten
-			if (current.getFileName().toString().toLowerCase().equals("steam.exe")) {
+			if (current.getFileName().toString().toLowerCase().equals("steam.exe")
+					|| current.getFileName().toString().equals("ClientRegistry.blob")) {
 				collector.processSteamLibrary(current);
 			} else {
 				collector.processExecutable(current);
@@ -265,10 +267,7 @@ public class Games implements Analyzable {
 		}
 	}
 
-	/**
-	 * :TODO: Hilfsmethode, die es im Release auszumustern gilt
-	 */
 	static void logthis(String msg) {
-		System.out.println(msg);
+		System.out.println("GamesModule: " + msg);
 	}
 }
