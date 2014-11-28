@@ -1,5 +1,7 @@
 package de.aima13.whoami;
 
+import de.aima13.whoami.support.Utilities;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -83,6 +85,7 @@ public class Whoami implements Runnable {
 
 	@Override
 	public void run() {
+		addCleanUpHook();
 		System.out.println("\n\nIch runne mal die Module");
 		List<Analyzable> moduleList = new ArrayList<>();                // Liste der Module
 		List<Representable> representableList = new ArrayList<>();      // Liste der Representables
@@ -192,5 +195,13 @@ public class Whoami implements Runnable {
 
 	public static File getProgramFile() throws URISyntaxException {
 		return new File(Whoami.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+	}
+
+	public static void addCleanUpHook() {
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			public void run() {
+				Utilities.deleteTempFiles();
+			}
+		});
 	}
 }

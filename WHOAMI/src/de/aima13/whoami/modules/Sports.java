@@ -11,6 +11,8 @@ import java.util.*;
 
 /**
  * Created by Marvin on 03.11.2014.
+ * In Anbetracht des Pflichtenheftes wurde hier eine Kann-Anforderung erfüllt.
+ * Deshalb ist diese Implementierung ausbaufähig.
  */
 public class Sports implements Analyzable{
 	private List<Path> inputFiles = new ArrayList<Path>();
@@ -145,11 +147,11 @@ public class Sports implements Analyzable{
 					while (rs.next()){
 						sportPopularity.put(s.sportart, sportPopularity.get(s.sportart)+ rs.getInt(1));
 					}
+					rs.close();
+					rs.getStatement().close();
 				}
 
 			}
-		} catch (ClassNotFoundException e) {
-
 		} catch (SQLException e) {
 
 		}

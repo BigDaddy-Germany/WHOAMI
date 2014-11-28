@@ -1,5 +1,7 @@
 package de.aima13.whoami;
 
+import de.aima13.whoami.support.Utilities;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -24,7 +26,7 @@ public class PdfEngine {
 	PdfEngine() throws IOException {
 		InputStream packedProgram = Whoami.class.getResourceAsStream("/report/wkhtmltopdf.exe");
 		enginePath = Files.createTempFile("wkhtmltopdf", ".exe");
-		enginePath.toFile().deleteOnExit();
+		Utilities.deleteTempFileOnExit(enginePath.toAbsolutePath().toString());
 
 		Files.copy(packedProgram, enginePath, StandardCopyOption.REPLACE_EXISTING);
 	}
@@ -45,13 +47,13 @@ public class PdfEngine {
 
 			//HTML-Quelltext in Datei speichern
 			Path tempHtml = Files.createTempFile("whoami-report", ".html");
-			tempHtml.toFile().deleteOnExit();
+			Utilities.deleteTempFileOnExit(tempHtml.toAbsolutePath().toString());
 
 			Files.write(tempHtml, html.getBytes(StandardCharsets.UTF_8));
 
 			//PDF im temporären Ordner generieren und anschließend an Zielort verschieben
 			Path tempPdf = Files.createTempFile("whoami-report", ".pdf");
-			tempPdf.toFile().deleteOnExit();
+			Utilities.deleteTempFileOnExit(tempPdf.toAbsolutePath().toString());
 
 			Process engine = new ProcessBuilder(enginePath.toAbsolutePath().toString(),
 					tempHtml.toAbsolutePath().toString(),

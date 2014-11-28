@@ -241,7 +241,7 @@ public class TopFive implements Analyzable {
 								"LIMIT 5;"
 				);
 			}
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			// Deadlock auf DB
 		}
 		return mostVisited;
