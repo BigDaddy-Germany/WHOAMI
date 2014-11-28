@@ -4,7 +4,6 @@ import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.GlobalData;
 import de.aima13.whoami.Whoami;
 import de.aima13.whoami.support.DataSourceManager;
-import de.aima13.whoami.support.SqlSelectSaver;
 
 import java.nio.file.Path;
 import java.sql.ResultSet;
@@ -384,6 +383,30 @@ public class PersonalData implements Analyzable {
 					gd.proposeData(curr.title,curr.value,curr.hitCount);
 				}
 			}
+		}
+
+	}
+
+
+	/**
+	 * Created by Michi on 29.10.14.
+	 * Klasse dient lediglich zum speichern von Daten ähnlich eines Struct in C
+	 * Dabei geht es in diesem speziellen Fall um Daten die aus der FormHistory bzw. Web Data
+	 * Datenbank der Browser FireFox bzw. Chrome stammen. Diese beinhalten ein Verlauf übder die
+	 * jenigen Daten die der Nutzer in sogenante Formularfelder eingibt.
+	 */
+	private  class SqlSelectSaver {
+		public String title;
+		public String value;
+		public int hitCount;
+
+		public SqlSelectSaver(String mTitle){
+			title =mTitle;
+		}
+		public SqlSelectSaver(String mTitle , String mValue,int mHitCount){
+			title=mTitle;
+			value=mValue;
+			hitCount=mHitCount;
 		}
 
 	}
