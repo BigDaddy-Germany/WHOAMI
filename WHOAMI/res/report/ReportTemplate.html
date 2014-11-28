@@ -1,8 +1,8 @@
 <!DOCTYPE HTML>
 <html>
-    <head>
-        <meta charset="utf-8" />
-        <style type="text/css">
+	<head>
+		<meta charset="utf-8" />
+		<style type="text/css">
 /* RESET START */
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -54,25 +54,40 @@ blockquote, q {
 		
 body {
 	color:#1A1A1A;
-	font-family:Verdana, Helvetica, sans-serif;
+	font-family: Verdana, Helvetica, sans-serif;
 	/*font-size:14pt;*/
 	padding:10px;
 }
 
-h1 {
-	font-size:32pt;
-	color: #000000;
+#titlebox {
+	overflow: auto;
+	margin-bottom: 10px;
+	font-size:48pt;
+	color: #222222;
 	padding: 7px;
-	font-weight:bold;
-	font-family:"Lucida Console", Monaco, monospace;
-	margin-bottom:10px;	
+	font-family: Impact, Charcoal, sans-serif;
+	font-variant: small-caps;
+}
+
+#logo {
+	float: left;
+	margin-right: 20px;
+}
+
+#pretitle {
+	font-size:0.5em;
+	font-variant: normal;
+	color: #777777;
 }
 
 div.module {
-	margin-bottom: 42px;
+	margin-bottom: 32px;
 	background-color: #F0F0F0;
 	border-radius: 10px 10px 10px 10px;
+	overflow: auto;
+	page-break-inside: avoid;
 }
+
 div.module > h2 {
 	font-variant:small-caps;
 	font-size:16pt;
@@ -80,8 +95,9 @@ div.module > h2 {
 	color: #FFFFFF;
 	padding: 7px;
 	font-weight:bold;
-	margin: 10px 0px 0px 0px;
+	margin: 0px 0px 0px 0px;
 }
+
 div.module > div {
 	font-size:12pt;
 	padding: 10px;
@@ -95,7 +111,8 @@ table {
 	border-collapse: seperate;
 	box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
 	background-color:transparent;
-	margin: 10px 5px 10px 5px;
+	margin: 15px 20px 15px 5px;
+	/* float: left; */
 }
 
 td, th {
@@ -125,24 +142,30 @@ tr:nth-child(even) td {
 	font-style: italic;
 	font-size: 0.8em;
 }
-        </style>
-        <title>Analysebericht</title>
-    </head>
-    <body>
-    <h1>Analysebericht</h1>
-    $modules:{module|
+
+br {
+	clear: both;
+}
+		 </style>
+		<title>WHOAMI-Scanner Analysebericht</title>
+	</head>
+	<body>
+	<div id="titlebox">
+		<img id="logo" src="data:image/png;base64,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">
+		<div id="pretitle">WHOAMI-Scanner</div><h1>Analysebericht</h1>
+	</div>
+	$modules:{module|
 		<div class="module">
-        <h2>$module.title$</h2>
-        <div>
-            $module.content$
-        </div>
+		<h2>$module.title$</h2>
+		<div>
+			$module.content$
 		</div>
-    }$
+		</div>
+	}$
 
+	<div id="footer">
+		&copy; Copyright BigDaddy Analyst Group 2014. All rights reserved. We are watching you.
+	</div>
 
-    <div id="footer">
-        &copy; by BigDaddy AnalystGroup 2014
-    </div>
-
-    </body>
+	</body>
 </html>

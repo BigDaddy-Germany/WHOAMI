@@ -37,7 +37,8 @@ public class Utilities {
 		try {
 
 			InputStream stream = de.aima13.whoami.Whoami.class.getResourceAsStream(jsonPath);
-			java.util.Scanner scanner = new java.util.Scanner(stream).useDelimiter("\\A");
+			java.util.Scanner scanner = new java.util.Scanner(stream,
+					StandardCharsets.UTF_8.toString()).useDelimiter("\\A");
 			jsonText = scanner.next();
 
 		} catch (Exception e) {
@@ -67,7 +68,7 @@ public class Utilities {
 	public static String getNewFileName(String favoredName, boolean backup) {
 		String currentName;
 
-		String baseName = getFileBaseName(favoredName);
+		String baseName = Whoami.OUTPUT_DIRECTORY + getFileBaseName(favoredName);
 		String extension = getFileExtenstion(favoredName);
 
 		if (backup) {

@@ -95,7 +95,7 @@ public class Gui extends Application {
 		primaryStage.initStyle(StageStyle.TRANSPARENT);
 		final FXMLLoader loader = new FXMLLoader();
 		Parent root;
-		InputStream is = Whoami.class.getResourceAsStream("/start.fxml");
+		InputStream is = Whoami.class.getResourceAsStream("/gui/start.fxml");
 		root = (Parent) loader.load(is);
 		guiController = loader.getController();
 		primaryStage.setTitle("Endnutzervereinbarung [WHOAMI-Scanner]");
@@ -124,7 +124,7 @@ public class Gui extends Application {
 		final Stage secondaryStage = new Stage();
 		secondaryStage.initStyle(StageStyle.TRANSPARENT);
 		secondaryStage.setTitle("Analyse... [WHOAMI-Scanner]");
-		InputStream isSecond = Whoami.class.getResourceAsStream("/progressScreen.fxml");
+		InputStream isSecond = Whoami.class.getResourceAsStream("/gui/progressScreen.fxml");
 		Parent root2 = (Parent) secondLoader.load(isSecond);
 		Scene scene = new Scene(root2);
 		scene.getStylesheets().addAll(Whoami.class.getResource("/gui/window.css")
@@ -157,7 +157,7 @@ public class Gui extends Application {
 		final Stage thirdStage = new Stage();
 		thirdStage.setTitle("Dein Ergebnis");
 
-		InputStream isThird = Whoami.class.getResourceAsStream("/reportScreen.fxml");
+		InputStream isThird = Whoami.class.getResourceAsStream("/gui/reportScreen.fxml");
 		Parent rootReport = (Parent) thirdLoader.load(isThird);
 		webEngine = ((WebView) rootReport.lookup("#webView")).getEngine();
 		Scene scene = new Scene(rootReport);

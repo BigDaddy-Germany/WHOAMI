@@ -48,8 +48,25 @@ public class Sports implements Analyzable{
 	@Override
 	public String getHtml() {
 		Map.Entry mostPopularSport = Utilities.getHighestEntry(sportPopularity);
+		if((Integer)mostPopularSport.getValue()<25){
+			return "Du scheinst dich nicht viel für Sport zu interessieren!";
+		}
 		return "Warum auch immer interessiert du dich am meisten für "+ mostPopularSport.getKey()
-				+"!";
+				+"! " + getCommentAccordingToSport(mostPopularSport.getKey().toString());
+	}
+
+	/**
+	 * Beziehe aus der JSON einen Kommentar von uns zur Sportart.
+	 * @param sport Wie Fußball oder Basketball etc.
+	 * @return String der den Kommentar zur Sportart darstellt. Vorrausgesetzt er ist existent.
+	 */
+	private String getCommentAccordingToSport(String sport) {
+		for (Sportart s : sportsList){
+			if (s.sportart.equals(sport)){
+				return s.kommentar;
+			}
+		}
+		return "";
 	}
 
 	@Override
@@ -62,13 +79,22 @@ public class Sports implements Analyzable{
 		return SPORTS_TITLE;
 	}
 
+	@Override
+	public String[] getCsvHeaders() {
+		return new String[]{"kind"};
+	}
+
 	/**
 	 * @return TreeMap die den Inhalt für die CSV-Datei bereitstellt.
 	 */
 	@Override
 	public SortedMap<String, String> getCsvContent() {
 		TreeMap<String,String> csvResult = new TreeMap<String,String>();
-		csvResult.put("1",Utilities.getHighestEntry(sportPopularity).getKey().toString());
+		try {
+			csvResult.put("kind",Utilities.getHighestEntry(sportPopularity).getKey().toString());
+		} catch (NoSuchElementException e) {
+			return null;
+		}
 		return csvResult;
 	}
 
@@ -104,15 +130,16 @@ public class Sports implements Analyzable{
 		try {
 			DataSourceManager dSm = new DataSourceManager(sqliteDB);
 			for (Sportart s : sportsList){
-				String sqlStatement  = "SELECT count(*) FROM " + fromTable+ " where title LIKE '%"+
-						s.sportart+"%' or url LIKE '%"+s.sportart+"%'";
+				String sqlStatement  = "SELECT sum(visit_count) FROM " + fromTable+ " where title" +
+						" LIKE '%"+
+						s.sportart+"%' OR url LIKE '%"+s.sportart+"%' ";
 				if(s.zusatz !=null) {
 					for (String addition : s.zusatz) {
 						sqlStatement += "OR url LIKE '%" + addition + "%' ";
-						sqlStatement += "OR title LIKE '%" + addition + "%'";
+						sqlStatement += "OR title LIKE '%" + addition + "%' ";
 					}
 				}
-				sqlStatement += " ;";
+				sqlStatement += ";";
 				ResultSet rs = dSm.querySqlStatement(sqlStatement);
 				if(rs != null){
 					while (rs.next()){
@@ -131,5 +158,10 @@ public class Sports implements Analyzable{
 	private class Sportart{
 		String sportart;
 		String [] zusatz;
+		String kommentar;
+		@Override
+		public String toString(){
+			return sportart + " Extras:"+Arrays.toString(zusatz);
+		}
 	}
 }

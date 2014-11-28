@@ -16,8 +16,10 @@ import java.util.List;
  */
 public class ReportCreator {
 	private List<Representable> representableList;
+	private String scanId;
 	private final String TEMPLATE_LOCATION = "/report/ReportTemplate.html"; // Berichtsvorlage
-	private final String FILE_NAME = "WHOAMI_Analyze_Results.pdf"; // Name der PDF Datei
+	private final String FILE_NAME = "WHOAMI_Analyze_Results-%ID%.pdf"; // Name der PDF Datei
+	private final String PLACEHOLDER_SCAN_ID = "%ID%";
 	private String htmlContent;
 
 	//private final String PDF_AUTHOR = "BigDaddy Analyst Group"; // Author der PDF
@@ -29,8 +31,9 @@ public class ReportCreator {
 	 *
 	 * @param representables Liste aller Representables, die in den Bericht aufgenommen werden
 	 */
-	public ReportCreator(List<Representable> representables) {
+	public ReportCreator(List<Representable> representables, String scanId) {
 		this.representableList = representables;
+		this.scanId = scanId;
 	}
 
 
@@ -43,7 +46,9 @@ public class ReportCreator {
 	public boolean savePdf() {
 		try {
 			// Evt. vorhandene Datei umbenennen
-			Path outputFile = Paths.get(FILE_NAME);
+			Path outputFile = Paths.get(Whoami.OUTPUT_DIRECTORY +
+					FILE_NAME.replace(PLACEHOLDER_SCAN_ID,
+					this.scanId));
 			if (Files.exists(outputFile)) {
 				String newName = Utilities.getNewFileName(outputFile.getFileName().toString());
 				Files.move(outputFile, Paths.get(newName));
@@ -96,12 +101,10 @@ public class ReportCreator {
 
 			// HTML-Content holen, wenn null Standardtext einfügen
 			String reprContent = representable.getHtml();
-			if (reprContent == null) {
-				reprContent = "-- Kein Inhalt verfügbar für Modul " + reprTitle + "--";
+			if (reprContent != null) {
+				// Variablen hinzufügen
+				template.addAggr("modules.{title, content}", reprTitle, reprContent);
 			}
-
-			// Variablen hinzufügen
-			template.addAggr("modules.{title, content}", reprTitle, reprContent);
 		}
 
 		// Template rendern und zurückgeben
