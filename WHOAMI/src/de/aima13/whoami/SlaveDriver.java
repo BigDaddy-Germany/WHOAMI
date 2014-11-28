@@ -50,6 +50,5 @@ public class SlaveDriver {
 				moduleThread.stop();
 			}
 		}
-		DataSourceManager.closeRemainingOpenConnections();
 	}
 }

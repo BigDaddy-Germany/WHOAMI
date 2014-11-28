@@ -145,11 +145,11 @@ public class Sports implements Analyzable{
 					while (rs.next()){
 						sportPopularity.put(s.sportart, sportPopularity.get(s.sportart)+ rs.getInt(1));
 					}
+					rs.close();
+					rs.getStatement().close();
 				}
 
 			}
-		} catch (ClassNotFoundException e) {
-
 		} catch (SQLException e) {
 
 		}

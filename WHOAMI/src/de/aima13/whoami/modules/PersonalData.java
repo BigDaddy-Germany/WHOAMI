@@ -315,12 +315,11 @@ public class PersonalData implements Analyzable {
 								sqlResults.add(new SqlSelectSaver(title, resultStrg, resultHitCnt));
 							}
 						}
+						resultSet.close();
+						resultSet.getStatement().close();
 					} catch (SQLException e) {
 						//nix machen
 					}
-
-
-
 				}
 			}
 			return sqlResults;

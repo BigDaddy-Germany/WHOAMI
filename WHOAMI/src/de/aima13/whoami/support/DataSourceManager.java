@@ -1,21 +1,19 @@
 package de.aima13.whoami.support;
 
-import org.sqlite.JDBC;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.sql.*;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.SortedMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * DataSourceManager der die Verbindungen zu den SQLite Datenbank handelt.
  *
  * @author Marvin Klose
- * @version 2.0
+ * @version 3.0
  */
 
 
@@ -23,24 +21,29 @@ public class DataSourceManager {
 
 	// Connections werden einmalig je Path angelegt, da mehrere Module sich für die Browser
 	// Datenbanken interessieren geht der Zugriff durch die Zuordnung schneller
-	private static Map<Path, Connection> openConnections = new TreeMap<Path, Connection>();
-	
+	private static SortedMap<String, Connection> openConnections = new ConcurrentSkipListMap<String, Connection>();
 	private Connection dbConnection = null;
 
+	/**
+	* Statischer Klassenkonstruktor der dafür sorgt, dass die von der SQLite Library ansonsten
+	* geladene dll nur nur einmal erzeugt wird.
+	*/
+	static {
+		try {
+			Class.forName("org.sqlite.JDBC");
+		} catch (ClassNotFoundException e) {
+			// kann nicht auftreten, weil durch Maven die Library sicher dabei ist
+		}
+	}
 
 	/**
-	 * Konstruktor erzeugt eine Verbindung zur Datenbank und lädt den JDBC Treiber dafür.
-	 * Ebenso gibt es einen Hook, dass wenn die Runtime beendet wird, auf die Connection getrennt
-	 * wird. Falls jemand vergisst die Verbindung zu schließen.
+	 * Konstruktor setzt für die lokale Instanz die Verbindung zu einer Datenbank.
+	 * Diese Datenbank wird lokal in den Temp Ordner kopiert und nach dem Beenden der JVM gelöscht.
 	 *
 	 * @param sqliteDatabase Dateipfad zur benötigten sqlite Datenbank.
 	 */
-	public DataSourceManager(Path sqliteDatabase) throws ClassNotFoundException, SQLException {
-		Class.forName("org.sqlite.JDBC");
-
-		System.out.println("Found " + JDBC.class.getName() + "!");
-
-		dbConnection = getAlreadyOpenConnection(sqliteDatabase);
+	public DataSourceManager(Path sqliteDatabase) throws SQLException {
+		dbConnection = openConnections.get(sqliteDatabase.toString());
 		if (dbConnection == null) {
 			dbConnection = getConnectionFromShadowCopy(sqliteDatabase);
 		}
@@ -48,18 +51,21 @@ public class DataSourceManager {
 
 	/**
 	 * Sind alle Module fertig alle Resourcen wieder freigeben.
+	 * Und die bestehenden Verbindungen wieder komplett gelöscht werden.
 	 */
 	public static void closeRemainingOpenConnections() {
-		for (Map.Entry<Path, Connection> entry : openConnections.entrySet()) {
+		for (Connection c : openConnections.values()) {
 			try {
-				if (entry.getValue() != null && !entry.getValue().isClosed()) {
-					entry.getValue().close();
+				if (c != null && !c.isClosed()) {
+					c.close();
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
+
 		openConnections.clear();
+		openConnections = null;
 	}
 
 	/**
@@ -71,45 +77,40 @@ public class DataSourceManager {
 	 * @param source Google Chrome sqlite Pfad
 	 * @return Connection Verbindung zur kopierten SQLite Datenbank.
 	 */
-	private Connection getConnectionFromShadowCopy(Path source) {
-		File browserCopy = null;
-		try {
-			browserCopy = File.createTempFile("db"+ java.util.UUID.randomUUID().toString(), ".sqlite", null);
-			browserCopy.deleteOnExit();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		try {
-			Files.copy(source, browserCopy.toPath(), StandardCopyOption.REPLACE_EXISTING);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	private synchronized Connection getConnectionFromShadowCopy(Path source) throws SQLException {
 		Connection fakedConnection = null;
-		try {
-			Class.forName("org.sqlite.JDBC");
-			fakedConnection = DriverManager.getConnection
-					("jdbc:sqlite:" + browserCopy.toString());
-			openConnections.put(source, fakedConnection);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+		if (!openConnections.containsKey(source.toString())) {
+			String copiedBrowser = copyToTemp(source);
+			fakedConnection = DriverManager.getConnection("jdbc:sqlite:" + copiedBrowser);
+			openConnections.put(source.toString(), fakedConnection);
+		} else {
+			fakedConnection = openConnections.get(source.toString());
 		}
 		return fakedConnection;
 	}
 
 	/**
-	 * Zur Abfrage, ob Verbindung noch offen ist bzw von null verschieden.
-	 *
-	 * @return Boolean, der angibt ob die Verbindung zustande gekommen ist, bzw. noch offen ist.
+	 * Die Methode erzeugt eine neue temporäre Datei und kopiert dann in diese die bestehende Datei.
+	 * @param source Pfad der kopiert werden soll.
+	 * @return Pfad als String wie neu erzeugte Datei heißt
 	 */
-	public boolean isConnected() {
+	private synchronized String copyToTemp(Path source) {
+		File browserCopy = null;
 		try {
-			return !dbConnection.isClosed();
-		} catch (SQLException e) {
-			return false;
+			browserCopy = File.createTempFile("db" + java.util.UUID.randomUUID().toString(), ".sqlite");
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+		try {
+			Files.copy(source, browserCopy.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			browserCopy.setWritable(true);
+			Utilities.deleteTempFileOnExit(browserCopy.getAbsolutePath());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return browserCopy.toString();
 	}
+
 
 	/**
 	 * @param statement Query als String die zur Abfrage dienen soll.
@@ -121,13 +122,6 @@ public class DataSourceManager {
 		Statement s = dbConnection.createStatement();
 		ResultSet rs = s.executeQuery(statement);
 		return rs;
-	}
-
-	private Connection getAlreadyOpenConnection(Path lookUpPath) {
-		if (openConnections.containsKey(lookUpPath)) {
-			return openConnections.get(lookUpPath);
-		}
-		return null;
 	}
 
 }

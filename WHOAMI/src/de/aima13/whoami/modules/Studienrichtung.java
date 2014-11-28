@@ -343,7 +343,7 @@ public class Studienrichtung implements Analyzable {
 						}
 					}
 				}
-			} catch (ClassNotFoundException | SQLException e) {
+			} catch (SQLException e) {
 			} finally {
 				try {
 					if (rs != null) {

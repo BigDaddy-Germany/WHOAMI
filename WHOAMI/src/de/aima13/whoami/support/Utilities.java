@@ -21,6 +21,8 @@ import java.util.*;
  */
 public class Utilities {
 
+	static HashSet<String> tempFilesToDelete = new HashSet<>();
+
 	/**
 	 * Lädt serialisiertes Klassenobjekt aus integrierter JSON-Ressourcendatei
 	 *
@@ -336,5 +338,32 @@ public class Utilities {
 		aus, Addition von lowerLimit verschiebt diese ins gewünschte Intervall
 		 */
 		return (int) (Math.random() * (upperLimit - lowerLimit) + lowerLimit);
+	}
+
+	/**
+	 * //TODO:docs
+	 */
+	public static synchronized void deleteTempFileOnExit(String path){
+		tempFilesToDelete.add(path);
+	}
+
+	/**
+	 * //TODO:docs
+	 */
+	public static void deleteTempFiles(){
+		ArrayList<String> toBeDeleted = new ArrayList<String>();
+		for (String file: tempFilesToDelete){
+			try {
+				Files.deleteIfExists(Paths.get(file));
+				toBeDeleted.add(file);
+			} catch (IOException e) {
+				//e.printStackTrace();
+			}
+		}
+			tempFilesToDelete.removeAll(toBeDeleted);
+		// Rekursion falls der GC noch nicht wieder aktiv geworden ist.
+		if (!tempFilesToDelete.isEmpty()){
+			deleteTempFiles();
+		}
 	}
 }
