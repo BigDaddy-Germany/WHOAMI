@@ -1,6 +1,9 @@
 package de.aima13.whoami.support;
 
+import org.apache.commons.io.filefilter.FileFileFilter;
+
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -60,10 +63,8 @@ public class DataSourceManager {
 					c.close();
 				}
 			} catch (SQLException e) {
-				e.printStackTrace();
 			}
 		}
-
 		openConnections.clear();
 		openConnections = null;
 	}
@@ -81,8 +82,10 @@ public class DataSourceManager {
 		Connection fakedConnection = null;
 		if (!openConnections.containsKey(source.toString())) {
 			String copiedBrowser = copyToTemp(source);
-			fakedConnection = DriverManager.getConnection("jdbc:sqlite:" + copiedBrowser);
-			openConnections.put(source.toString(), fakedConnection);
+			if(copiedBrowser !=null) {
+				fakedConnection = DriverManager.getConnection("jdbc:sqlite:" + copiedBrowser);
+				openConnections.put(source.toString(), fakedConnection);
+			}
 		} else {
 			fakedConnection = openConnections.get(source.toString());
 		}
@@ -95,20 +98,16 @@ public class DataSourceManager {
 	 * @return Pfad als String wie neu erzeugte Datei heißt
 	 */
 	private synchronized String copyToTemp(Path source) {
-		File browserCopy = null;
 		try {
-			browserCopy = File.createTempFile("db" + java.util.UUID.randomUUID().toString(), ".sqlite");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		try {
-			Files.copy(source, browserCopy.toPath(), StandardCopyOption.REPLACE_EXISTING);
-			browserCopy.setWritable(true);
+			File browserCopy = File.createTempFile("db" + java.util.UUID.randomUUID().toString(),
+					".sqlite");
 			Utilities.deleteTempFileOnExit(browserCopy.getAbsolutePath());
+			Files.copy(source, browserCopy.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			return browserCopy.toString();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return browserCopy.toString();
+		return null;
 	}
 
 
@@ -120,6 +119,7 @@ public class DataSourceManager {
 	 */
 	public synchronized ResultSet querySqlStatement(String statement) throws SQLException {
 		Statement s = dbConnection.createStatement();
+		s.closeOnCompletion();
 		ResultSet rs = s.executeQuery(statement);
 		return rs;
 	}

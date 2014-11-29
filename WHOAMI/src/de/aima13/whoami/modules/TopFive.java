@@ -132,7 +132,6 @@ public class TopFive implements Analyzable {
 						mostVisited.close();
 						mostVisited.getStatement().close();
 					} catch (SQLException e) {
-						e.printStackTrace();
 					}
 				}
 			}

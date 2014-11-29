@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Lose Sammlung statischer Hilfsfunktionen, die zu allgemein sind um in den Kontext anderer
@@ -21,7 +22,12 @@ import java.util.*;
  */
 public class Utilities {
 
-	static HashSet<String> tempFilesToDelete = new HashSet<>();
+//	 ConcurrentHashMap<String> tempFilesToDelete = new ConcurrentHashMap<String>();
+
+
+	private static List<String> tempFilesToDelete = Collections.synchronizedList(new
+			LinkedList<String>());
+
 
 	/**
 	 * Lädt serialisiertes Klassenobjekt aus integrierter JSON-Ressourcendatei
@@ -302,7 +308,7 @@ public class Utilities {
 	 * @throws java.util.NoSuchElementException Sollte kein Element gefunden werden gibt auch kein Entry
 	 *                                der am höchsten ist.
 	 */
-	// Author: Niko Berkmann
+	// Author: Marvin Klose
 	public static Map.Entry<String, Integer> getHighestEntry(SortedMap<String,
 			Integer> results) throws
 			NoSuchElementException {
@@ -357,7 +363,6 @@ public class Utilities {
 				Files.deleteIfExists(Paths.get(file));
 				toBeDeleted.add(file);
 			} catch (IOException e) {
-				//e.printStackTrace();
 			}
 		}
 			tempFilesToDelete.removeAll(toBeDeleted);
