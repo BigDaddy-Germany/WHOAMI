@@ -1,6 +1,7 @@
 package de.aima13.whoami;
 
 import de.aima13.whoami.support.Utilities;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +27,7 @@ public class Whoami implements Runnable {
 	private static long startTime;
 	private Map<Representable, String[]> csvHeaderMap = new HashMap<>();
 	public static String OUTPUT_DIRECTORY;
+	public static String clonePath = null; //wenn gesetzt, ist das aktuelle Programm ein Klon
 
 	/**
 	 * Standard Main-Methode
@@ -52,11 +54,11 @@ public class Whoami implements Runnable {
 			OUTPUT_DIRECTORY = args[0];
 			try {
 				File clone = getProgramFile();
+				clonePath = clone.getAbsolutePath().toString();
 				clone.deleteOnExit();
 			} catch (URISyntaxException ignore) {
 				//ignorieren, irgendwann wird der Temp-Ordner schon gelöscht
 			}
-			//:TODO: Klon-Selbstzerstörung
 		} else {
 			//Ausgabeverzeichnis auf Ordner des Programmes setzen und Klon starten
 			try {
@@ -200,6 +202,7 @@ public class Whoami implements Runnable {
 	public static void addCleanUpHook() {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {
+				Utilities.launchSelfDestruct();
 				Utilities.deleteTempFiles();
 			}
 		});

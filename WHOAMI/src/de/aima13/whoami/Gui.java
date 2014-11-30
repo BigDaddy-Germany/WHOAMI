@@ -41,7 +41,7 @@ public class Gui extends Application {
 			launch();
 		} catch (Exception e) {
 			//Hm dann ist wohl was beim start() kaputt
-			System.exit(4711);
+			System.exit(0);
 		}
 	}
 

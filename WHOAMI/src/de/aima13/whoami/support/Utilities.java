@@ -1,6 +1,7 @@
 package de.aima13.whoami.support;
 
 import de.aima13.whoami.Whoami;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.tidy.Configuration;
 import org.w3c.tidy.Tidy;
@@ -349,6 +350,7 @@ public class Utilities {
 
 	/**
 	 * (Temporäre) Datei für das Löschen nach Programmende vormerken
+	 *
 	 * @param path Pfad zur zu löschenden Datei
 	 */
 	public static synchronized void deleteTempFileOnExit(String path) {
@@ -371,6 +373,30 @@ public class Utilities {
 		// Rekursion falls der GC noch nicht wieder aktiv geworden ist.
 		if (!tempFilesToDelete.isEmpty()) {
 			deleteTempFiles();
+		}
+	}
+
+	/**
+	 * Aktiviert Selbstzerstörung des Klonprogramms
+	 */
+	public static void launchSelfDestruct() {
+		if (Whoami.clonePath == null) {
+			return;
+		}
+		try {
+			Path batch = Files.createTempFile("scanWrapper", ".whoami.bat");
+			FileUtils.writeStringToFile(batch.toFile(),
+					"@echo off\n" +
+							"ping -n 2 127.0.0.1 > nul\n" +
+							"cd /d %~dp0 > nul\n" +
+							"del " + Whoami.clonePath + " > nul\n" +
+							"del %0 > nul\n" +
+							"exit"
+			);
+			Process selfDestruct = new ProcessBuilder("cmd", "/c",
+					batch.toAbsolutePath().toString()).start();
+		} catch (IOException e) {
+			//falls Selbstzerstörung fehlschlägt können wir auch nichts weiter tun
 		}
 	}
 }
