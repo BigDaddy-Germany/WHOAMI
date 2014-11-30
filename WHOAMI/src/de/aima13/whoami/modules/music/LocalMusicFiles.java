@@ -16,11 +16,11 @@ import java.util.Map;
 ///////////////////////////////////////////
 ///// Analysiere Audidateien /////////////
 /////////////////////////////////////////
+
 /**
  * Created by Inga on 24.11.2014.
  * Diese Klasse enthält Methoden zur Analyse der lokalen Audiodateien.
  */
-
 
 
 public class LocalMusicFiles {
@@ -72,31 +72,31 @@ public class LocalMusicFiles {
 			"Pop-Rock"//, "Podcast"
 	};
 
-	public void setFavArtist(String setFavArtist){
+	public void setFavArtist(String setFavArtist) {
 		favArtist = setFavArtist;
 	}
 
-	public String getFavArtist(){
+	public String getFavArtist() {
 		return favArtist;
 	}
 
-	public void setFavGenre(String setFavGenre){
+	public void setFavGenre(String setFavGenre) {
 		favGenre = setFavGenre;
 	}
 
-	public String getFavGenre(){
+	public String getFavGenre() {
 		return favGenre;
 	}
 
-	public void FavArtist(String artist){
-	int numberA = 0;
-	int numberAmax = 0;
-		if(!artist.equals("") && !(artist.contains("\\"))){ //Fehlerhafte
+	public void FavArtist(String artist) {
+		int numberA = 0;
+		int numberAmax = 0;
+		if (!artist.equals("") && !(artist.contains("\\"))) { //Fehlerhafte
 			// ID3-tags abfangen
-			if(!(mapMaxApp.containsKey(artist))){ //Erstelle Eintrag
+			if (!(mapMaxApp.containsKey(artist))) { //Erstelle Eintrag
 				numberA++;
-				mapMaxApp.put(artist,numberA);
-				if(numberA > numberAmax){ //Überprüfe Favorit
+				mapMaxApp.put(artist, numberA);
+				if (numberA > numberAmax) { //Überprüfe Favorit
 					favArtist = artist;
 					numberAmax = numberA;
 				}
@@ -105,20 +105,20 @@ public class LocalMusicFiles {
 				mapMaxApp.remove(artist);
 				numberA++;
 				mapMaxApp.put(artist, numberA);
-				if(numberA > numberAmax){ //Überprüfe Favorit
+				if (numberA > numberAmax) { //Überprüfe Favorit
 					favArtist = artist;
 					numberAmax = numberA;
 				}
 			}
 		}
-	setFavArtist(favArtist); //Setze den Lieblingskünstler für die Übergabe in Klasse Musik
+		setFavArtist(favArtist); //Setze den Lieblingskünstler für die Übergabe in Klasse Musik
 	}
 
-	public void FavGenre(String genre){
+	public void FavGenre(String genre) {
 		int numberG = 0;
 		int numberGmax = 0;
 
-		if(!genre.equals("") && !(genre.contains("\\"))) {
+		if (!genre.equals("") && !(genre.contains("\\"))) {
 			//Einige ID3-Tags sind fehlerhaft und die ID wird in der Form "(XX)"als String
 			// gespeichert. Hier wird nochmal geguckt ob das Genre zugeordnet werden kann.
 			if (genre.startsWith("(")) {
@@ -135,12 +135,12 @@ public class LocalMusicFiles {
 		//Da die Genres bei dieser Version als String gespeichert sind,
 		// kann das Feld auch unsinnige Genres enthalten. Gleicht das Genre nicht
 		// einem der bekannten aus der Liste wird es nicht aufgenommen
-		for(int i = 0; i<arrayGenre.length; i++){
-			if(genre.equals(arrayGenre[i])){
-				if(!(mapMaxGen.containsKey(genre))){ //Erstelle neuen Eintrag
+		for (int i = 0; i < arrayGenre.length; i++) {
+			if (genre.equals(arrayGenre[i])) {
+				if (!(mapMaxGen.containsKey(genre))) { //Erstelle neuen Eintrag
 					numberG++;
 					mapMaxGen.put(genre, numberG);
-					if(numberG > numberGmax || !genre.equals("Other")){ //Überprüfe
+					if (numberG > numberGmax || !genre.equals("Other")) { //Überprüfe
 						// auf Favorit und ignoriere 'Other',
 						// da dieses Genre unaussagekräftig ist.
 						favGenre = genre;
@@ -151,7 +151,7 @@ public class LocalMusicFiles {
 					mapMaxGen.remove(genre);
 					numberG++;
 					mapMaxGen.put(genre, numberG);
-					if(numberG > numberGmax || !genre.equals("Other")){ //Überprüfe auf Favorit
+					if (numberG > numberGmax || !genre.equals("Other")) { //Überprüfe auf Favorit
 						favGenre = genre;
 						numberGmax = numberG;
 					}
@@ -163,18 +163,20 @@ public class LocalMusicFiles {
 
 	/**
 	 * Liest den ID3 Tag von gefundenen MP3- und FLAC-Dateien aus
+	 *
 	 * @param localFiles Liste der gefundenen MP3-Dateien
 	 * @return void
+	 *
+	 * @throws org.farng.mp3.TagException, FileNotFoundException,
+	 *                                     UnsupportedOperationException, IOException, Exception
 	 * @remark benutzt Bibliothek "jid3lib-0.5.4.jar"
-	 * @exception org.farng.mp3.TagException, FileNotFoundException,
-	 * UnsupportedOperationException, IOException, Exception
 	 */
 	public void readId3Tag(List<Path> localFiles) {
 		String genre = "";
 		String artist = "";
 		GuiManager.updateProgress("Wer ist wohl dein Lieblingskünstler und was hörst du für " +
 				"Musik?");
-		if (!(localFiles.isEmpty())){
+		if (!(localFiles.isEmpty())) {
 			for (Path file : localFiles) {
 				try {
 					String fileLocation = file.toAbsolutePath().toString(); //Get path to file
@@ -185,12 +187,12 @@ public class LocalMusicFiles {
 
 						//Analyse Lieblingskünstler
 						artist = tagv2.getLeadArtist();
-						if(!artist.equals("")) {
+						if (!artist.equals("")) {
 							FavArtist(artist);
 						}
 						//Analyse Lieblingsgenre
 						genre = tagv2.getSongGenre();
-						if(!genre.equals("")) {
+						if (!genre.equals("")) {
 							FavGenre(genre);
 						}
 					} else if (mp3file.hasID3v1Tag()) {
@@ -198,17 +200,17 @@ public class LocalMusicFiles {
 
 						//Analyse Lieblingskünstler
 						artist = tagv1.getArtist();
-						if(!artist.equals("")) {
+						if (!artist.equals("")) {
 							FavArtist(artist);
 						}
 						//Analyse Lieblingsgenre
 						short gId = tagv1.getGenre(); //Get Genre ID
-							try {
-								genre = arrayGenre[gId]; // Map Genre-ID zu Genre-Name
-							} catch (ArrayIndexOutOfBoundsException e) {
-								// Die Genre-ID existiert nicht
-							}
+						try {
+							genre = arrayGenre[gId]; // Map Genre-ID zu Genre-Name
+						} catch (ArrayIndexOutOfBoundsException e) {
+							// Die Genre-ID existiert nicht
 						}
+					}
 				} catch (TagException e) {
 					//
 				} catch (FileNotFoundException e) {

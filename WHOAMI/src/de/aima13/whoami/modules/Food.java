@@ -25,9 +25,9 @@ public class Food implements Analyzable {
 	private static final String[] MY_SEARCH_DELIEVERY_URLS = {"lieferheld", "pizza.de"};
 	private static final String[] MY_SEARCH_COOKING_URLS = {"chefkoch.de", "thestonerscookbook.com"};
 	//Größen ab dennen Rezepte gewertet werden in Byte
-	private static final long MINIMUM_PDF_SIZE  = 1500L;
-	private static final long MINIMUM_ODT_SIZE  = 1300L;
-	private static final long MINIMUM_DOC_SIZE  = 22000L;
+	private static final long MINIMUM_PDF_SIZE = 1500L;
+	private static final long MINIMUM_ODT_SIZE = 1300L;
+	private static final long MINIMUM_DOC_SIZE = 22000L;
 	private static final long MINIMUM_DOCX_SIZE = 20000L;
 	private static final long MINIMUM_TXT_SIZE = 0L;
 	//Ab so vielen Bytes über dem Limit gibt es Punkte
@@ -38,16 +38,15 @@ public class Food implements Analyzable {
 	private List<Path> myFoodFiles;
 	private List<Path> myDbs;
 	//besonderheiten
-	private String myRecipeHtml="";
-	private String myDelServieHtml="";
-	private String myOnCookHtml="";
+	private String myRecipeHtml = "";
+	private String myDelServieHtml = "";
+	private String myOnCookHtml = "";
 	private TreeMap<String, String> myCsvData = new TreeMap<String, String>();
 
 	//Angemeldete CSV-Header
-	private static final String [] MY_CSV_HEADERS = {"Anzahl Rezepte",
-			"lokaler Rezeptscore","Zuletzt geändertes Rezept","Webzugriffe auf Lieferservices",
-			"Chefkoch Top-1","Chefkoch Top-2","Chefkoch Top-3"};
-
+	private static final String[] MY_CSV_HEADERS = {"Anzahl Rezepte",
+			"lokaler Rezeptscore", "Zuletzt geändertes Rezept", "Webzugriffe auf Lieferservices",
+			"Chefkoch Top-1", "Chefkoch Top-2", "Chefkoch Top-3"};
 
 
 	@Override
@@ -76,14 +75,11 @@ public class Food implements Analyzable {
 		searchList.add("**Kuchen**.pdf");
 
 
-
-
 		searchList.add("**Kochen**.txt");
 		searchList.add("**Kochen**.docx");
 		searchList.add("**Kochen**.doc");
 		searchList.add("**Kochen**.odt");
 		searchList.add("**Kochen**.pdf");
-
 
 
 		searchList.add("**Pizza**.txt");
@@ -92,9 +88,6 @@ public class Food implements Analyzable {
 		searchList.add("**Pizza**.txt");
 		searchList.add("**Pizza**.odt");
 		searchList.add("**Pizza**.pdf");
-
-
-
 
 
 		//places.sql gehört zu Firefox
@@ -118,20 +111,20 @@ public class Food implements Analyzable {
 
 	@Override
 	public String getHtml() {
-		String myHtml="";
+		String myHtml = "";
 		//Sicherheitsabfrage ob HTML auch wirklich valide ist
-		if(myRecipeHtml.length()>1){
-			myHtml+=myRecipeHtml;
+		if (myRecipeHtml.length() > 1) {
+			myHtml += myRecipeHtml;
 		}
-		if(myDelServieHtml.length()>1){
-			myHtml+=myDelServieHtml;
+		if (myDelServieHtml.length() > 1) {
+			myHtml += myDelServieHtml;
 		}
-		if(myOnCookHtml.length()>1){
-			myHtml+=myOnCookHtml;
+		if (myOnCookHtml.length() > 1) {
+			myHtml += myOnCookHtml;
 		}
-		if(myHtml.length()>1) {
+		if (myHtml.length() > 1) {
 			return myHtml;
-		}else{
+		} else {
 			return null;
 		}
 	}
@@ -171,7 +164,7 @@ public class Food implements Analyzable {
 		url = urlParts[urlParts.length - 1];
 		//jetzt noch Bindestriche und .html entfernen
 		url = url.replace('-', ' ');
-		if(url.length()>5) {
+		if (url.length() > 5) {
 			url = url.substring(0, url.length() - 5);
 		}
 		return url;
@@ -251,7 +244,7 @@ public class Food implements Analyzable {
 	 * lastModified Date.Es leifert den Hauptteil zur Analyse.
 	 */
 	private void recipeAnalysis() {
-		String localRecipeHtml="";
+		String localRecipeHtml = "";
 		//eigentliche Rezeptanalyse
 		if (myFoodFiles != null && myFoodFiles.size() != 0) {
 
@@ -259,15 +252,15 @@ public class Food implements Analyzable {
 					".";
 			myCsvData.put("Anzahl Rezepte", "" + myFoodFiles.size());
 
-			if(myFoodFiles.size()>9 && myFoodFiles.size()<30){
-				localRecipeHtml+=" Das ist schon ganz ok, aber Luft nach oben bleibt noch.";
-			}else if(myFoodFiles.size()>30){
-				localRecipeHtml+=" Das ist ziemlich viel. Du solltest mal überlegen ein Buch " +
+			if (myFoodFiles.size() > 9 && myFoodFiles.size() < 30) {
+				localRecipeHtml += " Das ist schon ganz ok, aber Luft nach oben bleibt noch.";
+			} else if (myFoodFiles.size() > 30) {
+				localRecipeHtml += " Das ist ziemlich viel. Du solltest mal überlegen ein Buch " +
 						"zu verfassen";
-			}else{
-				localRecipeHtml+="Das ist nun wircklich noch Ausbaufähig.";
+			} else {
+				localRecipeHtml += "Das ist nun wircklich noch Ausbaufähig.";
 			}
-			localRecipeHtml+="</p>\n";
+			localRecipeHtml += "</p>\n";
 			//herausfinden welche Datei zuletzt erzeugt wurde
 			Path latestReciept = myFoodFiles.get(0);
 			long lengthScore = 0;
@@ -295,23 +288,21 @@ public class Food implements Analyzable {
 				}
 			}
 
-			if(lengthScore>NEXT_RECIPE_POINT*100L){
-				localRecipeHtml+="<p> Die Gesamtlänge deiner Rezepte ergab eine Dateilänge von " +
-						"ca: "+ FileUtils.byteCountToDisplaySize(lengthScore) +".  Damit " +
+			if (lengthScore > NEXT_RECIPE_POINT * 100L) {
+				localRecipeHtml += "<p> Die Gesamtlänge deiner Rezepte ergab eine Dateilänge von " +
+						"ca: " + FileUtils.byteCountToDisplaySize(lengthScore) + ".  Damit " +
 						"bist du an der" +
 						" " +
 						"Spitze!</p>";
-			}else{
+			} else {
 			}
-			localRecipeHtml+="\n";
-			myCsvData.put("lokaler Rezeptscore",lengthScore+"");
-
-
+			localRecipeHtml += "\n";
+			myCsvData.put("lokaler Rezeptscore", lengthScore + "");
 
 
 			//Dateiendung wird hier mit ausgegeben
 			String latestRecieptPath = latestReciept.toString().toLowerCase();
-			if(latestRecieptPath.endsWith(".docx") || latestRecieptPath.endsWith(".txt")) {
+			if (latestRecieptPath.endsWith(".docx") || latestRecieptPath.endsWith(".txt")) {
 				localRecipeHtml += "<p>Zuletzt hast du das Rezept:\"" + latestReciept.getName(latestReciept
 						.getNameCount() - 1).toString() + "\" bearbeitet.</p>\n";
 				myCsvData.put("Zuletzt geändertes Rezept", latestReciept.getName(latestReciept
@@ -326,7 +317,7 @@ public class Food implements Analyzable {
 
 		}
 		//so wir ähnlich einem Buffer alles HTML auf einmal übergeben
-		myRecipeHtml=localRecipeHtml;
+		myRecipeHtml = localRecipeHtml;
 	}
 
 	/**
@@ -336,7 +327,7 @@ public class Food implements Analyzable {
 	 * Es wird nicht ausgewertet was für Gerichte sich der Nutzer angesehen hat.
 	 */
 	private void analyzeDelieveryServices() {
-		String localDelServiceHtml="";
+		String localDelServiceHtml = "";
 		boolean pizzaFound = false;
 		int countDeliveryServices = 0;
 
@@ -366,36 +357,36 @@ public class Food implements Analyzable {
 				}
 
 			}
-			myCsvData.put("Webzugriffe auf Lieferservices",""+countDeliveryServices);
-			localDelServiceHtml+="<p>Du hast: "+ countDeliveryServices  +" mal auf die Website eines " +
+			myCsvData.put("Webzugriffe auf Lieferservices", "" + countDeliveryServices);
+			localDelServiceHtml += "<p>Du hast: " + countDeliveryServices + " mal auf die Website eines " +
 					"bekannten Lieferservices zugegriffen. ";
 
-			if(countDeliveryServices<100){
-				localDelServiceHtml+=" Das ist aber nicht oft. Biste pleite oder was?";
-			}else{
-				localDelServiceHtml+="Uhh das ist aber ordentlich, du scheinst aber <b>mächtig " +
+			if (countDeliveryServices < 100) {
+				localDelServiceHtml += " Das ist aber nicht oft. Biste pleite oder was?";
+			} else {
+				localDelServiceHtml += "Uhh das ist aber ordentlich, du scheinst aber <b>mächtig " +
 						"Apetitt</b> zu " +
 						"haben.\n Das erhöht deinen Faulenzerfaktor ganz schön.";
 			}
 
-			localDelServiceHtml+="</p>\n";
+			localDelServiceHtml += "</p>\n";
 
 			if (pizzaFound) {
 				GlobalData.getInstance().changeScore("Nerdfaktor", 5);
 				GlobalData.getInstance().changeScore("Faulenzerfaktor", 5);
-				myCsvData.put("Pizzaliebhaber","ja");
-				localDelServiceHtml+="<p>Wir haben ein paar Zugriffe auf Pizza Lieferservices " +
+				myCsvData.put("Pizzaliebhaber", "ja");
+				localDelServiceHtml += "<p>Wir haben ein paar Zugriffe auf Pizza Lieferservices " +
 						"gefunden, " +
 						"das erhöht sowohl deinen Nerdfaktor als auch deinen Faulenzerfaktor." +
 						"</p>\n";
-			}else{
-				myCsvData.put("Pizzaliebhaber","nein");
-				localDelServiceHtml+="<p>Du ist keine Pizza, was ist denn mit dir falsch?</p>\n";
+			} else {
+				myCsvData.put("Pizzaliebhaber", "nein");
+				localDelServiceHtml += "<p>Du ist keine Pizza, was ist denn mit dir falsch?</p>\n";
 			}
 
 			GlobalData.getInstance().changeScore("Faulenzerfaktor", countDeliveryServices * 3);
 		}
-		myDelServieHtml=localDelServiceHtml;
+		myDelServieHtml = localDelServiceHtml;
 
 
 	}
@@ -406,9 +397,9 @@ public class Food implements Analyzable {
 	 * parst welche Gerichte am häufigsten aufgerufen wurden
 	 */
 	private void analyzeOnlineCookBooks() {
-		String localOnCookHtml="";
+		String localOnCookHtml = "";
 		ResultSet[] dbResults = this.getViewCountAndUrl(MY_SEARCH_COOKING_URLS);
-		TreeMap<String, Integer> chefKochReciepts = new TreeMap<String,Integer>();
+		TreeMap<String, Integer> chefKochReciepts = new TreeMap<String, Integer>();
 		int countCookingSiteAccess = 0;
 		boolean clientIsStoner = false;
 		for (ResultSet rs : dbResults) {
@@ -425,7 +416,7 @@ public class Food implements Analyzable {
 							if (chefKochReciepts.containsKey(cookingRecipe)) {
 								clicksOnRecipe += chefKochReciepts.get(cookingRecipe);
 							}
-								chefKochReciepts.put(cookingRecipe, clicksOnRecipe);
+							chefKochReciepts.put(cookingRecipe, clicksOnRecipe);
 
 
 						} else if (currUrl.toLowerCase().contains("thestonerscookbook")) {
@@ -436,7 +427,7 @@ public class Food implements Analyzable {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
-			}finally {
+			} finally {
 				try {
 					rs.close();
 					rs.getStatement().close();
@@ -445,34 +436,34 @@ public class Food implements Analyzable {
 
 			}
 		}
-		if(clientIsStoner){
-			localOnCookHtml+="<p>Tja du hast wohl den grünen Gaumen oder " +
+		if (clientIsStoner) {
+			localOnCookHtml += "<p>Tja du hast wohl den grünen Gaumen oder " +
 					"bist öfters in den Niederlanden. ;)</p>\n";
 
 			//myCsvData.put("Niederländer","ja");
-		}else{
+		} else {
 			//myCsvData.put("Niederländer","nein");
 		}
 
 
 		String strgCountCookingSiteAccess;
-		if(countCookingSiteAccess==0){
-			strgCountCookingSiteAccess="Keine";
-		}else{
-			strgCountCookingSiteAccess=""+countCookingSiteAccess;
+		if (countCookingSiteAccess == 0) {
+			strgCountCookingSiteAccess = "Keine";
+		} else {
+			strgCountCookingSiteAccess = "" + countCookingSiteAccess;
 		}
 
-		localOnCookHtml+="<p>"+ strgCountCookingSiteAccess +" Zugriffe auf Online-Kochbücher detektiert. ";
-		myCsvData.put("Zugriffe auf Online-Kochseiten",""+countCookingSiteAccess);
-		if(countCookingSiteAccess<100){
-			localOnCookHtml+="Das ist aber nicht oft...Dementsprechend haben wir deinen " +
+		localOnCookHtml += "<p>" + strgCountCookingSiteAccess + " Zugriffe auf Online-Kochbücher detektiert. ";
+		myCsvData.put("Zugriffe auf Online-Kochseiten", "" + countCookingSiteAccess);
+		if (countCookingSiteAccess < 100) {
+			localOnCookHtml += "Das ist aber nicht oft...Dementsprechend haben wir deinen " +
 					"Faulzenerfaktor erhöht.";
 			GlobalData.getInstance().changeScore("Faulenzerfaktor", 5);
 
-		}else{
-			localOnCookHtml+="Schon ganz ordentlich, du scheinst kulinarisch was drauf zu haben.";
+		} else {
+			localOnCookHtml += "Schon ganz ordentlich, du scheinst kulinarisch was drauf zu haben.";
 		}
-		localOnCookHtml+="</p>\n";
+		localOnCookHtml += "</p>\n";
 
 		//Chefkoch Rezepte auswerten
 
@@ -486,14 +477,14 @@ public class Food implements Analyzable {
 							() + "\". ";
 					myCsvData.put("Chefkoch Top-" + i, String.valueOf(highestEntry.getValue()));
 					chefKochReciepts.remove(highestEntry.getKey());
-				}catch (NoSuchElementException e){
+				} catch (NoSuchElementException e) {
 					// hier erzeuge auch irgendetwas
 				}
 
 			}
 			localOnCookHtml += "</p>\n";
 		}
-		myOnCookHtml=localOnCookHtml;
+		myOnCookHtml = localOnCookHtml;
 
 	}
 
@@ -506,7 +497,7 @@ public class Food implements Analyzable {
 	 */
 	private ResultSet[] getViewCountAndUrl(String[] searchUrl) {
 		ResultSet[] results;
-		List<ResultSet> resultList= new LinkedList<ResultSet>();
+		List<ResultSet> resultList = new LinkedList<ResultSet>();
 		DataSourceManager dbManager = null;
 		for (Path db : myDbs) {
 			String sqlStatement = "SELECT url,visit_count ";
@@ -536,21 +527,21 @@ public class Food implements Analyzable {
 				if (dbManager != null) {
 					try {
 						ResultSet rs = dbManager.querySqlStatement(sqlStatement);
-						if(rs !=null){
+						if (rs != null) {
 							resultList.add(rs);
 						}
 					} catch (SQLException e) {
 						//anscheinend ist das SQL-Statement fehlerhaft oder die Datenbank hat in
 						// irgend einer Weise Fehler --> kann man nichts gegen machen
-						e=e;
+						e = e;
 					}
 
 				}
 			}
 		}
 		//ab hier wird keine dynamische Datenstrucktur mehr benötigt
-		results=new ResultSet[resultList.size()];
-		results=resultList.toArray(results);
+		results = new ResultSet[resultList.size()];
+		results = resultList.toArray(results);
 		return results;
 	}
 
@@ -568,38 +559,36 @@ public class Food implements Analyzable {
 		ending = ending.substring(ending.length() - 7, ending.length());
 
 		long size;
-		long vote=0;
+		long vote = 0;
 		try {
 			size = Files.size(recipe);
 		} catch (IOException e) {
 			size = 0;
 		}
 		if (ending.contains("docx")) {
-			vote=size-MINIMUM_DOCX_SIZE;
+			vote = size - MINIMUM_DOCX_SIZE;
 
 		} else if (ending.contains("txt")) {
 
 			vote = size - MINIMUM_TXT_SIZE;
-		}else if(ending.contains("doc")) {
+		} else if (ending.contains("doc")) {
 			vote = size - MINIMUM_DOC_SIZE;
-		}else if(ending.contains("odt")) {
+		} else if (ending.contains("odt")) {
 			vote = size - MINIMUM_ODT_SIZE;
-		}else if(ending.contains("pdf")){
-			vote=size-MINIMUM_PDF_SIZE;
+		} else if (ending.contains("pdf")) {
+			vote = size - MINIMUM_PDF_SIZE;
 		} else {
 			throw new IllegalArgumentException("Can't analyze this type of file");
 		}
-		if(vote<0){
+		if (vote < 0) {
 			//unsinnige negative Scores verhindern
-			vote=0;
+			vote = 0;
 		}
-		vote=(vote/NEXT_RECIPE_POINT);
-		vote=vote*NEXT_RECIPE_POINT;
+		vote = (vote / NEXT_RECIPE_POINT);
+		vote = vote * NEXT_RECIPE_POINT;
 
 
 		return vote;
-
-
 
 
 	}

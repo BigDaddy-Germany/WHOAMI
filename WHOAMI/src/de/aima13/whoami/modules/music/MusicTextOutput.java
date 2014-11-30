@@ -13,6 +13,7 @@ public class MusicTextOutput {
 	 * Ordnet dem Genre eine Art Kategorie zu, wie im Architekturdokument angekündigt. Dazu
 	 * wird zu jeder Kategory ein Kommentar, "hardcoded" als String hinzugefügt,
 	 * um einen Fließtext im PDF-Dokument zu erhalten.
+	 *
 	 * @return String stmtGenre
 	 */
 	public String getCategory(String favGenre) {
@@ -142,10 +143,11 @@ public class MusicTextOutput {
 
 	/**
 	 * Hier wird ein Kommentar zur Anzahl der Musikdateien abgegeben
+	 *
 	 * @param nrAudio
 	 * @return
 	 */
-		public String commentToAmmount(long nrAudio){
+	public String commentToAmmount(long nrAudio) {
 		String nrAudioCom = "";
 		if (nrAudio > 200) {
 			nrAudioCom = " Eine Menge Futter für das Modul! <br />";
@@ -161,6 +163,7 @@ public class MusicTextOutput {
 
 	/**
 	 * Hier wird das HTML-Output für die PDF-Datei als String zusammengesetzt
+	 *
 	 * @param cltProgram
 	 * @param onlService
 	 * @param favArtist
@@ -170,7 +173,7 @@ public class MusicTextOutput {
 	 * @return
 	 */
 	public String html(String cltProgram, String onlService, String favArtist, String favGenre,
-	                   long nrAudio, String Qualität){
+	                   long nrAudio, String Qualität) {
 		StringBuilder buffer = new StringBuilder();
 
 		// ', ' aus cltprogram und onlService durch Zeilenumbrüche ergänzen
@@ -274,6 +277,6 @@ public class MusicTextOutput {
 		}
 
 		String html = buffer.toString();
-	return html;
+		return html;
 	}
 }

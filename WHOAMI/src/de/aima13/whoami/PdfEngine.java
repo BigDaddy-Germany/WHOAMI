@@ -39,7 +39,7 @@ public class PdfEngine {
 	 * @throws IOException Fehler von Dateisystemnatur bei der Berichtserstellung
 	 */
 	public void generatePdf(String html, Path output) throws IOException {
-		if (enginePath == null){
+		if (enginePath == null) {
 			throw new RuntimeException("PdfCreater nach close() benutzt");
 		}
 

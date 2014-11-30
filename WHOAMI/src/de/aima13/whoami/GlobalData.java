@@ -180,6 +180,7 @@ public class GlobalData implements Representable {
 
 	/**
 	 * Erlangen der Singletoninstanz der Klasse
+	 *
 	 * @return Instanz der Singleton Klasse
 	 */
 	public static GlobalData getInstance() {
@@ -187,17 +188,15 @@ public class GlobalData implements Representable {
 	}
 
 
-
 	/**
 	 * Vorschlagen von persönlichen Daten. Es können nur Daten vorgeschlagen werden,
 	 * die in der <tt>GlobalData_Config.json</tt> als erlaubte Werte angemeldet wurden
 	 *
-	 * @param key Key des Datensatzes (z.B. "Name")
+	 * @param key   Key des Datensatzes (z.B. "Name")
 	 * @param value Wert des Datensatzes (z.B. der Name des Nutzers)
-	 *
 	 * @throws java.lang.RuntimeException Es wurde ein Datensatz übergeben,
-	 * welcher nicht in der <tt>GlobalData_Config.json</tt> eingetragen ist oder die Laufzeit der
-	 * Module ist beendet und damit die Zeit zum Vorschlagen von Datensätzen vorbei.
+	 *                                    welcher nicht in der <tt>GlobalData_Config.json</tt> eingetragen ist oder die Laufzeit der
+	 *                                    Module ist beendet und damit die Zeit zum Vorschlagen von Datensätzen vorbei.
 	 */
 	public synchronized void proposeData(String key, String value) {
 		this.proposeData(key, value, 1);
@@ -208,13 +207,12 @@ public class GlobalData implements Representable {
 	 * Vorschlagen von persönlichen Daten. Es können nur Daten vorgeschlagen werden,
 	 * die in der <tt>GlobalData_Config.json</tt> als erlaubte Werte angemeldet wurden
 	 *
-	 * @param key Key des Datensatzes (z.B. "Name")
+	 * @param key   Key des Datensatzes (z.B. "Name")
 	 * @param value Wert des Datensatzes (z.B. der Name des Nutzers)
 	 * @param count Wie oft wurde der Wert gefunden?
-	 *
 	 * @throws java.lang.RuntimeException Es wurde ein Datensatz übergeben,
-	 * welcher nicht in der <tt>GlobalData_Config.json</tt> eingetragen ist oder die Laufzeit der
-	 * Module ist beendet und damit die Zeit zum Vorschlagen von Datensätzen vorbei.
+	 *                                    welcher nicht in der <tt>GlobalData_Config.json</tt> eingetragen ist oder die Laufzeit der
+	 *                                    Module ist beendet und damit die Zeit zum Vorschlagen von Datensätzen vorbei.
 	 */
 	public synchronized void proposeData(String key, String value, int count) {
 		// Prüfen, ob Datenvorschläge aktuell erlaubt sind
@@ -251,11 +249,10 @@ public class GlobalData implements Representable {
 	 * Verändern eines globalen Scores. Diese Methode erlaubt das Ändern eines globalen Scores,
 	 * sofern dieser in der <tt>GlobalData_Config.json</tt> als erlaubt eingetragen wurde.
 	 *
-	 * @param key Key des Scores
+	 * @param key   Key des Scores
 	 * @param value Wert, um welchen erhöht oder erniedrigt werden soll
-	 *
 	 * @throws java.lang.RuntimeException Ein Score wurde zu einer nicht erlaubten Zeit geändert
-	 * oder er ist nicht in der <tt>GlobalData_Config.json</tt> eingetragen
+	 *                                    oder er ist nicht in der <tt>GlobalData_Config.json</tt> eingetragen
 	 */
 	public synchronized void changeScore(String key, int value) {
 		if (!this.dataProposalsAllowed) {
@@ -269,7 +266,7 @@ public class GlobalData implements Representable {
 
 		// Alle Scores werden mit der Hälfte des Maximums initialisiert
 		if (!this.globalScores.containsKey(key)) {
-			this.globalScores.put(key, MAX_SCORE_VALUE/2);
+			this.globalScores.put(key, MAX_SCORE_VALUE / 2);
 		}
 
 		// Score darf zur Runtime auch über 100 oder unter 0 gehen,
@@ -293,7 +290,7 @@ public class GlobalData implements Representable {
 		for (
 				Map.Entry<String, Map<String, Integer>> dataSet
 				: this.globalDataProposals.entrySet()
-			) {
+				) {
 			String key = dataSet.getKey();
 			Map<String, Integer> proposals = dataSet.getValue();
 

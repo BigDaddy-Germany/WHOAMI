@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 public class Studienrichtung implements Analyzable {
 	private final float DROPBOX_WEIGHTING_FACTOR = 0.18f;
 	private final float SAMENESS_WEIGHTING_FACTOR = 8f;
-	private final int   INITITIAL_VALUE = 100;
+	private final int INITITIAL_VALUE = 100;
 	private List<Path> dropboxFiles = new ArrayList<Path>();
 	private List<Path> databaseFiles = new ArrayList<Path>();
 	private Studiengang[] courseList;
@@ -72,6 +72,7 @@ public class Studienrichtung implements Analyzable {
 	/**
 	 * Aus den gefunden Ergebenissen wird ein Bericht erstellt.
 	 * Wünschenswert wäre ebenfalls wie bei anderen Modulen eine HTML Template gewesen.
+	 *
 	 * @return HTML als String der in Bericht einfließt.
 	 */
 	@Override
@@ -81,7 +82,7 @@ public class Studienrichtung implements Analyzable {
 		String courseName = "";
 		String lastCommentOnClass = "";
 		String graduation = "";
-		if (!foundOnlineCalender){
+		if (!foundOnlineCalender) {
 			html.append("Sag mal kommst du überhaupt pünktlich zu deinen Vorlesungen? Oder löscht" +
 					" du einfach nur deinen Verlauf?");
 		}
@@ -157,7 +158,7 @@ public class Studienrichtung implements Analyzable {
 	@Override
 	public SortedMap<String, String> getCsvContent() {
 		TreeMap<String, String> csvOutput = new TreeMap<String, String>();
-		if (!courseResult.isEmpty() && courseResult.get(0).visitCount>INITITIAL_VALUE) {
+		if (!courseResult.isEmpty() && courseResult.get(0).visitCount > INITITIAL_VALUE) {
 			csvOutput.put("Kurs", courseResult.get(0).name);
 			csvOutput.put("Kursbezeichnung", courseResult.get(0).kurzbez);
 		} else {
@@ -171,7 +172,6 @@ public class Studienrichtung implements Analyzable {
 	 * Es werden zunächst alle möglichen und unterstützen Kursabkürzungen und Namen geladen. Dann
 	 * werden zunächst Browserverläufe nach möglichen Aufrufen von Kurskalendern durchsucht.
 	 * Anschließend werden noch falls vorhanden Dropbox Ordner mit den Ergebnissen gewichtet.
-	 *
 	 */
 	@Override
 	public void run() {
@@ -193,7 +193,7 @@ public class Studienrichtung implements Analyzable {
 		//Dropbox mit berücksichtigen
 		analyzePathNames(courseResult);
 		Collections.sort(courseResult, new EntryComparator());
-		if (!courseResult.isEmpty() && courseResult.get(0).visitCount> INITITIAL_VALUE) {
+		if (!courseResult.isEmpty() && courseResult.get(0).visitCount > INITITIAL_VALUE) {
 			String course = getMostSuitableCourse();
 			GlobalData.getInstance().proposeData("Kurskürzel", course);
 		}
@@ -203,6 +203,7 @@ public class Studienrichtung implements Analyzable {
 	 * Reine Dropbox Analyse kann unter Umständen Mehrdeutigkeiten nicht final entscheiden.
 	 * Sollte 2 Vorschläge auf eine gleich Gewichtung kommen, dann wird der Rest der nicht mehr
 	 * gleich ist mit X auf gefüllt.
+	 *
 	 * @return Studiengangskürzel mit X aufgefüllt am Ende falls merhdeutig war
 	 */
 	private String getMostSuitableCourse() {
@@ -232,7 +233,7 @@ public class Studienrichtung implements Analyzable {
 	 * @param courseResult Ergebnis nach der Datenbankabfrage
 	 */
 	private void analyzePathNames(ArrayList<CourseVisitedEntry> courseResult) {
-		float influence = (float)INITITIAL_VALUE;
+		float influence = (float) INITITIAL_VALUE;
 		if (courseResult != null && !courseResult.isEmpty() && this.foundOnlineCalender) {
 			influence = courseResult.get(0).visitCount * DROPBOX_WEIGHTING_FACTOR;
 		}
@@ -293,6 +294,7 @@ public class Studienrichtung implements Analyzable {
 	 * Es kann vorkommen, dass Studiengänge nur durch den Suffix identizierbar sind. Zum Beispiel
 	 * ist TINF als Prefix für AI und IT gleich, nur am Suffix IT oder AI kann entschieden
 	 * werden, ob es Informatik oder Informationstechnologie als Studiengang ist.
+	 *
 	 * @param searchSuffix Suffix nach dem gesucht wird.
 	 * @return True - Suffix ist für Studiengang entscheidend. False - wenn er keine Rolle spielt
 	 */

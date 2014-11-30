@@ -17,9 +17,10 @@ public class NativeMusicClients {
 	/**
 	 * Überprüft welche Musikprogramme gefunden wurden und speichert diese global als Liste in der
 	 * Variable cltProgram
+	 *
+	 * @param exeFiles
 	 * @return String cltProgram Aufzählung der gefundenen Exe-Dateien aus der White-List in
 	 * MY_SEARCH_DELIVERY_NAMES
-	 * @param exeFiles
 	 */
 	public String checkNativeClients(List<Path> exeFiles) {
 		String cltProgram = "";
@@ -30,18 +31,17 @@ public class NativeMusicClients {
 
 		GuiManager.updateProgress("Wie du Musik hörst prüfen wir auch...");
 		for (Path currentExe : exeFiles) {
-			for(int i = 0; i < MY_SEARCH_DELIVERY_EXES.length; i++) {
+			for (int i = 0; i < MY_SEARCH_DELIVERY_EXES.length; i++) {
 				if (currentExe.toString().endsWith(MY_SEARCH_DELIVERY_EXES[i])) {
-					if(cltProgram.equals("")){
+					if (cltProgram.equals("")) {
 						cltProgram = MY_SEARCH_DELIVERY_EXES[i];
-					}
-					else if(!(cltProgram.contains(MY_SEARCH_DELIVERY_NAMES[i]))){
+					} else if (!(cltProgram.contains(MY_SEARCH_DELIVERY_NAMES[i]))) {
 						cltProgram += ", " + MY_SEARCH_DELIVERY_NAMES[i];
 					}
 				}
 			}
 		}
-	return cltProgram;
+		return cltProgram;
 	}
 
 }

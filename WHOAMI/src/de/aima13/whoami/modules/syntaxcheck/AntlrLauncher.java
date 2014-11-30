@@ -1,13 +1,11 @@
 package de.aima13.whoami.modules.syntaxcheck;
 
 import de.aima13.whoami.modules.syntaxcheck.languages.LanguageSetting;
-import de.aima13.whoami.modules.syntaxcheck.languages.settings.Java8Setting;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -55,6 +53,7 @@ public class AntlrLauncher {
 
 		/**
 		 * Speichern des returnCodes in privater Variable
+		 *
 		 * @param returnCode der oben zugewiesene ReturnCode
 		 */
 		private CHECK_RESULT(int returnCode) {
@@ -63,6 +62,7 @@ public class AntlrLauncher {
 
 		/**
 		 * Konvertierung von CheckResult zu ReturnCode (int)
+		 *
 		 * @return Der zugeordnete ReturnCode
 		 */
 		public int getReturnCode() {
@@ -71,6 +71,7 @@ public class AntlrLauncher {
 
 		/**
 		 * Konvertierung von ReturnCode (int) zu CheckResult
+		 *
 		 * @param returnCode Der entsprechende ReturnCode
 		 * @return Das dazugehörige CheckResult
 		 */
@@ -85,9 +86,9 @@ public class AntlrLauncher {
 	}
 
 
-
 	/**
 	 * Erlaubt den Aufruf von der CommandLine
+	 *
 	 * @param args Commandline-Argumente. 0 = Name des Settings der Sprache, 1 = Datei
 	 */
 	public static void main(String[] args) {
@@ -134,7 +135,7 @@ public class AntlrLauncher {
 	 * Diese Methode prüft die syntaktische Korrektheit einer Datei nach der übergebenen Sprache
 	 *
 	 * @param languageSetting Die Sprache, auf die geprüft werden soll
-	 * @param file Die Datei, die geprüft werden soll
+	 * @param file            Die Datei, die geprüft werden soll
 	 * @return ENUM, welches entscheidet, wie der Status der Datei ist
 	 */
 	private static CHECK_RESULT checkSyntax(LanguageSetting languageSetting, Path file) {

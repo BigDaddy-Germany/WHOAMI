@@ -20,6 +20,7 @@ public class BrowserMusicFiles {
 
 	/**
 	 * Durchsucht den Browser-Verlauf auf bekannte Musikportale (MY_SEARCH_DELIEVERY_URLS)
+	 *
 	 * @param searchUrl "final static String[] MY_SEARCH_DELIEVERY_URLS" wird übergeben
 	 * @return void
 	 * @exception java.sql.SQLException
@@ -36,7 +37,7 @@ public class BrowserMusicFiles {
 		for (Path db : browserFiles) {
 			try {
 				mostVisited = dbExtraction(db, MY_SEARCH_DELIEVERY_URLS);
-				if(mostVisited != null) {
+				if (mostVisited != null) {
 					while (mostVisited.next()) {
 						String urlName = "";
 						urlName = mostVisited.getString("host");
@@ -64,8 +65,8 @@ public class BrowserMusicFiles {
 
 		// Füge den String onlServices als Aufzählung zusammen
 		for (int i = 0; i < urls.size(); i++) {
-			for(int j = 0; j < MY_SEARCH_DELIEVERY_URLS.length; j++){
-				if(urls.get(i).contains(MY_SEARCH_DELIEVERY_URLS[j]) && !(onlService.contains(MY_SEARCH_DELIEVERY_URLS[j]))){
+			for (int j = 0; j < MY_SEARCH_DELIEVERY_URLS.length; j++) {
+				if (urls.get(i).contains(MY_SEARCH_DELIEVERY_URLS[j]) && !(onlService.contains(MY_SEARCH_DELIEVERY_URLS[j]))) {
 					if (onlService.isEmpty()) {
 						onlService += MY_SEARCH_DELIEVERY_URLS[j]; // erster Dienst
 					} else {
@@ -75,11 +76,12 @@ public class BrowserMusicFiles {
 				}
 			}
 		}
-	return onlService;
+		return onlService;
 	}
 
 	/**
 	 * Durchsucht den Browser-Verlauf auf bekannte Musikportale (MY_SEARCH_DELIEVERY_URLS)
+	 *
 	 * @param sqliteDb
 	 * @param searchUrl "final static String[] MY_SEARCH_DELIEVERY_URLS" wird übergeben
 	 * @return mostVisited Ergebnisliste aller gefundener URLs/Hosts

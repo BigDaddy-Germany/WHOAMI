@@ -18,11 +18,12 @@ public class LanguageSetting {
 
 	/**
 	 * Konstruktion nur durch Subklassen
-	 * @param language_name Name der Sprache zur Repräsentation auf dem Bericht
+	 *
+	 * @param language_name  Name der Sprache zur Repräsentation auf dem Bericht
 	 * @param file_extension Dateiendung, welche diese Sprache repräsentiert
-	 * @param parser Der zugehörige ANTLR Parser
-	 * @param lexer Der zugehörige ANTLR Lexer
-	 * @param start_symbol Der Name des Startsymbols der Sprache
+	 * @param parser         Der zugehörige ANTLR Parser
+	 * @param lexer          Der zugehörige ANTLR Lexer
+	 * @param start_symbol   Der Name des Startsymbols der Sprache
 	 */
 	protected LanguageSetting(String language_name, String file_extension,
 	                          Class<? extends Parser> parser, Class<? extends Lexer> lexer,

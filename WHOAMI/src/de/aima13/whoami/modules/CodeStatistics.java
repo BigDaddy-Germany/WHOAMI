@@ -24,6 +24,7 @@ public class CodeStatistics implements Analyzable {
 
 	/**
 	 * Rückgabe der Sprache, die am häufigsten Verwendet wird
+	 *
 	 * @return Der Name der Sprache als String
 	 */
 	private String getTopLanguage() {
@@ -101,6 +102,7 @@ public class CodeStatistics implements Analyzable {
 
 	/**
 	 * Erzeugt den Modul-spezifischen HTML Code
+	 *
 	 * @return Der HTML Code für den Report
 	 */
 	@Override
@@ -131,6 +133,7 @@ public class CodeStatistics implements Analyzable {
 
 	/**
 	 * Entscheidet darüber, ob der Benutzer eher nativ oder web-basiert programmiert
+	 *
 	 * @return True, wenn der Benutzer mehr im Web programmiert
 	 */
 	private boolean moreWebCoding() {

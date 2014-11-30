@@ -4,20 +4,16 @@ import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.GlobalData;
 import de.aima13.whoami.GuiManager;
 import de.aima13.whoami.Whoami;
+import de.aima13.whoami.modules.syntaxcheck.AntlrLauncher.CHECK_RESULT;
 import de.aima13.whoami.modules.syntaxcheck.languages.LanguageSetting;
 import de.aima13.whoami.support.Utilities;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.Lexer;
-import org.antlr.v4.runtime.Parser;
 import org.reflections.Reflections;
-
-import de.aima13.whoami.modules.syntaxcheck.AntlrLauncher.CHECK_RESULT;
 import org.stringtemplate.v4.ST;
 
-import java.io.*;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -177,7 +173,7 @@ public class SyntaxAnalyzer implements Analyzable {
 			// Der Name der Variable entspricht der Dateiendung
 			String varName = languageResult.getKey().FILE_EXTENSION;
 			template.addAggr(varName + ".{analyzed, countAll, countCorrect, countError, " +
-					"perfectResult, goodResult, badResult}", analyzed, sum, correct, error,
+							"perfectResult, goodResult, badResult}", analyzed, sum, correct, error,
 					perfectResult, goodResult, badResult);
 
 			// Sollte hier coding analysiert worden sein, kann noCoding auf false gesetzt werden
@@ -210,6 +206,7 @@ public class SyntaxAnalyzer implements Analyzable {
 	/**
 	 * Kalkulieren der möglichen CSV-Header Spalten. Das sind alle Sprachen x alle möglichen
 	 * CheckResults außer CANT_PARSE
+	 *
 	 * @return Ein Array der Spaltennamen
 	 */
 	@Override
@@ -218,7 +215,7 @@ public class SyntaxAnalyzer implements Analyzable {
 
 		CHECK_RESULT[] checkResults = CHECK_RESULT.values();
 
-		for (Map.Entry<LanguageSetting, List<Path>> languageSetting :  this.languageFilesMap
+		for (Map.Entry<LanguageSetting, List<Path>> languageSetting : this.languageFilesMap
 				.entrySet()) {
 
 			String langName = languageSetting.getKey().LANGUAGE_NAME;
@@ -236,6 +233,7 @@ public class SyntaxAnalyzer implements Analyzable {
 
 	/**
 	 * Kalkulieren der CSV-Ausgabe. Jedes Feld soll wie volgt aussehen: SPRACHE-RESULT -> Anzahl
+	 *
 	 * @return Die Map der CSV-Einträge
 	 */
 	@Override
@@ -301,7 +299,7 @@ public class SyntaxAnalyzer implements Analyzable {
 				} else {
 					jump = 1;
 					GuiManager.updateProgress("Bei so wenigen " + languageFilesEntry.getKey()
-							.LANGUAGE_NAME  + " Dateien kann ich auch gleich alle analysieren!");
+							.LANGUAGE_NAME + " Dateien kann ich auch gleich alle analysieren!");
 				}
 
 
@@ -320,7 +318,7 @@ public class SyntaxAnalyzer implements Analyzable {
 
 				// Die Gruppen werden in einer Schleife zusammengestellt
 				for (int currentFileIndex = 0; currentFileIndex / jump < MAX_FILES_PER_LANGUAGE;
-						currentFileIndex += jump) {
+				     currentFileIndex += jump) {
 					// Wenn alle Dateien abgearbeitet sind, sollten wir aufhören
 					if (currentFileIndex >= files.length) {
 						break;
@@ -396,7 +394,7 @@ public class SyntaxAnalyzer implements Analyzable {
 					int[] groupCheckResults = this.checkSyntax(languageFilesEntry.getKey(), group);
 
 					// Kommentar an GUI nach der Hälfte und kurz vor Schluss
-					if (groupCountForGui/2 == groupNumberForGui) {
+					if (groupCountForGui / 2 == groupNumberForGui) {
 						GuiManager.updateProgress(languageFilesEntry.getKey().LANGUAGE_NAME +
 								"-Parser zu 50% satt...");
 					} else if (groupCountForGui - 1 == groupNumberForGui) {
@@ -471,9 +469,9 @@ public class SyntaxAnalyzer implements Analyzable {
 	 * ANTLR DFA Cache zu unterdrücken
 	 *
 	 * @param languageSetting Die Sprache, auf die geprüft werden soll
-	 * @param files Die Dateien, die geprüft werden sollen als Array
+	 * @param files           Die Dateien, die geprüft werden sollen als Array
 	 * @return Array der Resultate, Index stellt den Returncode des ENUMS dar,
-	 *          das int die Anzahl der Dateien, die mit diesem Ergebnis geparst wurden
+	 * das int die Anzahl der Dateien, die mit diesem Ergebnis geparst wurden
 	 */
 	private int[] checkSyntax(LanguageSetting languageSetting, Path[] files) {
 		// Resultate als Array sind später besser zuzuweisen

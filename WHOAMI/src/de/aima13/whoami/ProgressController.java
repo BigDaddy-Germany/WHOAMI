@@ -1,13 +1,12 @@
 package de.aima13.whoami;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
+
+import java.net.URL;
+import java.util.ResourceBundle;
 
 public class ProgressController {
 
@@ -26,10 +25,10 @@ public class ProgressController {
 	@FXML
 		// This method is called by the FXMLLoader when initialization is complete
 	void initialize() {
-		GuiManager.pgController= this;
+		GuiManager.pgController = this;
 	}
 
-	public synchronized void addComment(final String comment){
+	public synchronized void addComment(final String comment) {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
@@ -38,7 +37,7 @@ public class ProgressController {
 		});
 	}
 
-	public void finishedScanningClose(){
+	public void finishedScanningClose() {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {

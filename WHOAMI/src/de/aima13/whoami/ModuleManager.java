@@ -2,12 +2,7 @@ package de.aima13.whoami;
 
 import org.reflections.Reflections;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
 
@@ -23,6 +18,7 @@ public class ModuleManager {
 
 	/**
 	 * Gibt eine Liste der Instanzen aller Module zurück
+	 *
 	 * @return Die Liste der Module
 	 */
 	public static List<Analyzable> getModuleList() {

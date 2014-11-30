@@ -1,10 +1,16 @@
 package de.aima13.whoami.modules.music;
+
 import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.GlobalData;
 import de.aima13.whoami.GuiManager;
 import de.aima13.whoami.Whoami;
+
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 /**
  * Music, created 16.10.14.
  * Die Klasse Musik ist eine Art Hauptklasse des Musikmoduls.
@@ -32,6 +38,7 @@ public class Music implements Analyzable {
 	private static final String[] MY_CSV_PREFIX = {"Lieblingskünstler", "Lieblingsgenre", "Onlineservices",
 			"Musikprogramme", "Anzahl_Musikdateien"};
 	private static final String TITLE = "Musikgeschmack";
+
 	//////////////////////////////////////////
 	//// überschriebene und Methoden ////////
 	////////////////////////////////////////
@@ -63,6 +70,7 @@ public class Music implements Analyzable {
 			favGenre = locals.getFavGenre();
 		}
 	}
+
 	@Override
 	/** Legt den Filter für den FileSearcher fest
 	 * @param
@@ -94,6 +102,7 @@ public class Music implements Analyzable {
 		filterMusic.add("**Deezer.exe");
 		return filterMusic;
 	}
+
 	@Override
 	/**
 	 * Ordnet musicDatabases für die Analyse des Musikgeschmacks, indem sie die vom FileSearcher
@@ -146,6 +155,7 @@ public class Music implements Analyzable {
 		musicDatabases.clear();
 		nrAudio = count;
 	}
+
 	@Override
 	/**
 	 * Das Ergebnis der Analyse wird in html als String in diesem Modul zusammengefügt
@@ -154,13 +164,14 @@ public class Music implements Analyzable {
 	 */
 	public String getHtml() {
 		MusicTextOutput musicText = new MusicTextOutput();
-		if(!favGenre.equals("")){
+		if (!favGenre.equals("")) {
 			stmtGenre = musicText.getCategory(favGenre);
 		}
 		String html = musicText.html(cltProgram, onlService, favArtist, favGenre, nrAudio,
 				Qualität);
 		return html;
 	}
+
 	@Override
 	/**
 	 * Übergibt den Prefix ("Musikgeschmack") für den Output der PDF-Datei
@@ -169,6 +180,7 @@ public class Music implements Analyzable {
 	public String getReportTitle() {
 		return TITLE;
 	}
+
 	@Override
 	/**
 	 * Übergibt den Prefix ("Musikgeschmack") für den Output der CSV-Datei
@@ -177,10 +189,12 @@ public class Music implements Analyzable {
 	public String getCsvPrefix() {
 		return TITLE;
 	}
+
 	@Override
 	public String[] getCsvHeaders() {
 		return MY_CSV_PREFIX;
 	}
+
 	@Override
 	/**
 	 * Füllt die CSV-Datei mit den Analyseergebnissen
@@ -191,20 +205,24 @@ public class Music implements Analyzable {
 		SortedMap<String, String> csvData = new TreeMap<>();
 		if (!(favArtist.equals(""))) {
 			csvData.put("Lieblingskünstler", favArtist);
-		} else
+		} else {
 			csvData.put("Lieblingskünstler", "-");
+		}
 		if (!(favGenre.equals(""))) {
 			csvData.put("Lieblingsgenre", favGenre);
-		} else
+		} else {
 			csvData.put("Lieblingsgenre", "-");
+		}
 		if (!(onlService.equals(""))) {
 			csvData.put("Onlineservices", onlService);
-		} else
+		} else {
 			csvData.put("Onlineservices", "-");
+		}
 		if (!(cltProgram.equals(""))) {
 			csvData.put("Musikprogramme", cltProgram);
-		} else
+		} else {
 			csvData.put("Musikprogramme", "-");
+		}
 		if (nrAudio != 0) {
 			String s = (new Long(nrAudio)).toString();
 			csvData.put("Anzahl_Musikdateien", s);

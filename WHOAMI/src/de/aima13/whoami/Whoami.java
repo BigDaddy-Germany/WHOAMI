@@ -1,7 +1,6 @@
 package de.aima13.whoami;
 
 import de.aima13.whoami.support.Utilities;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;

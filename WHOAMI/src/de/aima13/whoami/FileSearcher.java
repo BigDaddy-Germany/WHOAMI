@@ -23,8 +23,8 @@ public class FileSearcher {
 	// Dieser Pfad wird als root dir zum Suchen genutzt, wenn ungleich null
 
 	private static final String[] DEBUG_TEST_DIR = null
-//		{"hier kann dein Pfad stehen"}
-	;
+			//		{"hier kann dein Pfad stehen"}
+			;
 
 
 	/**
@@ -65,6 +65,7 @@ public class FileSearcher {
 		 * Methode der Superklasse - Was wird gemacht, wenn eine Datei besucht wird
 		 * Entscheide, welches Modul die Datei benötigt und im Falle eines Matches mit Modul
 		 * zusammen speichern
+		 *
 		 * @param file  Besuchte Datei oder Ordner
 		 * @param attrs Attribute der Datei/des Ordners
 		 * @return Konstante von FileVisitResult - Wie soll weitergemacht werden?
@@ -122,12 +123,13 @@ public class FileSearcher {
 		}
 
 
-
 		/**
 		 * Sollte ein Fehler auftreten, Subtree überspringen
+		 *
 		 * @param file Die besuchte Datei
-		 * @param exc Die Exception, welche beim Besuchen aufgetreten ist
+		 * @param exc  Die Exception, welche beim Besuchen aufgetreten ist
 		 * @return Flag, wie das Programm weiter vorgehen soll
+		 *
 		 * @throws IOException ein weiterer Fehler ist aufgetreten
 		 */
 		@Override
@@ -137,9 +139,11 @@ public class FileSearcher {
 
 		/**
 		 * Der Papierkorb hat hat $Recycle.Bin im Pfad und soll komplett übersprungen werden
-		 * @param dir Der Ordner, dessen Besuch bevorsteht
+		 *
+		 * @param dir   Der Ordner, dessen Besuch bevorsteht
 		 * @param attrs Die Attribute des Ordners
 		 * @return Flag, wie das Programm weiter vorgehen soll
+		 *
 		 * @throws IOException ein Fehler ist aufgetreten
 		 */
 		@Override
@@ -153,8 +157,9 @@ public class FileSearcher {
 
 		// Die FireFox-Meldung sollte nicht zu oft kommen
 		static int countFirefox = 0;
+
 		private void commentCurrentPath(Path file) {
-			if (file.toString().endsWith("places.sqlite")){
+			if (file.toString().endsWith("places.sqlite")) {
 				countFirefox++;
 				switch (countFirefox) {
 					case 1:
@@ -173,12 +178,9 @@ public class FileSearcher {
 	}
 
 
-
-
-
-
 	/**
 	 * Startet die Suche nach Dateien
+	 *
 	 * @param analyzables Liste der Module aus der Hauptklasse
 	 */
 	public static void startSearch(List<Analyzable> analyzables) {
@@ -196,7 +198,7 @@ public class FileSearcher {
 		GuiManager.updateProgress("Datenpakete werden geschnürt...");
 		for (Map.Entry<Analyzable, List<Path>> resultEntry : results.entrySet()) {
 			try {
-				resultEntry.getKey().setFileInputs(new ArrayList<> (resultEntry.getValue()));
+				resultEntry.getKey().setFileInputs(new ArrayList<>(resultEntry.getValue()));
 			} catch (Exception e) {
 				// e.printStackTrace();
 			}
@@ -204,11 +206,9 @@ public class FileSearcher {
 	}
 
 
-
-
-
 	/**
 	 * Zusammenstellen der Filter und Erstellen eines Glob-Patterns
+	 *
 	 * @param analyzables Liste der Module aus der Hauptklasse
 	 * @return Zusammengesetztes Glob-Pattern
 	 */
@@ -235,14 +235,10 @@ public class FileSearcher {
 	}
 
 
-
-
-
-
-
 	/**
 	 * Durchsucht alle gewünschten Ordner/Laufwerke und speichert die Ergebnisse
 	 * direkt im übergebenen FileFinder. Daher keine Rückgabe
+	 *
 	 * @param fileFinder die Instanz des FileFinders, welche genutzt werden soll
 	 */
 	private static void startFinder(FileFinder fileFinder) {
