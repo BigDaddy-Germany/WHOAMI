@@ -129,6 +129,7 @@ public class Sports implements Analyzable{
 	 *                  nachdem ob es sich ob Firefox oder Chrome handelt
 	 */
 	private void handleBrowserHistory(Path sqliteDB, String fromTable) {
+		ResultSet rs = null;
 		try {
 			DataSourceManager dSm = new DataSourceManager(sqliteDB);
 			for (Sportart s : sportsList){
@@ -142,18 +143,24 @@ public class Sports implements Analyzable{
 					}
 				}
 				sqlStatement += ";";
-				ResultSet rs = dSm.querySqlStatement(sqlStatement);
+				 rs = dSm.querySqlStatement(sqlStatement);
 				if(rs != null){
 					while (rs.next()){
 						sportPopularity.put(s.sportart, sportPopularity.get(s.sportart)+ rs.getInt(1));
 					}
-					rs.close();
-					rs.getStatement().close();
+
 				}
 
 			}
 		} catch (SQLException e) {
 
+		}
+		finally {
+			try {
+				rs.close();
+				rs.getStatement().close();
+			} catch (NullPointerException | SQLException e) {
+			}
 		}
 	}
 	// Klasse zum Laden der JSON Resource

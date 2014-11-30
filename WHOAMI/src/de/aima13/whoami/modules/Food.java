@@ -432,11 +432,17 @@ public class Food implements Analyzable {
 							clientIsStoner = true;
 						}
 					}
-					rs.close();
-					rs.getStatement().close();
+
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
+			}finally {
+				try {
+					rs.close();
+					rs.getStatement().close();
+				} catch (SQLException e) {
+				}
+
 			}
 		}
 		if(clientIsStoner){

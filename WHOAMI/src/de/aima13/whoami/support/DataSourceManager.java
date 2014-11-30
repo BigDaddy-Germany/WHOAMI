@@ -1,12 +1,10 @@
 package de.aima13.whoami.support;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.sql.*;
-import java.util.SortedMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
@@ -21,20 +19,9 @@ public class DataSourceManager {
 
 	// Connections werden einmalig je Path angelegt, da mehrere Module sich für die Browser
 	// Datenbanken interessieren geht der Zugriff durch die Zuordnung schneller
-	private static SortedMap<String, Connection> openConnections = new ConcurrentSkipListMap<String, Connection>();
+	private static ConcurrentSkipListMap<String, Connection> openConnections = new
+			ConcurrentSkipListMap<String, Connection>();
 	private Connection dbConnection = null;
-
-	/**
-	* Statischer Klassenkonstruktor der dafür sorgt, dass die von der SQLite Library ansonsten
-	* geladene dll nur nur einmal erzeugt wird.
-	*/
-	static {
-		try {
-			Class.forName("org.sqlite.JDBC");
-		} catch (ClassNotFoundException e) {
-			// kann nicht auftreten, weil durch Maven die Library sicher dabei ist
-		}
-	}
 
 	/**
 	 * Konstruktor setzt für die lokale Instanz die Verbindung zu einer Datenbank.
@@ -47,6 +34,9 @@ public class DataSourceManager {
 		if (dbConnection == null) {
 			dbConnection = getConnectionFromShadowCopy(sqliteDatabase);
 		}
+		if (dbConnection == null) {
+			throw new SQLException();
+		}
 	}
 
 	/**
@@ -56,16 +46,14 @@ public class DataSourceManager {
 	public static void closeRemainingOpenConnections() {
 		for (Connection c : openConnections.values()) {
 			try {
-				if (c != null && !c.isClosed()) {
+				if (c != null) {
 					c.close();
 				}
 			} catch (SQLException e) {
-				e.printStackTrace();
+				// Verbindung hat Probleme
 			}
 		}
-
 		openConnections.clear();
-		openConnections = null;
 	}
 
 	/**
@@ -78,37 +66,53 @@ public class DataSourceManager {
 	 * @return Connection Verbindung zur kopierten SQLite Datenbank.
 	 */
 	private synchronized Connection getConnectionFromShadowCopy(Path source) throws SQLException {
-		Connection fakedConnection = null;
 		if (!openConnections.containsKey(source.toString())) {
 			String copiedBrowser = copyToTemp(source);
-			fakedConnection = DriverManager.getConnection("jdbc:sqlite:" + copiedBrowser);
-			openConnections.put(source.toString(), fakedConnection);
+			if (copiedBrowser != null) {
+				try {
+					Class.forName("org.sqlite.JDBC");
+					Connection fakedConnection = DriverManager.getConnection("jdbc:sqlite:" +
+							copiedBrowser);
+					Connection old = openConnections.put(source.toString(), fakedConnection);
+					if (old != null) {
+						openConnections.put(source.toString(), old);
+						fakedConnection.close();
+					}
+				} catch (ClassNotFoundException e) {
+					// wird beim Build eingebaut tritt also nicht auf
+				}
+				return openConnections.get(source.toString());
+			}
+			// Darf nicht vorkommen! Wenn doch dann Exception
+			throw new SQLException();
 		} else {
-			fakedConnection = openConnections.get(source.toString());
+			return openConnections.get(source.toString());
 		}
-		return fakedConnection;
 	}
 
 	/**
 	 * Die Methode erzeugt eine neue temporäre Datei und kopiert dann in diese die bestehende Datei.
+	 *
 	 * @param source Pfad der kopiert werden soll.
 	 * @return Pfad als String wie neu erzeugte Datei heißt
 	 */
 	private synchronized String copyToTemp(Path source) {
-		File browserCopy = null;
+		Path browserCopy = null;
 		try {
-			browserCopy = File.createTempFile("db" + java.util.UUID.randomUUID().toString(), ".sqlite");
+			if (!openConnections.containsKey(source.toString())) {
+				browserCopy = Files.createTempFile("db" + java.util.UUID.randomUUID().toString(),
+						".sqlite");
+				Files.copy(source, browserCopy, StandardCopyOption.REPLACE_EXISTING);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			if (browserCopy != null) {
+				Utilities.deleteTempFileOnExit(browserCopy.toFile().getAbsolutePath());
+				return browserCopy.toString();
+			}
 		}
-		try {
-			Files.copy(source, browserCopy.toPath(), StandardCopyOption.REPLACE_EXISTING);
-			browserCopy.setWritable(true);
-			Utilities.deleteTempFileOnExit(browserCopy.getAbsolutePath());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return browserCopy.toString();
+		return null;
 	}
 
 
@@ -120,8 +124,8 @@ public class DataSourceManager {
 	 */
 	public synchronized ResultSet querySqlStatement(String statement) throws SQLException {
 		Statement s = dbConnection.createStatement();
-		ResultSet rs = s.executeQuery(statement);
-		return rs;
+		s.closeOnCompletion();
+		return s.executeQuery(statement);
 	}
 
 }
