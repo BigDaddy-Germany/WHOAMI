@@ -54,7 +54,6 @@ public class Studienrichtung implements Analyzable {
 	 *
 	 * @param files Liste der gefundenen Dateien
 	 * @throws Exception Ein Fehler ist aufgetreten
-	 * @author Marco Dörfler
 	 */
 	@Override
 	public void setFileInputs(List<Path> files) throws Exception {

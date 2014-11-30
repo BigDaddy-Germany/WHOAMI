@@ -9,7 +9,7 @@ import org.antlr.v4.runtime.Parser;
  *
  * @author Marco Dörfler
  */
-public abstract class LanguageSetting {
+public class LanguageSetting {
 	public final String LANGUAGE_NAME;
 	public final String FILE_EXTENSION;
 	public final Class<? extends Parser> PARSER;
