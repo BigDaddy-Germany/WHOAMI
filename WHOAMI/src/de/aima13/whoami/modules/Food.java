@@ -57,6 +57,9 @@ public class Food implements Analyzable {
 
 		searchList.add("**Rezept**.txt");
 		searchList.add("**Rezept**.docx");
+		searchList.add("**Rezept**.doc");
+		searchList.add("**Rezept**.pdf");
+		searchList.add("**Rezept**.odt");
 
 		//backen Filter ist restriktiver da sonst auch Ordner wie backend oder backend.txt
 		// Dateien gefunden werden
