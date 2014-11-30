@@ -21,7 +21,7 @@ class GameList extends ArrayList<GameEntry> {
 	public void addUnique(GameEntry game) {
 		//Falls Spiel schon enthalten, abbrechen und nichts hinzufügen
 		boolean found = false;
-		for(GameEntry compare: this) {
+		for (GameEntry compare : this) {
 			if (Utilities.isRoughlyEqual(game.name, compare.name, 0.8f)) {
 				return;
 			}
