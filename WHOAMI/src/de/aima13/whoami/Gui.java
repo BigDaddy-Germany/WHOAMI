@@ -1,6 +1,7 @@
 package de.aima13.whoami;
 
 
+import de.aima13.whoami.support.DataSourceManager;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -78,6 +79,7 @@ public class Gui extends Application {
 				webEngine.loadContent(GuiManager.getResultingHtml());
 				third.show();
 				third.centerOnScreen();
+				DataSourceManager.closeRemainingOpenConnections();
 			}
 		});
 	}

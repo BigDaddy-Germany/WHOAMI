@@ -28,9 +28,9 @@ public class Studienrichtung implements Analyzable {
 	private boolean foundOnlineCalender = true;
 
 	/**
-	 * Das Modul interessiert sich für die Chrome und Firefox History zum Abgleich,
-	 * mit dem Kurskalenderaufrufen und .dropbox die einen Shared-Folder identifizieren des
-	 * Studiengangs.
+	 * Das Modul benutzt die Chrome und Firefox History zum Abgleich,
+	 * mit dem Kurskalenderaufrufen und zusätzlich .dropbox Dateien die einen Shared-Folder
+	 * identifizieren. Dementsprechend werden die Browserdateien und Dropbox Dateien benötigt.
 	 *
 	 * @return Liste die den Filter für diese Modul darstellt.
 	 */
@@ -64,15 +64,15 @@ public class Studienrichtung implements Analyzable {
 			} else if (p.toString().endsWith(".sqlite") || p.toString().endsWith("History")) {
 				databaseFiles.add(p);
 			} else {
-				// irgendwas unbrauchbares
+				// zu ignorieren
 			}
 		}
 
 	}
 
 	/**
-	 * Aus den gefunden Ergebenissen wird ein netter Bericht erstellt.
-	 *
+	 * Aus den gefunden Ergebenissen wird ein Bericht erstellt.
+	 * Wünschenswert wäre ebenfalls wie bei anderen Modulen eine HTML Template gewesen.
 	 * @return HTML als String der in Bericht einfließt.
 	 */
 	@Override
@@ -104,14 +104,14 @@ public class Studienrichtung implements Analyzable {
 			if (courseToken.startsWith("T")) {
 				html.append("Immerhin bist du auch an der Fakultät Technik! ");
 				if (courseToken.startsWith("TMT") || courseToken.startsWith("TWIW")) {
-					html.append("Aber wir haben Mitleid, dass ihr in Eppelheim sitzt");
+					html.append("Aber wir haben Mitleid, dass du in Eppelheim sitzt");
 				}
 			} else if (courseToken.startsWith("W")) {
 				html.append("Wir als Techniker sind froh über jede Studentin, " +
 						"die bei uns in Neuostheim ist!");
 			}
-			html.append(" Um so besser, dass nächste Jahr hoffentlich alle in Neuostheim vereint " +
-					"sind");
+			html.append(" Wir freuen uns, dass nächste Jahr hoffentlich alle in Neuostheim " +
+					"vereint sind");
 			html.append("<br \\> Nichts desto trotz, du studierst also <b>" + courseName + "</b>");
 			if (graduation == null) {
 				graduation = "irgendwann";
@@ -140,7 +140,6 @@ public class Studienrichtung implements Analyzable {
 		return "Deine Studienrichtung";
 	}
 
-
 	@Override
 	public String getCsvPrefix() {
 		return "dhbw";
@@ -152,9 +151,9 @@ public class Studienrichtung implements Analyzable {
 	}
 
 	/**
-	 * Für den CSV Part der den vermuteten Namen entspricht und Kursbezeichnung.
+	 * Für den CSV Part der den vermuteten Namen entspricht und der passenden Kursbezeichnung.
 	 *
-	 * @return TreeMap Was letztendlich in die CSV einfließt
+	 * @return TreeMap Inhalt für die CSV Datei
 	 */
 	@Override
 	public SortedMap<String, String> getCsvContent() {
@@ -170,9 +169,10 @@ public class Studienrichtung implements Analyzable {
 	}
 
 	/**
-	 * Logik
-	 * Hole die meist aufgerufnen Vorlesungskalender, ergänze Informationen,
-	 * lass Dropbox-Wertung einfließen.
+	 * Es werden zunächst alle möglichen und unterstützen Kursabkürzungen und Namen geladen. Dann
+	 * werden zunächst Browserverläufe nach möglichen Aufrufen von Kurskalendern durchsucht.
+	 * Anschließend werden noch falls vorhanden Dropbox Ordner mit den Ergebnissen gewichtet.
+	 *
 	 */
 	@Override
 	public void run() {
@@ -187,11 +187,11 @@ public class Studienrichtung implements Analyzable {
 			}
 		}
 		for (CourseVisitedEntry entry : courseResult) {
-			// Ergänze restlichen Informationen
+			// Ergänze restlichen Informationen (Name und Kommentar)
 			entry.kurzbez = this.getKursById(entry.courseID);
 			addNameAndComment(entry);
 		}
-
+		//Dropbox mit berücksichtigen
 		analyzePathNames(courseResult);
 		Collections.sort(courseResult, new EntryComparator());
 		if (!courseResult.isEmpty() && courseResult.get(0).visitCount> INITITIAL_VALUE) {
@@ -228,7 +228,7 @@ public class Studienrichtung implements Analyzable {
 
 	/**
 	 * Vergleich der Kurse mit der Dropbox. Anhand des bisheringen Maximums kann die Dropbox
-	 * nochmal die Ergebnisse umwerfen oder deutlich bestätigen.
+	 * nochmal die Ergebnisse kippen oder deutlich bestätigen.
 	 *
 	 * @param courseResult Ergebnis nach der Datenbankabfrage
 	 */
@@ -290,6 +290,13 @@ public class Studienrichtung implements Analyzable {
 		}
 	}
 
+	/**
+	 * Es kann vorkommen, dass Studiengänge nur durch den Suffix identizierbar sind. Zum Beispiel
+	 * ist TINF als Prefix für AI und IT gleich, nur am Suffix IT oder AI kann entschieden
+	 * werden, ob es Informatik oder Informationstechnologie als Studiengang ist.
+	 * @param searchSuffix Suffix nach dem gesucht wird.
+	 * @return True - Suffix ist für Studiengang entscheidend. False - wenn er keine Rolle spielt
+	 */
 	private boolean suffixNecessary(String searchSuffix) {
 		for (Studiengang course : courseList) {
 			if (course.suffix != null && Arrays.asList(course.suffix).contains(searchSuffix)) {
@@ -343,7 +350,7 @@ public class Studienrichtung implements Analyzable {
 						}
 					}
 				}
-			} catch (ClassNotFoundException | SQLException e) {
+			} catch (SQLException e) {
 			} finally {
 				try {
 					if (rs != null) {

@@ -11,6 +11,8 @@ import java.util.*;
 
 /**
  * Created by Marvin on 03.11.2014.
+ * In Anbetracht des Pflichtenheftes wurde hier eine Kann-Anforderung erfüllt.
+ * Deshalb ist diese Implementierung ausbaufähig.
  */
 public class Sports implements Analyzable{
 	private List<Path> inputFiles = new ArrayList<Path>();
@@ -127,6 +129,7 @@ public class Sports implements Analyzable{
 	 *                  nachdem ob es sich ob Firefox oder Chrome handelt
 	 */
 	private void handleBrowserHistory(Path sqliteDB, String fromTable) {
+		ResultSet rs = null;
 		try {
 			DataSourceManager dSm = new DataSourceManager(sqliteDB);
 			for (Sportart s : sportsList){
@@ -140,18 +143,24 @@ public class Sports implements Analyzable{
 					}
 				}
 				sqlStatement += ";";
-				ResultSet rs = dSm.querySqlStatement(sqlStatement);
+				 rs = dSm.querySqlStatement(sqlStatement);
 				if(rs != null){
 					while (rs.next()){
 						sportPopularity.put(s.sportart, sportPopularity.get(s.sportart)+ rs.getInt(1));
 					}
+
 				}
 
 			}
-		} catch (ClassNotFoundException e) {
-
 		} catch (SQLException e) {
 
+		}
+		finally {
+			try {
+				rs.close();
+				rs.getStatement().close();
+			} catch (NullPointerException | SQLException e) {
+			}
 		}
 	}
 	// Klasse zum Laden der JSON Resource

@@ -1,12 +1,10 @@
 package de.aima13.whoami.modules.music;
-
 import de.aima13.whoami.Analyzable;
 import de.aima13.whoami.GlobalData;
 import de.aima13.whoami.GuiManager;
 import de.aima13.whoami.Whoami;
 import java.nio.file.Path;
 import java.util.*;
-
 /**
  * Music, created 16.10.14.
  * Die Klasse Musik ist eine Art Hauptklasse des Musikmoduls.
@@ -16,35 +14,27 @@ import java.util.*;
  * @author Inga Miadowicz
  * @version 1.2
  */
-
 public class Music implements Analyzable {
-
 	//////////////////////////////////////////
 	//// Deklarierung & Initialisierungen ///
 	////////////////////////////////////////
-
 	List<Path> musicDatabases = new ArrayList<>(); //Liste aller Dateien fürs Musikmodul
-	List<Path> localFiles = new ArrayList<>();     //Liste von MP3-Dateien
-	List<Path> browserFiles = new ArrayList<>();   //Liste der Browser-DB
-	List<Path> exeFiles = new ArrayList<>();       //Liste der Musikprogramme
-
-	public String favArtist = "";   //Ermittelter Lieblingskünstler aus LocalMusicFiles
-	public String favGenre = "";    //Ermitteltes Lieblingsgenre aus LocalMusicFiles
+	List<Path> localFiles = new ArrayList<>(); //Liste von MP3-Dateien
+	List<Path> browserFiles = new ArrayList<>(); //Liste der Browser-DB
+	List<Path> exeFiles = new ArrayList<>(); //Liste der Musikprogramme
+	public String favArtist = ""; //Ermittelter Lieblingskünstler aus LocalMusicFiles
+	public String favGenre = ""; //Ermitteltes Lieblingsgenre aus LocalMusicFiles
 	public String onlService = ""; //Genutzte Onlinedienste (siehe: MY_SEARCH_DELIVERY_URLS)
 	public String cltProgram = ""; //Installierte Programme (siehe: MY_SEARCH_EXES)
-	String stmtGenre = "";         //Kommentar zum Genre nach Kategorie
-	String Qualität = "";          //Kommentar zur Existenz von FLAC-Dateien
-	long nrAudio = 0;              //Anzahl der Audiodateien
-
+	String stmtGenre = ""; //Kommentar zum Genre nach Kategorie
+	String Qualität = ""; //Kommentar zur Existenz von FLAC-Dateien
+	long nrAudio = 0; //Anzahl der Audiodateien
 	private static final String[] MY_CSV_PREFIX = {"Lieblingskünstler", "Lieblingsgenre", "Onlineservices",
 			"Musikprogramme", "Anzahl_Musikdateien"};
-
 	private static final String TITLE = "Musikgeschmack";
-
 	//////////////////////////////////////////
 	//// überschriebene und Methoden ////////
 	////////////////////////////////////////
-
 	@Override
 	/**
 	 * Implementierung der Methode run() von Runnable. Hier wird die Reihenfolge der Analyse
@@ -53,7 +43,6 @@ public class Music implements Analyzable {
 	 * @return void
 	 */
 	public void run() {
-
 		getFilter();
 		if (Whoami.getTimeProgress() < 100) {
 			GuiManager.updateProgress("Überprüfe lokale Musikdienste...");
@@ -74,15 +63,13 @@ public class Music implements Analyzable {
 			favGenre = locals.getFavGenre();
 		}
 	}
-
 	@Override
 	/** Legt den Filter für den FileSearcher fest
-	 *  @param
-	 *  @return filterMusic
+	 * @param
+	 * @return filterMusic
 	 */
 	public List<String> getFilter() {
 		List<String> filterMusic = new ArrayList<>();
-
 		// lokale Audiodateien
 		filterMusic.add("**.mp3");
 		filterMusic.add("**.wav");
@@ -94,11 +81,9 @@ public class Music implements Analyzable {
 		filterMusic.add("**.M4a");
 		filterMusic.add("**.vox");
 		filterMusic.add("**.m4b");
-
 		// Browser-history
 		filterMusic.add("**Google/Chrome**History");
 		filterMusic.add("**Firefox**places.sqlite");
-
 		// installierte Programme
 		filterMusic.add("**spotify.exe");
 		filterMusic.add("**iTunes.exe");
@@ -107,10 +92,8 @@ public class Music implements Analyzable {
 		filterMusic.add("**napster.exe");
 		filterMusic.add("**Amazon*Music.exe");
 		filterMusic.add("**Deezer.exe");
-
 		return filterMusic;
 	}
-
 	@Override
 	/**
 	 * Ordnet musicDatabases für die Analyse des Musikgeschmacks, indem sie die vom FileSearcher
@@ -121,7 +104,6 @@ public class Music implements Analyzable {
 	 */
 	public void setFileInputs(List<Path> files) throws Exception {
 		long count = 0;
-
 		//Überprüfe ob Dateien gefunden wurden
 		if (!(files == null)) {
 			musicDatabases = files;
@@ -129,11 +111,9 @@ public class Music implements Analyzable {
 			throw new IllegalArgumentException("Auf dem Dateisystem konnten keine " +
 					"Informationen zu Musik gefunden werden.");
 		}
-
 		//Benutzername wird an Globaldata übergeben. Benötigt für Pfadangabe der Browserhistory
 		String username = System.getProperty("user.name");
 		GlobalData.getInstance().proposeData("Windows-Benutzername", username);
-
 		//Spalte die Liste in drei Unterlisten:
 		for (Path element : musicDatabases) {
 			String path = element.toString();
@@ -142,7 +122,6 @@ public class Music implements Analyzable {
 					element.toString().contains(".flac")) {
 				localFiles.add(element);
 				count++;
-
 				//Kommentar zu ".flac-Dateien" abgeben
 				if (element.toString().endsWith(".flac")) {
 					Qualität = "Da du '.flac'- Dateien auf deinem PC hast, " +
@@ -150,7 +129,6 @@ public class Music implements Analyzable {
 							"zu sein und legst wert auf die maximale Qualität deiner " +
 							"Musiksammlung! ";
 				}
-
 				// Entferne Beispielmusik und Musik aus der Steambibliothek
 				if (element.toString().contains("Steam") || element.toString().contains("Kalimba" +
 						".mp3") || element.toString().contains("Sleep Away.mp3") || element.toString().contains("Maid with the Flaxen " +
@@ -168,7 +146,6 @@ public class Music implements Analyzable {
 		musicDatabases.clear();
 		nrAudio = count;
 	}
-
 	@Override
 	/**
 	 * Das Ergebnis der Analyse wird in html als String in diesem Modul zusammengefügt
@@ -184,7 +161,6 @@ public class Music implements Analyzable {
 				Qualität);
 		return html;
 	}
-
 	@Override
 	/**
 	 * Übergibt den Prefix ("Musikgeschmack") für den Output der PDF-Datei
@@ -193,7 +169,6 @@ public class Music implements Analyzable {
 	public String getReportTitle() {
 		return TITLE;
 	}
-
 	@Override
 	/**
 	 * Übergibt den Prefix ("Musikgeschmack") für den Output der CSV-Datei
@@ -202,12 +177,10 @@ public class Music implements Analyzable {
 	public String getCsvPrefix() {
 		return TITLE;
 	}
-
 	@Override
 	public String[] getCsvHeaders() {
 		return MY_CSV_PREFIX;
 	}
-
 	@Override
 	/**
 	 * Füllt die CSV-Datei mit den Analyseergebnissen

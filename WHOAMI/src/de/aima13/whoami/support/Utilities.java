@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Lose Sammlung statischer Hilfsfunktionen, die zu allgemein sind um in den Kontext anderer
@@ -20,6 +21,13 @@ import java.util.*;
  * @author Marco Dörfler
  */
 public class Utilities {
+
+//	 ConcurrentHashMap<String> tempFilesToDelete = new ConcurrentHashMap<String>();
+
+
+	private static List<String> tempFilesToDelete = Collections.synchronizedList(new
+			LinkedList<String>());
+
 
 	/**
 	 * Lädt serialisiertes Klassenobjekt aus integrierter JSON-Ressourcendatei
@@ -300,7 +308,7 @@ public class Utilities {
 	 * @throws java.util.NoSuchElementException Sollte kein Element gefunden werden gibt auch kein Entry
 	 *                                der am höchsten ist.
 	 */
-	// Author: Niko Berkmann
+	// Author: Marvin Klose
 	public static Map.Entry<String, Integer> getHighestEntry(SortedMap<String,
 			Integer> results) throws
 			NoSuchElementException {
@@ -336,5 +344,31 @@ public class Utilities {
 		aus, Addition von lowerLimit verschiebt diese ins gewünschte Intervall
 		 */
 		return (int) (Math.random() * (upperLimit - lowerLimit) + lowerLimit);
+	}
+
+	/**
+	 * //TODO:docs
+	 */
+	public static synchronized void deleteTempFileOnExit(String path){
+		tempFilesToDelete.add(path);
+	}
+
+	/**
+	 * //TODO:docs
+	 */
+	public static void deleteTempFiles(){
+		ArrayList<String> toBeDeleted = new ArrayList<String>();
+		for (String file: tempFilesToDelete){
+			try {
+				Files.deleteIfExists(Paths.get(file));
+				toBeDeleted.add(file);
+			} catch (IOException e) {
+			}
+		}
+			tempFilesToDelete.removeAll(toBeDeleted);
+		// Rekursion falls der GC noch nicht wieder aktiv geworden ist.
+		if (!tempFilesToDelete.isEmpty()){
+			deleteTempFiles();
+		}
 	}
 }
