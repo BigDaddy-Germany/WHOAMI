@@ -11,7 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Lose Sammlung statischer Hilfsfunktionen, die zu allgemein sind um in den Kontext anderer
@@ -22,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Utilities {
 
-//	 ConcurrentHashMap<String> tempFilesToDelete = new ConcurrentHashMap<String>();
+	//	 ConcurrentHashMap<String> tempFilesToDelete = new ConcurrentHashMap<String>();
 
 
 	private static List<String> tempFilesToDelete = Collections.synchronizedList(new
@@ -255,6 +254,7 @@ public class Utilities {
 
 	/**
 	 * Diese Methode nutzt den TidyParser, um HTML zu korrektem XHTML zu wandeln
+	 *
 	 * @param html Der HTML code
 	 * @return Der generierte XHTML Code
 	 */
@@ -289,6 +289,7 @@ public class Utilities {
 
 	/**
 	 * Rückgabe einer vorhandenen Resource als String
+	 *
 	 * @param location Der Speicherort der Resource
 	 * @return Die Resource als String
 	 */
@@ -306,7 +307,7 @@ public class Utilities {
 	 * @return Ergebnis ist der Eintrag der den höchsten Value in der TreeMap hat.
 	 *
 	 * @throws java.util.NoSuchElementException Sollte kein Element gefunden werden gibt auch kein Entry
-	 *                                der am höchsten ist.
+	 *                                          der am höchsten ist.
 	 */
 	// Author: Marvin Klose
 	public static Map.Entry<String, Integer> getHighestEntry(SortedMap<String,
@@ -322,8 +323,7 @@ public class Utilities {
 		}
 		if (null == highestEntry) {
 			throw new NoSuchElementException("Highest Value was not found");
-		}
-		else {
+		} else {
 			return highestEntry;
 		}
 
@@ -331,6 +331,7 @@ public class Utilities {
 
 	/**
 	 * Kalkuliert eine ganzzahlige Zufallszahl zwischen zwei angegebenen Grenzen
+	 *
 	 * @param lowerLimit Die untere Grenze (einschließlich)
 	 * @param upperLimit Die obere Grenze (einschließlich)
 	 * @return Eine Zufallszahl im Bereich [lowerLimit, upperLimit]
@@ -347,27 +348,28 @@ public class Utilities {
 	}
 
 	/**
-	 * //TODO:docs
+	 * (Temporäre) Datei für das Löschen nach Programmende vormerken
+	 * @param path Pfad zur zu löschenden Datei
 	 */
-	public static synchronized void deleteTempFileOnExit(String path){
+	public static synchronized void deleteTempFileOnExit(String path) {
 		tempFilesToDelete.add(path);
 	}
 
 	/**
-	 * //TODO:docs
+	 * Löschung der vorgemerkten temporären Dateien durchführen
 	 */
-	public static void deleteTempFiles(){
+	public static void deleteTempFiles() {
 		ArrayList<String> toBeDeleted = new ArrayList<String>();
-		for (String file: tempFilesToDelete){
+		for (String file : tempFilesToDelete) {
 			try {
 				Files.deleteIfExists(Paths.get(file));
 				toBeDeleted.add(file);
 			} catch (IOException e) {
 			}
 		}
-			tempFilesToDelete.removeAll(toBeDeleted);
+		tempFilesToDelete.removeAll(toBeDeleted);
 		// Rekursion falls der GC noch nicht wieder aktiv geworden ist.
-		if (!tempFilesToDelete.isEmpty()){
+		if (!tempFilesToDelete.isEmpty()) {
 			deleteTempFiles();
 		}
 	}
