@@ -203,7 +203,7 @@ public class PersonalData implements Analyzable {
 	}
 
 	/**
-	 * Diese MEthode sendet SQL Statements and die sogenannte FireFox FormHistory um folgende
+	 * Diese Methode sendet SQL Statements and die sogenannte FireFox FormHistory um folgende
 	 * Daten zu ermitteln:
 	 * Vornanme,Nachname,Wohnort(Straße,Ort),Telefonummer,IBAN,Emailadresse
 	 */

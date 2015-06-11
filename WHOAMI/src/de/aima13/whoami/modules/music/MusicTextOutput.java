@@ -156,7 +156,7 @@ public class MusicTextOutput {
 			nrAudioCom = " Schon eine Menge mit der das Modul einiges anfangen kann! <br />";
 		}
 		if (nrAudio <= 100) {
-			nrAudioCom = " Immerhin ein bischen Input.<br />";
+			nrAudioCom = " Immerhin ein bisschen Input.<br />";
 		}
 		return nrAudioCom;
 	}
@@ -266,7 +266,7 @@ public class MusicTextOutput {
 				buffer.append(" Schon eine Menge mit der das Modul einiges anfangen kann! <br />");
 			}
 			if (nrAudio <= 100) {
-				buffer.append(" Immerhin ein bischen Input.<br />");
+				buffer.append(" Immerhin ein bisschen Input.<br />");
 			}
 			if (!(favArtist.equals(""))) {
 				buffer.append("<br />Deine Lieblingsband ist " + favArtist + ".");

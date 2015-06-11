@@ -64,7 +64,7 @@ public class Sports implements Analyzable {
 	 * Beziehe aus der JSON einen Kommentar von uns zur Sportart.
 	 *
 	 * @param sport Wie Fußball oder Basketball etc.
-	 * @return String der den Kommentar zur Sportart darstellt. Vorrausgesetzt er ist existent.
+	 * @return String der den Kommentar zur Sportart darstellt. Vorausgesetzt er ist existent.
 	 */
 	private String getCommentAccordingToSport(String sport) {
 		for (Sportart s : sportsList) {
