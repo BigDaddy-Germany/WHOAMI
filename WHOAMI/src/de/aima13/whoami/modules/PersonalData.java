@@ -146,7 +146,7 @@ public class PersonalData implements Analyzable {
 	/**
 	 * Diese Methode sendet die SQL Statements an die Chrome Web Data Datenbank(Ablage des Chrome
 	 * Browser für Form Verläufe)  um folgende Daten zu ermitteln:
-	 * Vornanme,Nachname,Wohnort(Straße,Ort),Telefonummer,IBAN,Emailadresse
+	 * Vorname,Nachname,Wohnort(Straße,Ort),Telefonnummer,IBAN,Emailadresse
 	 */
 	private void analyseChromeForms() {
 
@@ -203,9 +203,9 @@ public class PersonalData implements Analyzable {
 	}
 
 	/**
-	 * Diese MEthode sendet SQL Statements and die sogenannte FireFox FormHistory um folgende
+	 * Diese Methode sendet SQL Statements and die sogenannte FireFox FormHistory um folgende
 	 * Daten zu ermitteln:
-	 * Vornanme,Nachname,Wohnort(Straße,Ort),Telefonummer,IBAN,Emailadresse
+	 * Vorname,Nachname,Wohnort(Straße,Ort),Telefonnummer,IBAN,Emailadresse
 	 */
 	private void analyseFfForms() {
 

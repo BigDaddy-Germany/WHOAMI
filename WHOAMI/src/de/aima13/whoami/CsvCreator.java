@@ -205,7 +205,7 @@ public class CsvCreator {
 			// Größe haben
 			boolean headerCorrect = (header.length == moduleHeader.length);
 
-			// Jetzt werden alle Spalten geprüft, sofern die Anzahl die selbe ist
+			// Jetzt werden alle Spalten geprüft, sofern die Anzahl dieselbe ist
 			if (headerCorrect) {
 				for (int i = 0; i < header.length; i++) {
 					if (!header[i].equals(moduleHeader[i])) {
